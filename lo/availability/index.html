@@ -27,6 +27,32 @@ if (location.hostname.endsWith('workers.dev')) {
   location.replace('https://thongwaihomestay.com' + location.pathname + location.search + location.hash);
 }
 </script>
+<script>
+
+(function(){
+  var seg = location.pathname.split('/')[1];
+  var cur = (seg === 'en' || seg === 'lo') ? seg : 'th';
+  window.__computeLangTarget = function(path, saved){
+    var s = path.split('/')[1];
+    var c = (s === 'en' || s === 'lo') ? s : 'th';
+    if (!saved || saved === c) return null;
+    var rest = c === 'th' ? path : (path.slice(3) || '/');
+    return saved === 'th' ? rest : '/' + saved + rest;
+  };
+  try {
+    var saved = localStorage.getItem('tw_lang');
+    var t = window.__computeLangTarget(location.pathname, saved);
+    if (t) location.replace(t + location.search + location.hash);
+  } catch (e) {}
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('.langs a, .langs span, .mnav-langs a, .mnav-langs span');
+    if (!a) return;
+    var href = a.getAttribute('href') || location.pathname;
+    var s2 = href.split('/')[1];
+    try { localStorage.setItem('tw_lang', (s2 === 'en' || s2 === 'lo') ? s2 : 'th'); } catch (e) {}
+  });
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
@@ -159,7 +185,7 @@ const AVW_DAYS = 92;
 
   const freeCount = d => D.rooms.length - D.rooms.filter(r => isBusy(r.id, d)).length;
 
-  const ROOM_URL = { R3: '/rooms/jaosua1/', R4: '/rooms/jaosua2/' };  
+  const ROOM_URL = { R3: '/lo/rooms/jaosua1/', R4: '/lo/rooms/jaosua2/' };  
   const NAME_MAP = { R1:'ເຮືອນມະຫາເສດຖີ', R2:'ເຮືອນໂຊກລາບເງິນທອງ', R3:'ເຮືອນເຈົ້າສົວ 1', R4:'ເຮືອນເຈົ້າສົວ 2', R5:'ເຮືອນມັ່ງມີເງິນທອງ', R6:'ເຮືອນລ້ຳລວຍ', R7:'ເຮືອນອຸດົມສຸກ', R8:'ເຮືອນມັ່ງຄັ່ງ', R9:'ເຮືອນມະຫາເຮງ', T1:'ເຕັນ 1', T2:'ເຕັນ 2', T3:'ເຕັນ 3', T4:'ເຕັນ 4', T5:'ເຕັນ 5', T6:'ເຕັນ 6', T7:'ເຕັນ 7', T8:'ເຕັນ 8' };
   const ROOM_IMG = {
     R1:'/images/room-mahasetthi.webp', R2:'/images/room-choklap.webp',

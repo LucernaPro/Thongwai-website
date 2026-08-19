@@ -193,7 +193,12 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
 6. ✅ เสร็จ 19 ส.ค. 2026: หน้า ລາວ (/lo) และ EN (/en) ครบ 4 หน้า (หน้าแรก, availability,
    jaosua1, jaosua2) — generate จากหน้าไทยด้วย tools/build_i18n.py (หน้าไทย = ต้นฉบับ,
    **แก้หน้าไทยแล้วรัน python3 tools/build_i18n.py ก่อน push ทุกครั้ง** residue ต้อง 0)
-   / ปุ่มภาษา ไทย·ລາວ·EN ใช้งานจริงทุกหน้า, hreflang 4 ทาง (th/lo/en/x-default),
+   / ปุ่มภาษา ไทย·ລາວ·EN ใช้งานจริงทุกหน้า + **sticky language** (19 ส.ค. 2026:
+   สคริปต์ __computeLangTarget ใน head ทุกหน้า — จำภาษาที่กดเลือกใน localStorage
+   tw_lang แล้ว redirect ทุกหน้าให้อยู่ภาษานั้นเสมอ, bot ไม่มี localStorage = SEO
+   ไม่กระทบ) / builder rewrite ลิงก์ใน JS literals ด้วย (ROOM_URL, location.href —
+   บทเรียน: ลิงก์ HTML ย้ายโซนแล้วแต่ลิงก์ใน JS หลุด ทำให้ภาษาไม่ติดตาม),
+   hreflang 4 ทาง (th/lo/en/x-default),
    sitemap ครบ 12 URL, ปฏิทิน EN/LO มี NAME_MAP แปลชื่อห้องจาก API, locale
    en-GB/lo-LA (ค.ศ.), ราคา/ตัวเลข/เบอร์เหมือนไทยเป๊ะ
 7. ลิงก์เพจ SepSook / เปลี่ยนโลโก้บนเพจ FB เป็นชุด Thongwai ใหม่

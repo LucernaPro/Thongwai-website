@@ -29,6 +29,32 @@ if (location.hostname.endsWith('workers.dev')) {
   location.replace('https://thongwaihomestay.com' + location.pathname + location.search + location.hash);
 }
 </script>
+<script>
+
+(function(){
+  var seg = location.pathname.split('/')[1];
+  var cur = (seg === 'en' || seg === 'lo') ? seg : 'th';
+  window.__computeLangTarget = function(path, saved){
+    var s = path.split('/')[1];
+    var c = (s === 'en' || s === 'lo') ? s : 'th';
+    if (!saved || saved === c) return null;
+    var rest = c === 'th' ? path : (path.slice(3) || '/');
+    return saved === 'th' ? rest : '/' + saved + rest;
+  };
+  try {
+    var saved = localStorage.getItem('tw_lang');
+    var t = window.__computeLangTarget(location.pathname, saved);
+    if (t) location.replace(t + location.search + location.hash);
+  } catch (e) {}
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('.langs a, .langs span, .mnav-langs a, .mnav-langs span');
+    if (!a) return;
+    var href = a.getAttribute('href') || location.pathname;
+    var s2 = href.split('/')[1];
+    try { localStorage.setItem('tw_lang', (s2 === 'en' || s2 === 'lo') ? s2 : 'th'); } catch (e) {}
+  });
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
@@ -434,14 +460,14 @@ const BOOKING_API = '/api';
       const free = tents.filter(t => !isBusy(t.id)).length;
       el.textContent = free === 0 ? 'ຄືນນີ້ເຕັມ · ເບິ່ງວັນວ່າງ' : `ຄືນນີ້ວ່າງ ${free}/${tents.length} ຫຼັງ`;
       el.className = 'avail ' + (free === 0 ? 'full' : 'free');
-      if (free === 0) { el.style.cursor = 'pointer'; el.onclick = () => location.href = '/availability/'; }
+      if (free === 0) { el.style.cursor = 'pointer'; el.onclick = () => location.href = '/lo/availability/'; }
       return;
     }
     if (!D.rooms.some(x => x.id === id)) return;
     const busy = isBusy(id);
     el.textContent = busy ? 'ຄືນນີ້ເຕັມ · ເບິ່ງວັນວ່າງ' : 'ຄືນນີ້ວ່າງ';
     el.className = 'avail ' + (busy ? 'full' : 'free');
-    if (busy) { el.style.cursor = 'pointer'; el.onclick = () => location.href = '/availability/'; }
+    if (busy) { el.style.cursor = 'pointer'; el.onclick = () => location.href = '/lo/availability/'; }
   });
   const sum = document.getElementById('avctaSum');
   if (sum) {

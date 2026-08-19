@@ -370,6 +370,7 @@ def build(th_path, lang, D):
     # ตัด comment ไทย (โน้ตนักพัฒนา — หน้าแปลเป็นไฟล์ generate)
     h = re.sub(r'<!--[^>]*?[ก-๙].*?-->', '', h, flags=re.S)
     h = re.sub(r'(^|[ \t])//[^\n]*[ก-๙][^\n]*', r'\1', h, flags=re.M)
+    h = re.sub(r'/\*[^*]*[ก-๙].*?\*/', '', h, flags=re.S)
     # แทนที่ยาว→สั้น กันคำซ้อน
     hits = 0
     for k in sorted(D, key=len, reverse=True):
@@ -384,6 +385,9 @@ def build(th_path, lang, D):
     h = re.sub(r'(<link rel="canonical"[^>]*>)', r'\1\n' + hreflang(th_path), h)
     # ลิงก์ภายในก่อน แล้วค่อยฝังปุ่มภาษา (กันปุ่มไทยโดน rewrite ทับ)
     h = rewrite_links(h, lang)
+    # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
+    for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'"):
+        h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     # NAME_MAP ในหน้า availability
