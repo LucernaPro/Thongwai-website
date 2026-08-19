@@ -10,6 +10,9 @@
 // ระบบผู้ใช้: user+password รายคน เก็บใน D1 (ตาราง users) — คนแรก admin/2569 seed อัตโนมัติ
 // จัดการผู้ใช้ (เพิ่ม/ลบ/เปลี่ยนรหัส) ทำได้เฉพาะ role=admin ผ่านหน้า /admin
 
+// ═══ นำเข้าสมุดจองเดิม (ชั่วคราว — ลบทิ้งหลังนำเข้าเสร็จ) ═══
+import IMPORT_DATA from './tools/import-data.json' with { type: 'json' };
+
 const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 async function hashPw(password, salt) {
   const data = new TextEncoder().encode(salt + ':' + password);
@@ -225,6 +228,21 @@ export default {
         case 'bookings': return json(await listBookings(env.DB, p));
         case 'add':      return json(await addBooking(env.DB, p, me));
         case 'cancel':   return json(await cancelBooking(env.DB, p));
+        // ── นำเข้าสมุดจองเดิม (admin, ทำซ้ำได้ ไม่ซ้ำแถว) ──
+        case 'import': {
+          if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
+          const { c } = await env.DB.prepare("SELECT COUNT(*) AS c FROM bookings WHERE id LIKE 'X%'").first();
+          const CHUNK = 300;
+          const batch = IMPORT_DATA.slice(c, c + CHUNK);
+          if (batch.length) {
+            await env.DB.batch(batch.map(r => env.DB.prepare(
+              `INSERT OR IGNORE INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff)
+               VALUES (?,?,?,?,?,?,?,?,?,?)`)
+              .bind(r[0], r[1], r[2], r[3], r[4], r[5], r[6], 'จอง', r[7], r[8])));
+          }
+          const done = c + batch.length >= IMPORT_DATA.length;
+          return json({ ok: true, total: IMPORT_DATA.length, imported: c + batch.length, done });
+        }
         // ── เฉพาะ admin ──
         case 'users': case 'user_add': case 'user_del': case 'user_setpw': {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });

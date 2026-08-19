@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ทุ่งหวาย · นำเข้าสมุดจองเดิม</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Sarabun',sans-serif;background:#152227;color:#f5efe3;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:20px}
+.card{max-width:440px;width:100%;background:rgba(245,239,227,.06);border:1px solid rgba(246,200,119,.3);border-radius:16px;padding:26px 24px}
+h1{font-family:'Mitr',sans-serif;color:#f6c877;font-size:1.15rem;margin:0 0 8px}
+p{font-size:.92rem;line-height:1.7;opacity:.9}
+button{font-family:'Mitr',sans-serif;background:#e8963e;color:#152227;border:none;border-radius:999px;padding:13px 28px;font-size:1rem;cursor:pointer;width:100%;margin-top:14px}
+button:disabled{opacity:.5;cursor:default}
+.bar{height:10px;background:rgba(245,239,227,.12);border-radius:999px;overflow:hidden;margin-top:18px;display:none}
+.bar i{display:block;height:100%;width:0;background:#e8963e;transition:width .3s}
+.st{margin-top:10px;font-size:.9rem;min-height:1.4em}
+.ok{color:#9fe0b7}.err{color:#f0a898}
+a{color:#f6c877}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>นำเข้าสมุดจองเดิม (3,545 รายการ)</h1>
+  <p>ระบบจะดึงรายการจองทั้งหมดจากสมุดจองเดิมเข้าฐานข้อมูลเว็บ กดซ้ำได้ ไม่มีรายการซ้ำ ใช้สิทธิ์ admin ที่ล็อกอินไว้ในหน้า <a href="/admin/">/admin</a></p>
+  <button id="go">เริ่มนำเข้า</button>
+  <div class="bar" id="bar"><i id="fill"></i></div>
+  <div class="st" id="st"></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const user = localStorage.getItem('tw_user') || '', pass = localStorage.getItem('tw_pass') || '';
+if (!user || localStorage.getItem('tw_role') !== 'admin') {
+  $('go').disabled = true;
+  $('st').className = 'st err';
+  $('st').textContent = 'ต้องล็อกอินเป็น admin ที่หน้า /admin ก่อน แล้วกลับมาหน้านี้';
+}
+$('go').onclick = async () => {
+  $('go').disabled = true;
+  $('bar').style.display = 'block';
+  const st = $('st'); st.className = 'st';
+  try {
+    let done = false, guard = 0;
+    while (!done && guard++ < 40) {
+      const u = new URL('/api', location.origin);
+      u.searchParams.set('action', 'import');
+      u.searchParams.set('user', user); u.searchParams.set('pass', pass);
+      const r = await (await fetch(u)).json();
+      if (!r.ok) { st.className = 'st err'; st.textContent = r.error; $('go').disabled = false; return; }
+      $('fill').style.width = Math.round(r.imported / r.total * 100) + '%';
+      st.textContent = `นำเข้าแล้ว ${r.imported.toLocaleString()} / ${r.total.toLocaleString()} รายการ…`;
+      done = r.done;
+    }
+    st.className = 'st ok';
+    st.textContent = '✓ นำเข้าครบทุกรายการ — เปิดหน้า /admin หรือปฏิทินหน้าเว็บเพื่อตรวจสอบ แล้วแจ้ง Claude เพื่อถอดหน้านี้ออก';
+  } catch (e) {
+    st.className = 'st err'; st.textContent = 'การเชื่อมต่อสะดุด กดเริ่มนำเข้าอีกครั้งได้ (ไม่มีรายการซ้ำ)';
+    $('go').disabled = false;
+  }
+};
+</script>
+</body>
+</html>

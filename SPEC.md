@@ -152,6 +152,14 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
   เปลี่ยนรหัสลูกทีม / whoami แสดง "admin · เจ้าของ"
 - **หน้าแรก:** BOOKING_API = '/api' แล้ว — fetch fail เงียบๆ จนกว่า worker จะ deploy
   (ปฏิทิน+ป้ายจะติดเองทันทีที่เปิดสวิตช์)
+- **นำเข้าสมุดจองเดิม (19 ส.ค. 2026, ชั่วคราว):** ข้อมูล 3,545 รายการจาก xlsx ของทีม
+  (แปลง พ.ศ.→ค.ศ., ซ่อม checkout เพี้ยน 30 แถวจากคอลัมน์จำนวนคืน, map ห้อง:
+  เรือนร่ำรวย→R6 ล้ำลวย, เต้นท์เล็ก1-6→T1-T6, เล็ก7+/ใหญ่/โปรเหมา = room "X:ชื่อเดิม"
+  เก็บเป็นประวัติ ไม่บล็อกปฏิทิน) → bundle ใน worker ผ่าน tools/import-data.json
+  (assetsignore กันเสิร์ฟ) / action=import (admin, chunk 300, idempotent id X0000-X3544)
+  / หน้ากดปุ่ม /admin/import/ (ไม่มี PII ในหน้า) — **หลัง Pist นำเข้าเสร็จ ให้ลบ:
+  import action + JSON + หน้า import ออก** / จองซ้อนในอนาคต 2 คู่ให้ทีมยกเลิกเอง:
+  R2 29 ส.ค. (พี่จ๋ม/พี่จุ๋ม), R5 23 ส.ค. (ปัอปปี้/แอนนี้)
 - **⏳ เปิดสวิตช์ (ขั้นเดียวที่เหลือ):** Pist เข้า Cloudflare dashboard → Storage & Databases
   → D1 → Create database ชื่อ `thongwai-booking` → ส่ง **Database ID** (UUID บนหน้า DB)
   มาให้ Claude → Claude แก้ wrangler.jsonc (เพิ่ม main:worker.js + assets binding
