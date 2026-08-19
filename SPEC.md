@@ -190,7 +190,12 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
 4. หน้า detail รายเฮือน (การ์ดหน้าแรกเตรียม data-room ไว้แล้ว) — มีรูปสต็อก:
    มหาเศรษฐีกลางคืน, เด็คคาเฟ่เก้าอี้โยก, ผังมุมสูงกลางวัน, ชุด SepSook ที่เหลือ
 5. พิกัด Google Maps + geo ใน schema + หน้าการเดินทางละเอียด (มีรูปผังมุมสูงรอ)
-6. หน้า ລາວ (/lo) และ EN (/en) — ปุ่มบน topbar ขึ้น "เร็วๆนี้" อยู่
+6. ✅ เสร็จ 19 ส.ค. 2026: หน้า ລາວ (/lo) และ EN (/en) ครบ 4 หน้า (หน้าแรก, availability,
+   jaosua1, jaosua2) — generate จากหน้าไทยด้วย tools/build_i18n.py (หน้าไทย = ต้นฉบับ,
+   **แก้หน้าไทยแล้วรัน python3 tools/build_i18n.py ก่อน push ทุกครั้ง** residue ต้อง 0)
+   / ปุ่มภาษา ไทย·ລາວ·EN ใช้งานจริงทุกหน้า, hreflang 4 ทาง (th/lo/en/x-default),
+   sitemap ครบ 12 URL, ปฏิทิน EN/LO มี NAME_MAP แปลชื่อห้องจาก API, locale
+   en-GB/lo-LA (ค.ศ.), ราคา/ตัวเลข/เบอร์เหมือนไทยเป๊ะ
 7. ลิงก์เพจ SepSook / เปลี่ยนโลโก้บนเพจ FB เป็นชุด Thongwai ใหม่
 8. Google Business Profile ผูกเว็บ + Search Console submit sitemap
 9. อนาคต: Cloudflare Email Routing ถ้าอยากมี email@thongwaihomestay.com
