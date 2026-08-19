@@ -394,3 +394,16 @@ a.tl:hover .nm{color:var(--glow)}
 .avpage{background:var(--dusk-deep);color:var(--cream);min-height:100vh}
 .avpage section{padding:52px 0 72px}
 .avw-load{margin-top:34px;opacity:.7}
+
+/* ===== บีบระยะหัว section บนมือถือ (19 ส.ค. 2026 — Pist: เว้นหัวเยอะเกิน) ===== */
+@media(max-width:720px){
+  section{padding:38px 0 50px}
+  #gallery[style],#visit[style],section[style*="padding-top"]{padding-top:38px!important}
+  .lights{height:38px}
+  h2{margin-bottom:10px}
+  .high-grid,.room-grid,.gal-grid,.reel-row{margin-top:20px}
+  .avcta{margin-top:22px}
+  .gal-label{margin-top:24px}
+  .hero .wrap{padding-top:84px;padding-bottom:48px}
+  .rd-hero .wrap{padding-top:64px;padding-bottom:32px}
+}

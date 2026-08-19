@@ -71,6 +71,13 @@ Lightbox (19 ส.ค. 2026): คลิกรูปใน .gal-grid ขยาย�
 มาไว้ที่นี่ — topbar มือถือซ่อน .langs) / ปุ่มโทรจองล่างสุด — JS อยู่ใน lightbox.js (?v=3)
 หน้าใหม่: ก๊อป <button .menu-btn> (ตัวแรกใน .wrap) + บล็อก drawer หลัง </header>
 JS แยกเป็น /assets/lightbox.js — แก้ style.css เมื่อไรให้ bump `?v=` ที่ลิงก์ stylesheet (ตอนนี้ v=rd1)
+**หน้า detail = หน้าปิดการขาย (กติกา 19 ส.ค. 2026):** การ์ดราคาต้องมีปุ่มครบ 5:
+โทรจอง / แอดไลน์ (lin.ee/tvjr6Fx) / ทักเพจ Messenger (**m.me เท่านั้น ห้ามลิงก์หน้าเพจ**)
+/ เปิดแผนที่นำทาง / ดูปฏิทินห้องว่าง — เฮือนใหม่ทุกหลังยึดชุดนี้
+Mobile spacing (19 ส.ค. 2026): มีบล็อก CSS บีบระยะหัว section ≤720px (padding 38px,
+override inline padding-top ด้วย !important, lights 38px) — Pist ติเรื่องเว้นหัวเยอะ
+Cache-bust ทุกครั้งที่แก้ style.css: ใช้ sed ตัวเดียว bump ทุกหน้า (index, availability,
+rooms/*) แล้ว grep ยืนยัน — เคย drift เพราะ replace เงียบๆ ไม่ติด
 หน้า detail ห้องพัก (19 ส.ค. 2026): เริ่มที่เจ้าสัว 1+2 — การ์ดในหน้าแรกลิงก์ด้วยรูป+ชื่อ+
 "ชมบ้านหลังนี้ →" (.more) / โครงหน้า: rd-hero (รูปการ์ดเป็น hero) + rd-grid
 (เนื้อหา 1.6fr : การ์ดราคา sticky 1fr) + แกลเลอรี .gal-grid ใช้ lightbox ร่วม /
