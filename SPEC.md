@@ -89,7 +89,9 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
   เพจ FB ทางการ https://www.facebook.com/thongwaihomestay/ (URL vanity — เลิกใช้เลข
   61563305080991 บนเว็บแล้ว) ปุ่มทักเพจใช้ https://m.me/thongwaihomestay
 - แผนที่นำทาง: https://maps.app.goo.gl/7SpH7qq64s1iKQvr7 (ปุ่มใน visit card)
-- กล่องติดตามเพจ (FB page plugin timeline) อยู่ใน #visit คอลัมน์ซ้าย + ลิงก์ fallback
+- กล่องติดตามเพจ (FB page plugin) อยู่ใน #visit คอลัมน์ซ้าย + ลิงก์ fallback —
+  **ต้องใช้ tabs= ว่าง (header อย่างเดียว สูง 180)** ห้ามใส่ tabs=timeline: โพสต์แนวตั้ง
+  โดน crop ดูไม่ดี (บทเรียน 19 ส.ค. 2026)
 - เฮือน 9 หลัง + เต็นท์ (room_id ใช้ในระบบจอง):
   | id | ชื่อ (ตามป้าย) | สเปคย่อ | ราคา ไม่รวม/รวมอาหารเช้า (บาท) |
   |----|----|----|----|

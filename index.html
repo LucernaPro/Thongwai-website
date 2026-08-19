@@ -294,11 +294,15 @@ if (location.hostname.endsWith('workers.dev')) {
     <p class="lead">เลือกวันที่ต้องการเข้าพัก — ทุกห้องขึ้นทันทีว่าว่างหรือเต็ม ถ้าเต็มกดดูวันว่างถัดไปได้เลย</p>
 
     <div class="avw" id="avw" style="display:none">
-      <div class="avw-bar">
-        <button class="avw-nav" id="avwPrev" aria-label="ย้อน 7 วัน">‹</button>
-        <div class="avw-strip" id="avwStrip"></div>
-        <button class="avw-nav" id="avwNext" aria-label="ถัดไป 7 วัน">›</button>
+      <div class="avw-mbar">
+        <button class="avw-nav" id="avwPrev" aria-label="เดือนก่อนหน้า">‹</button>
+        <div class="avw-month" id="avwMonth"></div>
+        <button class="avw-nav" id="avwNext" aria-label="เดือนถัดไป">›</button>
       </div>
+      <div class="avw-dow">
+        <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
+      </div>
+      <div class="avw-grid" id="avwGrid"></div>
       <div class="avw-sel" id="avwSel"></div>
       <div class="avw-rooms" id="avwRooms"></div>
       <div class="avw-cta">
@@ -385,7 +389,7 @@ if (location.hostname.endsWith('workers.dev')) {
         <div class="fb-follow">
           <h3>ติดตามความเคลื่อนไหวของเรา</h3>
           <div class="fb-frame">
-            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fthongwaihomestay&tabs=timeline&width=340&height=420&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true" width="340" height="420" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="เพจ Facebook ทุ่งหวายโฮมสเตย์"></iframe>
+            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fthongwaihomestay&tabs=&width=340&height=180&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true" width="340" height="180" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="เพจ Facebook ทุ่งหวายโฮมสเตย์"></iframe>
           </div>
           <a class="fb-link" href="https://www.facebook.com/thongwaihomestay/" target="_blank" rel="noopener">เปิดเพจ ทุ่งหวายโฮมสเตย์ →</a>
         </div>
@@ -424,7 +428,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <script>
 // ═══ ระบบห้องว่าง: fetch เดียว เลี้ยงทั้งป้ายการ์ด + ปฏิทิน ═══
 const BOOKING_API = '/api';   // Cloudflare Worker + D1 (เปิดใช้เมื่อ wrangler.jsonc ผูก DB แล้ว)
-const AVW_DAYS = 60;      // ดูล่วงหน้าได้กี่วัน
+const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
 (async () => {
   if (!BOOKING_API) return;
   let D;
@@ -455,33 +459,47 @@ const AVW_DAYS = 60;      // ดูล่วงหน้าได้กี่ว
     if (busy) { el.style.cursor = 'pointer'; el.onclick = () => location.hash = 'availability'; }
   });
 
-  // ── ปฏิทินห้องว่าง ──
+  // ── ปฏิทินห้องว่างรายเดือน (ช่องใหญ่ กดง่าย จองล่วงหน้าได้ 3 เดือน) ──
   const avw = document.getElementById('avw');
   if (!avw) return;
-  const WIN = 14;                 // จำนวนวันต่อหน้าจอ
-  let offset = 0;                 // จุดเริ่มหน้าต่าง (วันจาก today)
-  let sel = today;                // วันที่เลือก
+  const maxDate = addDays(today, AVW_DAYS - 1);
+  let sel = today;
+  let month = today.slice(0, 7);              // 'yyyy-mm' ของเดือนที่แสดง
+  const monthOf = s => s.slice(0, 7);
+  const thMonth = m => new Date(m + '-01T00:00:00').toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
 
-  const strip = document.getElementById('avwStrip'),
+  const grid = document.getElementById('avwGrid'),
+        monthEl = document.getElementById('avwMonth'),
         roomsEl = document.getElementById('avwRooms'),
         selEl = document.getElementById('avwSel'),
         prev = document.getElementById('avwPrev'),
         next = document.getElementById('avwNext');
 
+  const freeCount = d => D.rooms.length - D.rooms.filter(r => isBusy(r.id, d)).length;
+
   const render = () => {
+    monthEl.textContent = thMonth(month);
+    prev.disabled = month <= monthOf(today);
+    next.disabled = month >= monthOf(maxDate);
+
+    const first = month + '-01';
+    const startDow = new Date(first + 'T00:00:00').getDay();
+    const nDays = new Date(Number(month.slice(0,4)), Number(month.slice(5,7)), 0).getDate();
     let s = '';
-    for (let i = 0; i < WIN; i++) {
-      const d = addDays(today, offset + i);
-      if (d >= D.to) break;
-      const dt = new Date(d + 'T00:00:00');
-      s += `<button class="avw-day${d === sel ? ' sel' : ''}" data-d="${d}">
-        <span class="dw">${d === today ? 'วันนี้' : DOW[dt.getDay()]}</span>
-        <span class="dn">${dt.getDate()}</span>
-        <span class="dm">${dt.toLocaleDateString('th-TH', { month: 'short' })}</span></button>`;
+    for (let i = 0; i < startDow; i++) s += '<span class="avw-day blank"></span>';
+    for (let n = 1; n <= nDays; n++) {
+      const d = month + '-' + String(n).padStart(2, '0');
+      const out = d < today || d > maxDate;
+      const fc = out ? null : freeCount(d);
+      const full = fc === 0;
+      let sub = '';
+      if (!out && full) sub = '<span class="fc full">เต็ม</span>';
+      else if (!out && fc < D.rooms.length) sub = `<span class="fc">ว่าง ${fc}</span>`;
+      s += `<button class="avw-day${d === sel ? ' sel' : ''}${out ? ' dis' : ''}${full ? ' isfull' : ''}"
+        ${out ? 'disabled' : ''} data-d="${d}">
+        <span class="dn">${n}</span>${d === today ? '<span class="td">วันนี้</span>' : ''}${sub}</button>`;
     }
-    strip.innerHTML = s;
-    prev.disabled = offset <= 0;
-    next.disabled = offset + WIN >= AVW_DAYS;
+    grid.innerHTML = s;
     selEl.textContent = 'ห้องว่างคืน' + thFull(sel);
 
     roomsEl.innerHTML = D.rooms.map(r => {
@@ -497,15 +515,20 @@ const AVW_DAYS = 60;      // ดูล่วงหน้าได้กี่ว
   };
 
   avw.addEventListener('click', e => {
-    const day = e.target.closest('.avw-day, .avw-next');
-    if (!day) return;
+    const day = e.target.closest('.avw-day:not(.dis):not(.blank), .avw-next');
+    if (!day || !day.dataset.d) return;
     sel = day.dataset.d;
-    const rel = Math.round((new Date(sel) - new Date(today)) / 864e5);
-    if (rel < offset || rel >= offset + WIN) offset = Math.max(0, Math.min(rel - 3, AVW_DAYS - WIN));
+    month = monthOf(sel);
     render();
   });
-  prev.onclick = () => { offset = Math.max(0, offset - 7); render(); };
-  next.onclick = () => { offset = Math.min(AVW_DAYS - WIN, offset + 7); render(); };
+  prev.onclick = () => {
+    const d = new Date(month + '-01T00:00:00'); d.setMonth(d.getMonth() - 1);
+    month = d.toISOString().slice(0, 7); render();
+  };
+  next.onclick = () => {
+    const d = new Date(month + '-01T00:00:00'); d.setMonth(d.getMonth() + 1);
+    month = d.toISOString().slice(0, 7); render();
+  };
 
   document.getElementById('availBox').style.display = 'none';
   avw.style.display = 'block';
