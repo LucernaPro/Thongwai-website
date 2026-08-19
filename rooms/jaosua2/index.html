@@ -23,7 +23,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=rl1">
+<link rel="stylesheet" href="/assets/style.css?v=dw1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -45,6 +45,7 @@ if (location.hostname.endsWith('workers.dev')) {
 
 <header class="topbar">
   <div class="wrap">
+    <button class="menu-btn" id="mnavBtn" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
     <a class="brand" href="/" style="display:flex;align-items:center;gap:9px"><img src="/images/logo-emblem.png" alt="" style="height:34px;width:auto"><span>ทุ่งหวายโฮมสเตย์<small>Thongwai Homestay · Paksong</small></span></a>
     <nav class="main">
       <a href="/#rooms">ห้องพัก</a>
@@ -52,9 +53,29 @@ if (location.hostname.endsWith('workers.dev')) {
       <a href="/#gallery">แกลเลอรี</a>
       <a href="/#visit">การเดินทาง</a>
     </nav>
-    <button class="menu-btn" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
   </div>
 </header>
+
+<!-- ═══ MOBILE DRAWER MENU (แพทเทิร์นเดียวกับ lucernapro) ═══ -->
+<div class="mnav-scrim" id="mnavScrim" aria-hidden="true"></div>
+<aside class="mnav" id="mnav" aria-label="เมนูหลัก">
+  <div class="mnav-head">
+    <span class="mnav-brand"><img src="/images/logo-emblem.png" alt="" width="26" height="26" style="object-fit:contain;vertical-align:-6px;margin-right:8px">ทุ่งหวายโฮมสเตย์</span>
+    <button class="mnav-close" id="mnavClose" aria-label="ปิดเมนู">✕</button>
+  </div>
+  <div class="mnav-tag">Thongwai Homestay · Paksong</div>
+  <nav class="mnav-links">
+    <a href="/#rooms">ห้องพัก <span>→</span></a>
+    <a href="/#reviews">คลิปพาชม <span>→</span></a>
+    <a href="/#availability">เช็คห้องว่าง <span>→</span></a>
+    <a href="/#gallery">แกลเลอรี <span>→</span></a>
+    <a href="/#visit">การเดินทาง <span>→</span></a>
+  </nav>
+  <div class="mnav-langs">
+    <span class="on">ไทย</span><span class="soon">ລາວ</span><span class="soon">EN</span>
+  </div>
+  <a class="btn btn-lantern mnav-call" href="tel:+8562091555288">โทรจอง +856 20 91 555 288</a>
+</aside>
 
 <div class="rd-hero">
   <img class="bg" src="/images/room-jaosua2.webp" alt="เฮือนเจ้าสัว 2 ทุ่งหวายโฮมสเตย์" fetchpriority="high">
@@ -118,6 +139,6 @@ if (location.hostname.endsWith('workers.dev')) {
   </div>
 </footer>
 
-<script src="/assets/lightbox.js?v=2" defer></script>
+<script src="/assets/lightbox.js?v=3" defer></script>
 </body>
 </html>

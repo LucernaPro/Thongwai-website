@@ -47,19 +47,20 @@
   }, { passive: true });
 })();
 
-// เมนูมือถือ (hamburger)
+// เมนูมือถือ: ลิ้นชักซ้าย
 (() => {
-  const btn = document.querySelector('.menu-btn'), nav = document.querySelector('nav.main');
-  if (!btn || !nav) return;
+  const btn = document.getElementById('mnavBtn'), mnav = document.getElementById('mnav'),
+        scrim = document.getElementById('mnavScrim'), closeBtn = document.getElementById('mnavClose');
+  if (!btn || !mnav || !scrim) return;
   const set = open => {
-    nav.classList.toggle('open', open);
+    mnav.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', open);
-    btn.textContent = open ? '\u2715' : '\u2630';
-    btn.setAttribute('aria-label', open ? '\u0e1b\u0e34\u0e14\u0e40\u0e21\u0e19\u0e39' : '\u0e40\u0e1b\u0e34\u0e14\u0e40\u0e21\u0e19\u0e39');
+    document.body.style.overflow = open ? 'hidden' : '';
   };
-  btn.addEventListener('click', () => set(!nav.classList.contains('open')));
-  nav.addEventListener('click', e => { if (e.target.tagName === 'A') set(false); });
-  document.addEventListener('click', e => {
-    if (nav.classList.contains('open') && !nav.contains(e.target) && e.target !== btn) set(false);
-  });
+  btn.addEventListener('click', () => set(true));
+  closeBtn.addEventListener('click', () => set(false));
+  scrim.addEventListener('click', () => set(false));
+  mnav.addEventListener('click', e => { if (e.target.closest('a')) set(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && mnav.classList.contains('open')) set(false); });
 })();
