@@ -388,10 +388,17 @@ if (location.hostname.endsWith('workers.dev')) {
         <p class="lead">ขับรถจากด่านช่องเม็ก–วังเต่า ผ่านปากเซ มุ่งหน้าปากซอง สอบถามเส้นทางละเอียดหรือให้เราช่วยแนะนำจุดแวะเที่ยวได้ทุกช่องทาง</p>
         <div class="fb-follow">
           <h3>ติดตามความเคลื่อนไหวของเรา</h3>
-          <div class="fb-frame">
-            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fthongwaihomestay&tabs=&width=340&height=180&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true" width="340" height="180" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="เพจ Facebook ทุ่งหวายโฮมสเตย์"></iframe>
-          </div>
-          <a class="fb-link" href="https://www.facebook.com/thongwaihomestay/" target="_blank" rel="noopener">เปิดเพจ ทุ่งหวายโฮมสเตย์ →</a>
+          <a class="fb-card" href="https://www.facebook.com/thongwaihomestay/" target="_blank" rel="noopener">
+            <img class="fb-cover" src="/images/dining-night-river.webp" alt="ทุ่งหวายโฮมสเตย์ยามค่ำ ไฟราวริมลำธาร" loading="lazy">
+            <span class="fb-body">
+              <img class="fb-logo" src="/images/logo-emblem.png" alt="" width="44" height="44">
+              <span class="fb-names">
+                <b>ทุ่งหวายโฮมสเตย์ ທົ່ງຫວາຍໂຮມສະເຕ</b>
+                <small>ผู้ติดตามกว่า 1 หมื่นคน · รูปและคลิปใหม่ลงที่เพจก่อนใคร</small>
+              </span>
+              <span class="fb-btn">ติดตามเพจ</span>
+            </span>
+          </a>
         </div>
       </div>
       <div class="visit-card">
@@ -521,14 +528,12 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     month = monthOf(sel);
     render();
   });
-  prev.onclick = () => {
-    const d = new Date(month + '-01T00:00:00'); d.setMonth(d.getMonth() - 1);
-    month = d.toISOString().slice(0, 7); render();
+  const shiftMonth = (m, k) => {
+    const d = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)) - 1 + k, 1));
+    return d.toISOString().slice(0, 7);
   };
-  next.onclick = () => {
-    const d = new Date(month + '-01T00:00:00'); d.setMonth(d.getMonth() + 1);
-    month = d.toISOString().slice(0, 7); render();
-  };
+  prev.onclick = () => { month = shiftMonth(month, -1); render(); };
+  next.onclick = () => { month = shiftMonth(month, +1); render(); };
 
   document.getElementById('availBox').style.display = 'none';
   avw.style.display = 'block';

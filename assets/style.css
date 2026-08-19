@@ -356,6 +356,12 @@ footer a{color:var(--glow)}
 @media(max-width:720px){.line-qr-box{display:none}}
 .fb-follow{margin-top:30px}
 .fb-follow h3{font-size:1.05rem;margin-bottom:12px}
-.fb-frame{max-width:340px;border-radius:12px;overflow:hidden;border:1px solid var(--cream-2);background:var(--white);min-height:120px}
-.fb-frame iframe{display:block;max-width:100%}
-.fb-link{display:inline-block;margin-top:10px;font-size:.9rem;font-family:'Mitr',sans-serif;color:var(--pine)}
+.fb-card{display:block;max-width:420px;border-radius:14px;overflow:hidden;border:1px solid var(--cream-2);background:var(--white);text-decoration:none;color:var(--ink);box-shadow:0 4px 18px rgba(36,49,44,.07);transition:transform .15s ease,box-shadow .15s ease}
+.fb-card:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(36,49,44,.12)}
+.fb-cover{width:100%;aspect-ratio:16/8;object-fit:cover;display:block}
+.fb-body{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.fb-logo{flex:none;border-radius:10px;border:1px solid var(--cream-2);background:var(--white);object-fit:contain}
+.fb-names{flex:1;min-width:0;line-height:1.4}
+.fb-names b{display:block;font-family:'Mitr',sans-serif;font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fb-names small{color:var(--ink-soft);font-size:.78rem}
+.fb-btn{flex:none;background:#1877F2;color:#fff;font-family:'Mitr',sans-serif;font-size:.85rem;padding:8px 16px;border-radius:8px}
