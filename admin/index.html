@@ -129,7 +129,15 @@ table.cal{border-collapse:collapse;min-width:100%}
     <div><label>เช็คอิน *</label><input id="fIn" type="date"></div>
     <div><label>เช็คเอาท์ *</label><input id="fOut" type="date"></div>
   </div>
-  <label>หมายเหตุ</label><input id="fNote" placeholder="มัดจำ / มากี่คน / อาหารเช้า ฯลฯ">
+  <div class="grid2">
+    <div><label>อาหารเช้า</label><select id="fBf"><option value="">ไม่รวมอาหารเช้า</option><option value="1">รวมอาหารเช้า</option></select></div>
+    <div><label>เตียงเสริม</label><select id="fXbed"><option value="">ไม่มี</option><option value="1">มี</option></select></div>
+  </div>
+  <div class="grid2">
+    <div><label>มัดจำ (บาท)</label><input id="fDepB" inputmode="numeric" placeholder="0"></div>
+    <div><label>มัดจำ (กีบ)</label><input id="fDepK" inputmode="numeric" placeholder="0"></div>
+  </div>
+  <label>หมายเหตุเพิ่มเติม</label><input id="fNote" placeholder="มากี่คน / รายการอาหาร ฯลฯ">
   <div class="row" style="margin-top:16px">
     <button class="btn btn-l" id="fSave">บันทึกการจอง</button>
     <button class="btn btn-g" id="fClose">ปิด</button>
@@ -348,6 +356,7 @@ function openForm(room, date){
   $('fIn').value = date || todayStr();
   $('fOut').value = addDays(date || todayStr(), 1);
   $('fName').value=''; $('fPhone').value=''; $('fNote').value='';
+  $('fBf').value=''; $('fXbed').value=''; $('fDepB').value=''; $('fDepK').value='';
   $('fMsg').className='msg';
   $('backdrop').classList.add('show'); $('formSheet').classList.add('open');
 }
@@ -358,9 +367,16 @@ function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').c
 
 $('fSave').onclick = async () => {
   const m=$('fMsg'); m.className='msg';
+  const parts = [];
+  const depB = Number($('fDepB').value) || 0, depK = Number($('fDepK').value) || 0;
+  if (depB) parts.push('มัดจำ ' + depB.toLocaleString() + '฿');
+  if (depK) parts.push('มัดจำ ' + depK.toLocaleString() + ' กีบ');
+  parts.push($('fBf').value ? 'รวมอาหารเช้า' : 'ไม่รวมอาหารเช้า');
+  if ($('fXbed').value) parts.push('เตียงเสริม');
+  if ($('fNote').value.trim()) parts.push($('fNote').value.trim());
   const p = { action:'add',
     name:$('fName').value.trim(), phone:$('fPhone').value.trim(),
-    room:$('fRoom').value, checkin:$('fIn').value, checkout:$('fOut').value, note:$('fNote').value.trim() };
+    room:$('fRoom').value, checkin:$('fIn').value, checkout:$('fOut').value, note:parts.join(' · ') };
   if(!p.name || !p.checkin || !p.checkout){ m.className='msg err'; m.textContent='กรอกชื่อและวันที่ให้ครบ'; return; }
   m.className='msg ok'; m.textContent='กำลังบันทึก…';
   try{
