@@ -101,13 +101,19 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
 - จุดขาย: ลำธารไหลผ่านที่พัก / อากาศเย็น (โบโลเวน >1,000ม.) / **กาแฟลาวแท้จากแหล่งปลูก จิบริมลำธาร**
 - เครดิตภาพ: เพจ SepSook (ลูกค้า) — ยังไม่มีลิงก์เพจ ถ้าได้มาให้ทำเป็นลิงก์
 
-## 6. ระบบจอง (สถานะ: โครงเสร็จ รอ Pist ติดตั้ง Apps Script)
+## 6. ระบบจอง (สถานะ: ฝั่งเว็บเสร็จหมด รอ Pist ติดตั้ง Apps Script อย่างเดียว)
 สถาปัตยกรรม: Google Sheet = database → Apps Script = API (ฟรี) → เว็บ 2 หน้า
-- **สคริปต์เขียนเสร็จแล้ว** (เคยส่งเป็นไฟล์ thongwai-booking-script.gs — ถ้าเปิดแชทใหม่
-  แล้วไม่มีไฟล์ ให้เขียนใหม่ตามสเปคนี้): Sheet 2 tabs (Rooms / Bookings 10 คอลัมน์รวม "บันทึกโดย"),
-  `setup()` สร้างตารางเอง, doGet actions: availability (สาธารณะ ไม่มีชื่อลูกค้า) /
-  rooms, bookings, add, cancel (ต้องมี PIN), กันจองซ้อนด้วย LockService, TZ Asia/Vientiane,
-  วันที่เป็น text yyyy-MM-dd, id = B+timestamp
+- **สคริปต์อยู่ใน repo แล้ว: `tools/thongwai-booking-script.gs`** (19 ส.ค. 2026 — เขียนใหม่
+  ตรง contract ที่ /admin เรียก ไม่หายกับแชทอีก มีวิธีติดตั้งอยู่หัวไฟล์): Sheet 2 tabs
+  (Rooms seed 10 ห้อง / Bookings 10 คอลัมน์รวม "บันทึกโดย"), `setup()` สร้างตารางเอง,
+  doGet actions: availability (สาธารณะ ไม่มีชื่อลูกค้า, days≤120) / rooms, bookings, add,
+  cancel (ต้องมี PIN), กันจองซ้อนด้วย LockService, TZ Asia/Vientiane, วันที่ text yyyy-MM-dd,
+  id = B+timestamp, ยกเลิก = เปลี่ยนสถานะไม่ลบแถว
+- **ปฏิทินห้องว่างหน้าแรก (19 ส.ค. 2026, เสร็จแล้ว):** ใน #availability — แถบวัน 14 วัน
+  เลื่อน ‹› ทีละ 7 วัน สูงสุด 60 วัน (AVW_DAYS) กดวันไหนทุกห้องขึ้น ว่าง/เต็ม ทันที
+  ห้องเต็มมีปุ่ม "ว่างอีกที [วันที่] →" กดกระโดดไปวันนั้น / fetch availability ครั้งเดียว
+  เลี้ยงทั้งป้าย "คืนนี้ว่าง/เต็ม" บนการ์ดและปฏิทิน / BOOKING_API ว่าง = โชว์กล่อง
+  placeholder เดิม (avail-box), ต่อ API สำเร็จ = สลับเป็นปฏิทินอัตโนมัติ
 - **ขั้นติดตั้งฝั่ง Pist (ค้างอยู่):** สร้าง Sheet "Thongwai Booking" → Extensions→Apps Script
   → วางโค้ด → เปลี่ยน PIN → Run setup → Deploy Web app (Execute as Me / Anyone) → ส่ง URL /exec
 - **/admin (live แล้ว):** จอตั้งค่าครั้งแรก (API URL + PIN + ชื่อผู้ใช้ → localStorage),

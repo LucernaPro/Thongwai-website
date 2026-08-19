@@ -24,7 +24,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=vd1">
+<link rel="stylesheet" href="/assets/style.css?v=av1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -289,8 +289,24 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">เช็คห้องว่าง</div>
     <h2 style="color:var(--white)">ดูวันว่างก่อนโทรจอง</h2>
-    <p class="lead">ปฏิทินห้องว่างแบบเรียลไทม์กำลังจะมาอยู่ตรงนี้ — เลือกเดือน เห็นทุกห้องทุกวัน ว่างหรือเต็มรู้ทันที</p>
-    <div class="avail-box">
+    <p class="lead">เลือกวันที่ต้องการเข้าพัก — ทุกห้องขึ้นทันทีว่าว่างหรือเต็ม ถ้าเต็มกดดูวันว่างถัดไปได้เลย</p>
+
+    <div class="avw" id="avw" style="display:none">
+      <div class="avw-bar">
+        <button class="avw-nav" id="avwPrev" aria-label="ย้อน 7 วัน">‹</button>
+        <div class="avw-strip" id="avwStrip"></div>
+        <button class="avw-nav" id="avwNext" aria-label="ถัดไป 7 วัน">›</button>
+      </div>
+      <div class="avw-sel" id="avwSel"></div>
+      <div class="avw-rooms" id="avwRooms"></div>
+      <div class="avw-cta">
+        <a class="btn btn-lantern" id="avwCall" href="tel:+8562091555288">โทรจอง +856 20 91 555 288</a>
+        <a class="btn btn-ghost" href="https://www.facebook.com/61563305080991" target="_blank" rel="noopener">ทักเพจ Facebook</a>
+      </div>
+      <p class="avw-note">อัปเดตจากสมุดจองจริงของที่พัก · การจองยืนยันทางโทรศัพท์หรือเพจ</p>
+    </div>
+
+    <div class="avail-box" id="availBox">
       <div class="lant">🏮</div>
       <h3>ปฏิทินกำลังเชื่อมต่อระบบ</h3>
       <p>ระหว่างนี้เช็คห้องว่างได้ทันทีทางโทรศัพท์หรือกล่องข้อความเพจ ตอบไวแน่นอน</p>
@@ -372,24 +388,94 @@ if (location.hostname.endsWith('workers.dev')) {
 </footer>
 
 <script>
-// ป้าย "ว่างวันนี้" — จะทำงานเมื่อใส่ URL ของ Apps Script (/exec) ด้านล่าง
-const BOOKING_API = '';   // ★ วาง URL /exec ตรงนี้เมื่อระบบจองพร้อม
+// ═══ ระบบห้องว่าง: fetch เดียว เลี้ยงทั้งป้ายการ์ด + ปฏิทิน ═══
+const BOOKING_API = '';   // ★ วาง URL /exec ของ Apps Script ตรงนี้เมื่อระบบจองพร้อม
+const AVW_DAYS = 60;      // ดูล่วงหน้าได้กี่วัน
 (async () => {
   if (!BOOKING_API) return;
+  let D;
   try {
-    const r = await fetch(BOOKING_API + '?action=availability&days=1');
-    const d = await r.json();
-    if (!d.ok) return;
-    const today = d.from;
-    document.querySelectorAll('[data-avail]').forEach(el => {
-      const id = el.dataset.avail;
-      if (!d.rooms.some(x => x.id === id)) return;
-      const busy = (d.booked[id] || []).includes(today);
-      el.textContent = busy ? 'คืนนี้เต็ม · ดูวันว่าง' : 'คืนนี้ว่าง';
-      el.className = 'avail ' + (busy ? 'full' : 'free');
-      if (busy) { el.style.cursor='pointer'; el.onclick = () => location.hash = 'availability'; }
-    });
-  } catch (e) {}
+    const r = await fetch(BOOKING_API + '?action=availability&days=' + AVW_DAYS, { redirect: 'follow' });
+    D = await r.json();
+    if (!D.ok) return;
+  } catch (e) { return; }
+
+  const addDays = (s, n) => { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('sv-SE'); };
+  const thDate = s => new Date(s + 'T00:00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+  const thFull = s => new Date(s + 'T00:00:00').toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long' });
+  const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+  const today = D.from;
+  const isBusy = (room, d) => (D.booked[room] || []).includes(d);
+  const nextFree = (room, d) => {
+    for (let x = d; x < D.to; x = addDays(x, 1)) if (!isBusy(room, x)) return x;
+    return null;
+  };
+
+  // ── ป้าย "คืนนี้ว่าง/เต็ม" บนการ์ดห้อง ──
+  document.querySelectorAll('[data-avail]').forEach(el => {
+    const id = el.dataset.avail;
+    if (!D.rooms.some(x => x.id === id)) return;
+    const busy = isBusy(id, today);
+    el.textContent = busy ? 'คืนนี้เต็ม · ดูวันว่าง' : 'คืนนี้ว่าง';
+    el.className = 'avail ' + (busy ? 'full' : 'free');
+    if (busy) { el.style.cursor = 'pointer'; el.onclick = () => location.hash = 'availability'; }
+  });
+
+  // ── ปฏิทินห้องว่าง ──
+  const avw = document.getElementById('avw');
+  if (!avw) return;
+  const WIN = 14;                 // จำนวนวันต่อหน้าจอ
+  let offset = 0;                 // จุดเริ่มหน้าต่าง (วันจาก today)
+  let sel = today;                // วันที่เลือก
+
+  const strip = document.getElementById('avwStrip'),
+        roomsEl = document.getElementById('avwRooms'),
+        selEl = document.getElementById('avwSel'),
+        prev = document.getElementById('avwPrev'),
+        next = document.getElementById('avwNext');
+
+  const render = () => {
+    let s = '';
+    for (let i = 0; i < WIN; i++) {
+      const d = addDays(today, offset + i);
+      if (d >= D.to) break;
+      const dt = new Date(d + 'T00:00:00');
+      s += `<button class="avw-day${d === sel ? ' sel' : ''}" data-d="${d}">
+        <span class="dw">${d === today ? 'วันนี้' : DOW[dt.getDay()]}</span>
+        <span class="dn">${dt.getDate()}</span>
+        <span class="dm">${dt.toLocaleDateString('th-TH', { month: 'short' })}</span></button>`;
+    }
+    strip.innerHTML = s;
+    prev.disabled = offset <= 0;
+    next.disabled = offset + WIN >= AVW_DAYS;
+    selEl.textContent = 'ห้องว่างคืน' + thFull(sel);
+
+    roomsEl.innerHTML = D.rooms.map(r => {
+      const busy = isBusy(r.id, sel);
+      const nf = busy ? nextFree(r.id, sel) : null;
+      return `<div class="avw-room"><span class="nm">${r.name}</span>` +
+        (busy
+          ? `<span class="avw-pill full">เต็ม</span>` +
+            (nf ? `<button class="avw-next" data-d="${nf}">ว่างอีกที ${thDate(nf)} →</button>` : '')
+          : `<span class="avw-pill free">ว่าง</span>`) +
+        `</div>`;
+    }).join('');
+  };
+
+  avw.addEventListener('click', e => {
+    const day = e.target.closest('.avw-day, .avw-next');
+    if (!day) return;
+    sel = day.dataset.d;
+    const rel = Math.round((new Date(sel) - new Date(today)) / 864e5);
+    if (rel < offset || rel >= offset + WIN) offset = Math.max(0, Math.min(rel - 3, AVW_DAYS - WIN));
+    render();
+  });
+  prev.onclick = () => { offset = Math.max(0, offset - 7); render(); };
+  next.onclick = () => { offset = Math.min(AVW_DAYS - WIN, offset + 7); render(); };
+
+  document.getElementById('availBox').style.display = 'none';
+  avw.style.display = 'block';
+  render();
 })();
 </script>
 <script src="/assets/lightbox.js?v=3" defer></script>

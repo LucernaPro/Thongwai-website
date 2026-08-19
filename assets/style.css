@@ -309,3 +309,29 @@ footer a{color:var(--glow)}
   .mnav-langs .soon{opacity:.45}
   .mnav-call{margin-top:auto;text-align:center;padding-top:12px;padding-bottom:12px;font-size:.95rem}
 }
+
+/* ===== ปฏิทินห้องว่างหน้าแรก (#availability) ===== */
+.avw{margin-top:34px}
+.avw-bar{display:flex;align-items:center;gap:8px}
+.avw-nav{flex:none;width:40px;height:52px;background:rgba(245,239,227,.07);border:1px solid rgba(246,200,119,.35);color:var(--glow);border-radius:10px;font-size:20px;cursor:pointer}
+.avw-nav:disabled{opacity:.3;cursor:default}
+.avw-strip{display:flex;gap:6px;overflow-x:auto;flex:1;scrollbar-width:none;padding:2px}
+.avw-strip::-webkit-scrollbar{display:none}
+.avw-day{flex:none;min-width:56px;padding:7px 4px 6px;border-radius:10px;border:1px solid rgba(246,200,119,.25);background:rgba(245,239,227,.05);color:var(--cream);text-align:center;cursor:pointer;line-height:1.25}
+.avw-day .dw{display:block;font-size:.68rem;opacity:.65}
+.avw-day .dn{display:block;font-family:'Mitr',sans-serif;font-size:1.05rem}
+.avw-day .dm{display:block;font-size:.66rem;opacity:.65}
+.avw-day.sel{background:var(--lantern);border-color:var(--lantern);color:var(--dusk-deep)}
+.avw-day.sel .dw,.avw-day.sel .dm{opacity:.8}
+.avw-sel{margin:16px 2px 8px;font-family:'Mitr',sans-serif;color:var(--glow)}
+.avw-rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:8px}
+.avw-room{display:flex;align-items:center;gap:10px;background:rgba(245,239,227,.05);border:1px solid rgba(246,200,119,.18);border-radius:10px;padding:10px 14px;font-size:.93rem}
+.avw-room .nm{flex:1}
+.avw-pill{flex:none;font-size:.78rem;font-family:'Mitr',sans-serif;padding:3px 12px;border-radius:999px}
+.avw-pill.free{background:rgba(84,160,110,.25);color:#9fe0b7;border:1px solid rgba(84,160,110,.5)}
+.avw-pill.full{background:rgba(200,90,70,.2);color:#f0a898;border:1px solid rgba(200,90,70,.45)}
+.avw-next{flex:none;font-size:.76rem;background:none;border:1px dashed rgba(246,200,119,.5);color:var(--glow);border-radius:999px;padding:3px 10px;cursor:pointer}
+.avw-next:active{background:rgba(246,200,119,.15)}
+.avw-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.avw-note{font-size:.8rem;opacity:.6;margin-top:12px}
+@media(max-width:720px){.avw-rooms{grid-template-columns:1fr}}
