@@ -171,3 +171,9 @@ footer a{color:var(--glow)}
 /* ---- bulletproof room image ratio (v3) ---- */
 .room .imgbox{position:relative;width:100%;padding-top:66.67%;overflow:hidden;background:var(--dusk-deep)}
 .room .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* ---- highlight card photos ---- */
+.high{padding:0 0 24px;overflow:hidden}
+.high .hpic{width:100%;height:150px;overflow:hidden;margin-bottom:16px}
+.high .hpic img{width:100%;height:100%;object-fit:cover}
+.high h3,.high p{padding:0 24px}
