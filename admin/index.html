@@ -105,6 +105,11 @@ table.cal{border-collapse:collapse;min-width:100%}
     </div>
 
     <div class="card">
+      <h2 id="tonightHead">เข้าพักคืนนี้</h2>
+      <div class="list" id="tonight"></div>
+    </div>
+
+    <div class="card">
       <h2>การจองข้างหน้า</h2>
       <div class="list" id="upcoming"></div>
     </div>
@@ -299,7 +304,7 @@ function render(){
       if(b){
         const cls = (d===b.checkin||d===days[0]?' start':'') + (addDays(d,1)===b.checkout||d===days[days.length-1]?' end':'');
         const nm = (d===b.checkin||d===days[0]) ? `<span class="nm">${b.name}</span>` : '';
-        h += `<td class="busy${cls}${past}" data-bid="${b.id}">${nm}</td>`;
+        h += `<td class="busy${cls}${past}" data-bid="${b.id}" title="${b.name} · ${thDate(b.checkin)} → ${thDate(b.checkout)}">${nm}</td>`;
       }else{
         h += `<td class="free${past}" data-room="${r.id}" data-date="${d}"></td>`;
       }
@@ -311,6 +316,19 @@ function render(){
   $('loading').style.display='none'; cal.style.display='table';
   cal.querySelectorAll('td.busy').forEach(td => td.onclick = () => openDetail(td.dataset.bid));
   cal.querySelectorAll('td.free').forEach(td => td.onclick = () => openForm(td.dataset.room, td.dataset.date));
+
+  // เข้าพักคืนนี้ — ชื่อลูกค้า ห้อง เบอร์ วันเข้า-ออก ครบเหมือนสมุด
+  const tn = bookings.filter(b => b.status==='จอง' && b.checkin <= todayStr() && todayStr() < b.checkout)
+                     .sort((a,b)=>a.room<b.room?-1:1);
+  $('tonightHead').textContent = `เข้าพักคืนนี้ · ${thDate(todayStr())} (${tn.length} รายการ)`;
+  $('tonight').innerHTML = tn.length ? tn.map(b => {
+    const rn = (rooms.find(r=>r.id===b.room)||{}).name || b.room;
+    return `<div class="bk" onclick="openDetail('${b.id}')">
+      <span class="d">${rn}</span>
+      <span style="flex:1"><b>${b.name}</b>${b.phone?` · <a href="tel:${b.phone}" style="color:var(--glow)" onclick="event.stopPropagation()">${b.phone}</a>`:''}
+        <br><small style="opacity:.7">เข้า ${thDate(b.checkin)} → ออก ${thDate(b.checkout)}</small></span>
+    </div>`;
+  }).join('') : '<div style="opacity:.6;padding:8px 2px">คืนนี้ยังไม่มีการจอง</div>';
 
   // รายการข้างหน้า
   const up = bookings.filter(b => b.status==='จอง' && b.checkout > todayStr())
@@ -364,7 +382,7 @@ function openDetail(id){
     `🏠 ${rn}<br>📅 ${thDate(b.checkin)} → ${thDate(b.checkout)}<br>` +
     (b.phone?`📞 <a href="tel:${b.phone}" style="color:var(--glow)">${b.phone}</a><br>`:'') +
     (b.note?`📝 ${b.note}<br>`:'') +
-    `<span style="opacity:.6;font-size:.8rem">${b.id} · บันทึกเมื่อ ${b.created}${b.staff?' · โดย '+b.staff:''}</span>`;
+    `<span style="opacity:.6;font-size:.8rem">${b.id} · จองเมื่อ ${b.created}${b.staff?' · โดย '+b.staff:''}</span>`;
   $('dMsg').className='msg';
   $('backdrop').classList.add('show'); $('detailSheet').classList.add('open');
 }
