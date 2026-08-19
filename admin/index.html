@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ทุ่งหวาย · จัดการการจอง</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dusk:#152227; --pine:#2e4a38; --lantern:#e8963e; --glow:#f6c877;
+  --cream:#f5efe3; --ink:#24312c; --red:#c74b3c; --ok:#3d8b5f;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun',sans-serif;background:var(--dusk);color:var(--cream);font-size:16px;padding-bottom:90px}
+h1,h2,h3,button{font-family:'Mitr',sans-serif}
+header{position:sticky;top:0;z-index:30;background:var(--pine);padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+header h1{font-size:1.05rem;color:var(--glow);flex:1}
+header button{background:none;border:none;color:var(--cream);font-size:1.3rem;cursor:pointer}
+.wrap{padding:14px 12px;max-width:1100px;margin:0 auto}
+.btn{display:inline-block;border:none;border-radius:999px;padding:11px 20px;font-size:.95rem;font-weight:500;cursor:pointer}
+.btn-l{background:var(--lantern);color:var(--dusk)}
+.btn-g{background:transparent;border:1.5px solid rgba(246,200,119,.5);color:var(--cream)}
+.btn-r{background:var(--red);color:#fff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font-size:.78rem;padding:3px 10px;border-radius:999px;background:rgba(246,200,119,.15);color:var(--glow)}
+
+/* ---- setup / form cards ---- */
+.card{background:rgba(245,239,227,.06);border:1px solid rgba(246,200,119,.25);border-radius:14px;padding:18px 16px;margin:14px 0}
+.card h2{color:var(--glow);font-size:1.05rem;margin-bottom:10px}
+label{display:block;font-size:.85rem;opacity:.85;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(246,200,119,.35);background:rgba(21,34,39,.6);color:var(--cream);font-size:16px;font-family:'Sarabun',sans-serif}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--lantern)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.msg{margin-top:10px;font-size:.9rem;padding:10px 12px;border-radius:10px;display:none}
+.msg.err{display:block;background:rgba(199,75,60,.2);color:#ffb0a5}
+.msg.ok{display:block;background:rgba(61,139,95,.2);color:#9fe0bd}
+
+/* ---- cinema grid ---- */
+.gridbox{overflow-x:auto;border:1px solid rgba(246,200,119,.25);border-radius:14px;background:rgba(245,239,227,.04)}
+table.cal{border-collapse:collapse;min-width:100%}
+.cal th,.cal td{border:1px solid rgba(246,200,119,.12);padding:0;height:44px}
+.cal th{background:rgba(21,34,39,.9);font-family:'Mitr';font-weight:500;font-size:.72rem;color:var(--glow);padding:6px 4px;min-width:46px;position:sticky;top:0}
+.cal th.today{background:var(--lantern);color:var(--dusk)}
+.cal td.roomname,.cal th.roomname{position:sticky;left:0;background:var(--pine);min-width:96px;max-width:110px;font-size:.78rem;padding:4px 8px;z-index:5;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal td.free{background:transparent;cursor:pointer}
+.cal td.free:active{background:rgba(246,200,119,.25)}
+.cal td.busy{background:var(--lantern);cursor:pointer;position:relative}
+.cal td.busy.start{border-radius:10px 0 0 10px}
+.cal td.busy.end{border-radius:0 10px 10px 0}
+.cal td.busy .nm{position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:.72rem;color:var(--dusk);font-weight:600;white-space:nowrap;overflow:hidden;max-width:400%;z-index:2}
+.cal td.past{opacity:.35}
+.legend{display:flex;gap:14px;font-size:.8rem;opacity:.8;margin:8px 2px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+
+/* ---- bottom sheet ---- */
+.sheet{position:fixed;left:0;right:0;bottom:-100%;background:var(--pine);border-radius:18px 18px 0 0;padding:20px 18px 30px;z-index:50;transition:bottom .25s ease;box-shadow:0 -8px 30px rgba(0,0,0,.5);max-height:85vh;overflow-y:auto}
+.sheet.open{bottom:0}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;display:none}
+.backdrop.show{display:block}
+.list{margin-top:6px}
+.bk{display:flex;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid rgba(246,200,119,.15);font-size:.9rem}
+.bk .d{color:var(--glow);font-family:'Mitr';font-size:.8rem;min-width:88px}
+.fab{position:fixed;right:18px;bottom:18px;width:58px;height:58px;border-radius:50%;background:var(--lantern);color:var(--dusk);font-size:2rem;border:none;box-shadow:0 6px 20px rgba(232,150,62,.5);cursor:pointer;z-index:35;line-height:1}
+.loading{text-align:center;padding:30px;opacity:.7}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง</h1>
+  <span class="pill" id="whoami"></span>
+  <button id="btnRefresh" title="โหลดใหม่">⟳</button>
+  <button id="btnSettings" title="ตั้งค่า">⚙︎</button>
+</header>
+
+<div class="wrap">
+
+  <!-- จอตั้งค่าครั้งแรก -->
+  <div class="card" id="setupCard" style="display:none">
+    <h2>ตั้งค่าครั้งแรก</h2>
+    <label>API URL (ลิงก์ Apps Script ลงท้าย /exec)</label>
+    <input id="cfgApi" placeholder="https://script.google.com/macros/s/..../exec">
+    <label>PIN</label>
+    <input id="cfgPin" type="password" placeholder="รหัสที่ตั้งไว้ในสคริปต์">
+    <label>ชื่อคนใช้เครื่องนี้ (จะติดในทุกการจองที่บันทึก)</label>
+    <input id="cfgStaff" placeholder="เช่น เจ้าของ / นก / บอย">
+    <div style="margin-top:14px"><button class="btn btn-l" id="cfgSave">บันทึกและเชื่อมต่อ</button></div>
+    <div class="msg" id="cfgMsg"></div>
+  </div>
+
+  <!-- ผังห้อง -->
+  <div id="board" style="display:none">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <div class="row">
+        <button class="btn btn-g" id="prevBtn">← ก่อน</button>
+        <button class="btn btn-g" id="todayBtn">วันนี้</button>
+        <button class="btn btn-g" id="nextBtn">ถัดไป →</button>
+      </div>
+      <h2 id="rangeLabel" style="font-size:.95rem;color:var(--glow)"></h2>
+    </div>
+    <div class="gridbox"><div class="loading" id="loading">กำลังโหลด…</div><table class="cal" id="cal" style="display:none"></table></div>
+    <div class="legend">
+      <span><i style="background:var(--lantern)"></i>มีจอง (กดดูรายละเอียด)</span>
+      <span><i style="background:rgba(245,239,227,.08);border:1px solid rgba(246,200,119,.3)"></i>ว่าง (กดเพื่อจอง)</span>
+    </div>
+
+    <div class="card">
+      <h2>การจองข้างหน้า</h2>
+      <div class="list" id="upcoming"></div>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fabAdd" style="display:none">+</button>
+
+<!-- bottom sheet: ฟอร์มจอง -->
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="formSheet">
+  <h2 style="color:var(--glow);margin-bottom:6px">บันทึกการจอง</h2>
+  <label>ชื่อลูกค้า *</label><input id="fName">
+  <label>เบอร์โทร</label><input id="fPhone" inputmode="tel">
+  <label>ห้อง *</label><select id="fRoom"></select>
+  <div class="grid2">
+    <div><label>เช็คอิน *</label><input id="fIn" type="date"></div>
+    <div><label>เช็คเอาท์ *</label><input id="fOut" type="date"></div>
+  </div>
+  <label>หมายเหตุ</label><input id="fNote" placeholder="มัดจำ / มากี่คน / อาหารเช้า ฯลฯ">
+  <div class="row" style="margin-top:16px">
+    <button class="btn btn-l" id="fSave">บันทึกการจอง</button>
+    <button class="btn btn-g" id="fClose">ปิด</button>
+  </div>
+  <div class="msg" id="fMsg"></div>
+</div>
+
+<!-- bottom sheet: รายละเอียดการจอง -->
+<div class="sheet" id="detailSheet">
+  <h2 style="color:var(--glow)" id="dTitle">รายละเอียด</h2>
+  <div id="dBody" style="margin:10px 0;font-size:.95rem;line-height:2"></div>
+  <div class="row">
+    <button class="btn btn-r" id="dCancel">ยกเลิกการจองนี้</button>
+    <button class="btn btn-g" id="dClose">ปิด</button>
+  </div>
+  <div class="msg" id="dMsg"></div>
+</div>
+
+<script>
+/* ================= config ================= */
+const store = {
+  get api(){ return localStorage.getItem('tw_api') || '' },
+  get pin(){ return localStorage.getItem('tw_pin') || '' },
+  get staff(){ return localStorage.getItem('tw_staff') || '' },
+  save(a,p,s){ localStorage.setItem('tw_api',a); localStorage.setItem('tw_pin',p); localStorage.setItem('tw_staff',s); }
+};
+const $ = id => document.getElementById(id);
+const DAYS = window.innerWidth < 700 ? 10 : 21;   // จำนวนวันต่อจอ
+let viewStart = todayStr();
+let rooms = [], bookings = [];
+
+function todayStr(){ const d=new Date(); return d.toLocaleDateString('sv-SE'); }
+function addDays(s,n){ const d=new Date(s+'T00:00:00'); d.setDate(d.getDate()+n); return d.toLocaleDateString('sv-SE'); }
+function thDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('th-TH',{day:'numeric',month:'short'}); }
+function thDow(s){ const d=new Date(s+'T00:00:00'); return ['อา','จ','อ','พ','พฤ','ศ','ส'][d.getDay()]; }
+
+async function api(params){
+  const u = new URL(store.api);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k,v));
+  const r = await fetch(u, {redirect:'follow'});
+  return r.json();
+}
+
+/* ================= boot ================= */
+function boot(){
+  if(!store.api || !store.pin){ $('setupCard').style.display='block'; return; }
+  $('setupCard').style.display='none';
+  $('board').style.display='block';
+  $('fabAdd').style.display='block';
+  $('whoami').textContent = store.staff || '';
+  load();
+}
+$('cfgSave').onclick = async () => {
+  const a=$('cfgApi').value.trim(), p=$('cfgPin').value.trim(), s=$('cfgStaff').value.trim();
+  const m=$('cfgMsg'); m.className='msg';
+  if(!a.endsWith('/exec')){ m.className='msg err'; m.textContent='URL ต้องลงท้ายด้วย /exec'; return; }
+  store.save(a,p,s);
+  m.className='msg ok'; m.textContent='กำลังทดสอบการเชื่อมต่อ…';
+  try{
+    const r = await api({action:'rooms', pin:store.pin});
+    if(!r.ok){ m.className='msg err'; m.textContent='เชื่อมต่อได้แต่ PIN ไม่ถูก'; return; }
+    m.className='msg ok'; m.textContent='เชื่อมต่อสำเร็จ ✓';
+    setTimeout(boot, 600);
+  }catch(e){ m.className='msg err'; m.textContent='เชื่อมต่อไม่ได้ เช็ค URL อีกครั้ง'; }
+};
+$('btnSettings').onclick = () => {
+  $('board').style.display='none'; $('fabAdd').style.display='none';
+  $('setupCard').style.display='block';
+  $('cfgApi').value=store.api; $('cfgPin').value=store.pin; $('cfgStaff').value=store.staff;
+};
+$('btnRefresh').onclick = () => load();
+
+/* ================= data ================= */
+async function load(){
+  $('loading').style.display='block'; $('cal').style.display='none';
+  try{
+    const [rr, rb] = await Promise.all([
+      api({action:'rooms', pin:store.pin}),
+      api({action:'bookings', pin:store.pin, from:addDays(viewStart,-60), to:addDays(viewStart, DAYS+90)})
+    ]);
+    if(!rr.ok || !rb.ok) throw new Error('unauthorized');
+    rooms = rr.rooms; bookings = rb.bookings;
+    render();
+  }catch(e){
+    $('loading').textContent = 'โหลดไม่สำเร็จ — เช็คการตั้งค่า ⚙︎ หรืออินเทอร์เน็ต';
+  }
+}
+
+/* ================= render grid ================= */
+function render(){
+  const days = Array.from({length:DAYS}, (_,i)=>addDays(viewStart,i));
+  $('rangeLabel').textContent = thDate(days[0]) + ' – ' + thDate(days[days.length-1]);
+  let h = '<tr><th class="roomname">ห้อง</th>';
+  for(const d of days) h += `<th class="${d===todayStr()?'today':''}">${thDow(d)}<br>${thDate(d)}</th>`;
+  h += '</tr>';
+  for(const r of rooms){
+    h += `<tr><td class="roomname" title="${r.name}">${r.name}</td>`;
+    for(const d of days){
+      const b = bookings.find(x => x.room===r.id && x.status==='จอง' && d>=x.checkin && d<x.checkout);
+      const past = d < todayStr() ? ' past' : '';
+      if(b){
+        const cls = (d===b.checkin||d===days[0]?' start':'') + (addDays(d,1)===b.checkout||d===days[days.length-1]?' end':'');
+        const nm = (d===b.checkin||d===days[0]) ? `<span class="nm">${b.name}</span>` : '';
+        h += `<td class="busy${cls}${past}" data-bid="${b.id}">${nm}</td>`;
+      }else{
+        h += `<td class="free${past}" data-room="${r.id}" data-date="${d}"></td>`;
+      }
+    }
+    h += '</tr>';
+  }
+  const cal = $('cal');
+  cal.innerHTML = h;
+  $('loading').style.display='none'; cal.style.display='table';
+  cal.querySelectorAll('td.busy').forEach(td => td.onclick = () => openDetail(td.dataset.bid));
+  cal.querySelectorAll('td.free').forEach(td => td.onclick = () => openForm(td.dataset.room, td.dataset.date));
+
+  // รายการข้างหน้า
+  const up = bookings.filter(b => b.status==='จอง' && b.checkout > todayStr())
+                     .sort((a,b)=>a.checkin<b.checkin?-1:1).slice(0,25);
+  $('upcoming').innerHTML = up.length ? up.map(b => {
+    const rn = (rooms.find(r=>r.id===b.room)||{}).name || b.room;
+    return `<div class="bk" onclick="openDetail('${b.id}')"><span class="d">${thDate(b.checkin)}→${thDate(b.checkout)}</span><span style="flex:1"><b>${b.name}</b> · ${rn}</span></div>`;
+  }).join('') : '<div style="opacity:.6;padding:8px 2px">ยังไม่มีการจองข้างหน้า</div>';
+}
+$('prevBtn').onclick = () => { viewStart = addDays(viewStart, -7); load(); };
+$('nextBtn').onclick = () => { viewStart = addDays(viewStart, 7); load(); };
+$('todayBtn').onclick = () => { viewStart = todayStr(); load(); };
+
+/* ================= form ================= */
+function openForm(room, date){
+  $('fRoom').innerHTML = rooms.map(r => `<option value="${r.id}" ${r.id===room?'selected':''}>${r.name} (${r.capacity} คน · ${r.price}฿)</option>`).join('');
+  $('fIn').value = date || todayStr();
+  $('fOut').value = addDays(date || todayStr(), 1);
+  $('fName').value=''; $('fPhone').value=''; $('fNote').value='';
+  $('fMsg').className='msg';
+  $('backdrop').classList.add('show'); $('formSheet').classList.add('open');
+}
+$('fabAdd').onclick = () => openForm();
+$('fClose').onclick = closeSheets;
+$('backdrop').onclick = closeSheets;
+function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').classList.remove('open'); $('detailSheet').classList.remove('open'); }
+
+$('fSave').onclick = async () => {
+  const m=$('fMsg'); m.className='msg';
+  const p = { action:'add', pin:store.pin, staff:store.staff,
+    name:$('fName').value.trim(), phone:$('fPhone').value.trim(),
+    room:$('fRoom').value, checkin:$('fIn').value, checkout:$('fOut').value, note:$('fNote').value.trim() };
+  if(!p.name || !p.checkin || !p.checkout){ m.className='msg err'; m.textContent='กรอกชื่อและวันที่ให้ครบ'; return; }
+  m.className='msg ok'; m.textContent='กำลังบันทึก…';
+  try{
+    const r = await api(p);
+    if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
+    m.className='msg ok'; m.textContent='บันทึกแล้ว ✓ ' + r.id;
+    setTimeout(()=>{ closeSheets(); load(); }, 700);
+  }catch(e){ m.className='msg err'; m.textContent='ส่งไม่สำเร็จ ลองใหม่'; }
+};
+
+/* ================= detail ================= */
+let currentId = null;
+function openDetail(id){
+  const b = bookings.find(x=>x.id===id); if(!b) return;
+  currentId = id;
+  const rn = (rooms.find(r=>r.id===b.room)||{}).name || b.room;
+  $('dTitle').textContent = b.name;
+  $('dBody').innerHTML =
+    `🏠 ${rn}<br>📅 ${thDate(b.checkin)} → ${thDate(b.checkout)}<br>` +
+    (b.phone?`📞 <a href="tel:${b.phone}" style="color:var(--glow)">${b.phone}</a><br>`:'') +
+    (b.note?`📝 ${b.note}<br>`:'') +
+    `<span style="opacity:.6;font-size:.8rem">${b.id} · บันทึกเมื่อ ${b.created}${b.staff?' · โดย '+b.staff:''}</span>`;
+  $('dMsg').className='msg';
+  $('backdrop').classList.add('show'); $('detailSheet').classList.add('open');
+}
+$('dClose').onclick = closeSheets;
+$('dCancel').onclick = async () => {
+  if(!confirm('ยืนยันยกเลิกการจองนี้?')) return;
+  const m=$('dMsg'); m.className='msg ok'; m.textContent='กำลังยกเลิก…';
+  try{
+    const r = await api({action:'cancel', pin:store.pin, id:currentId});
+    if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
+    m.className='msg ok'; m.textContent='ยกเลิกแล้ว ✓';
+    setTimeout(()=>{ closeSheets(); load(); }, 600);
+  }catch(e){ m.className='msg err'; m.textContent='ส่งไม่สำเร็จ ลองใหม่'; }
+};
+
+boot();
+</script>
+</body>
+</html>
