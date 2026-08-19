@@ -1,8 +1,18 @@
 {
-  // Thongwai Homestay — static site served via Cloudflare Workers (assets-only)
+  // Thongwai Homestay — static site + booking API (Worker + D1) on Cloudflare Workers
   "name": "thongwai-website",
   "compatibility_date": "2026-08-19",
+  "main": "worker.js",
   "assets": {
-    "directory": "./"
-  }
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "thongwai-booking",
+      "database_id": "8a8663d2-560b-460f-8578-b4bbbbb3a8c1"
+    }
+  ]
 }
