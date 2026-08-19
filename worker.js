@@ -236,6 +236,14 @@ export default {
           return json({ ok: true, rooms });
         }
         case 'bookings': return json(await listBookings(env.DB, p));
+        case 'booked_on': {
+          const dt = p.get('date');
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dt || '')) return json({ ok: false, error: 'รูปแบบวันที่ไม่ถูกต้อง' });
+          const bookings = (await env.DB.prepare(
+            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff FROM bookings
+             WHERE created LIKE ? ORDER BY created, id`).bind(dt + '%').all()).results;
+          return json({ ok: true, bookings });
+        }
         case 'add':      return json(await addBooking(env.DB, p, me));
         case 'cancel':   return json(await cancelBooking(env.DB, p));
         // ── นำเข้าสมุดจองเดิม (admin, ทำซ้ำได้ ไม่ซ้ำแถว) ──

@@ -63,6 +63,21 @@ table.cal{border-collapse:collapse;min-width:100%}
 .bk .d{color:var(--glow);font-family:'Mitr';font-size:.8rem;min-width:88px}
 .fab{position:fixed;right:18px;bottom:18px;width:58px;height:58px;border-radius:50%;background:var(--lantern);color:var(--dusk);font-size:2rem;border:none;box-shadow:0 6px 20px rgba(232,150,62,.5);cursor:pointer;z-index:35;line-height:1}
 .loading{text-align:center;padding:30px;opacity:.7}
+/* tabs 2 มุมมอง */
+.tabs{display:flex;gap:8px;margin:2px 0 14px}
+.tabs button{flex:1;font-family:'Mitr';font-size:.95rem;padding:11px;border-radius:12px;border:1.5px solid rgba(246,200,119,.35);background:transparent;color:var(--cream);cursor:pointer}
+.tabs button.on{background:var(--lantern);border-color:var(--lantern);color:var(--dusk);font-weight:600}
+/* log รายวัน (ตามวันที่รับจอง) */
+.bk.log{display:block;padding:12px 4px;line-height:1.8}
+.bk.log .r1{font-size:1rem}
+.bk.log .r1 b{color:var(--glow)}
+.bk.log small{opacity:.75}
+.bk.log .cancelled{color:#ffb0a5}
+/* detail แบบกางครบ */
+#dBody .ln{display:flex;gap:10px;padding:7px 0;border-bottom:1px dashed rgba(246,200,119,.15);font-size:.95rem}
+#dBody .ln .k{flex:none;width:96px;opacity:.7;font-size:.85rem}
+#dBody .ln .v{flex:1;word-break:break-word}
+#dBody .ln .v a{color:var(--glow)}
 </style>
 </head>
 <body>
@@ -90,6 +105,25 @@ table.cal{border-collapse:collapse;min-width:100%}
 
   <!-- ผังห้อง -->
   <div id="board" style="display:none">
+    <div class="tabs">
+      <button id="tabLog">📒 การจอง (ตามวันรับจอง)</button>
+      <button id="tabCal">🏠 ห้องว่าง (ตามวันเข้าพัก)</button>
+    </div>
+
+    <!-- มุมมองสมุดจองรายวัน -->
+    <div id="logView" style="display:none">
+      <div class="row" style="margin-bottom:10px">
+        <button class="btn btn-g" id="logPrev">← วันก่อน</button>
+        <button class="btn btn-g" id="logToday">วันนี้</button>
+        <button class="btn btn-g" id="logNext">วันถัดไป →</button>
+      </div>
+      <div class="card">
+        <h2 id="logHead">รับจองวันนี้</h2>
+        <div class="list" id="logList"></div>
+      </div>
+    </div>
+
+    <div id="calView">
     <div class="row" style="justify-content:space-between;margin-bottom:10px">
       <div class="row">
         <button class="btn btn-g" id="prevBtn">← ก่อน</button>
@@ -113,6 +147,7 @@ table.cal{border-collapse:collapse;min-width:100%}
       <h2>การจองข้างหน้า</h2>
       <div class="list" id="upcoming"></div>
     </div>
+    </div><!-- /calView -->
   </div>
 </div>
 
@@ -185,12 +220,14 @@ const store = {
 const $ = id => document.getElementById(id);
 const DAYS = window.innerWidth < 700 ? 10 : 21;   // จำนวนวันต่อจอ
 let viewStart = todayStr();
-let rooms = [], bookings = [];
+let rooms = [], bookings = [], logBookings = [], logDate = null, view = 'log';
 
 function todayStr(){ const d=new Date(); return d.toLocaleDateString('sv-SE'); }
 function addDays(s,n){ const d=new Date(s+'T00:00:00'); d.setDate(d.getDate()+n); return d.toLocaleDateString('sv-SE'); }
 function thDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('th-TH',{day:'numeric',month:'short'}); }
 function thDow(s){ const d=new Date(s+'T00:00:00'); return ['อา','จ','อ','พ','พฤ','ศ','ส'][d.getDay()]; }
+function roomName(id){ return (rooms.find(r=>r.id===id)||{}).name || id; }
+function nightsOf(b){ return Math.max(1, Math.round((new Date(b.checkout)-new Date(b.checkin))/864e5)); }
 
 async function api(params){
   const u = new URL(API, location.origin);
@@ -210,6 +247,7 @@ function boot(){
   $('whoami').textContent = store.user + (store.role==='admin' ? ' · เจ้าของ' : '');
   $('btnUsers').style.display = store.role==='admin' ? 'inline' : 'none';
   load();
+  setView(view);
 }
 $('cfgSave').onclick = async () => {
   const u=$('cfgUser').value.trim(), p=$('cfgPass').value;
@@ -279,7 +317,43 @@ $('uAdd').onclick = async () => {
   $('uName').value=''; $('uPass').value='';
   loadUsers();
 };
-$('btnRefresh').onclick = () => load();
+$('btnRefresh').onclick = () => { load(); if (view==='log') loadLog(); };
+
+/* ================= 2 มุมมอง ================= */
+function setView(v){
+  view = v;
+  $('logView').style.display = v==='log' ? 'block' : 'none';
+  $('calView').style.display = v==='cal' ? 'block' : 'none';
+  $('tabLog').className = v==='log' ? 'on' : '';
+  $('tabCal').className = v==='cal' ? 'on' : '';
+  if (v==='log' && !logDate){ logDate = todayStr(); loadLog(); }
+}
+$('tabLog').onclick = () => setView('log');
+$('tabCal').onclick = () => setView('cal');
+$('logPrev').onclick  = () => { logDate = addDays(logDate, -1); loadLog(); };
+$('logNext').onclick  = () => { logDate = addDays(logDate, +1); loadLog(); };
+$('logToday').onclick = () => { logDate = todayStr(); loadLog(); };
+
+async function loadLog(){
+  $('logHead').textContent = 'รับจองวัน' + thDow(logDate) + 'ที่ ' + thDate(logDate) + ' …';
+  $('logList').innerHTML = '<div style="opacity:.6;padding:8px 2px">กำลังโหลด…</div>';
+  try{
+    const r = await api({action:'booked_on', date:logDate});
+    if(!r.ok) throw 0;
+    logBookings = r.bookings;
+    const act = logBookings.filter(b=>b.status==='จอง');
+    $('logHead').textContent = `รับจองวัน${thDow(logDate)}ที่ ${thDate(logDate)} — ${act.length} รายการ` + (logBookings.length>act.length ? ` (+ยกเลิก ${logBookings.length-act.length})` : '');
+    $('logList').innerHTML = logBookings.length ? logBookings.map(b => `
+      <div class="bk log" onclick="openDetail('${b.id}')">
+        <div class="r1"><b>${b.name}</b>${b.phone?` · <a href="tel:${b.phone}" style="color:var(--glow)" onclick="event.stopPropagation()">${b.phone}</a>`:''}${b.status!=='จอง'?' <span class="cancelled">· ยกเลิกแล้ว</span>':''}</div>
+        <div>🏠 ${roomName(b.room)} · 📅 เข้า ${thDate(b.checkin)} → ออก ${thDate(b.checkout)} (${nightsOf(b)} คืน)</div>
+        ${b.note?`<div><small>📝 ${b.note}</small></div>`:''}
+        <div><small>รับจองโดย ${b.staff||'-'} · ${b.created}</small></div>
+      </div>`).join('') : '<div style="opacity:.6;padding:8px 2px">ไม่มีการรับจองวันนี้</div>';
+  }catch(e){
+    $('logList').innerHTML = '<div style="opacity:.6;padding:8px 2px">โหลดไม่สำเร็จ ลองกด ⟳</div>';
+  }
+}
 
 /* ================= data ================= */
 async function load(){
@@ -390,21 +464,29 @@ $('fSave').onclick = async () => {
 /* ================= detail ================= */
 let currentId = null;
 function openDetail(id){
-  const b = bookings.find(x=>x.id===id); if(!b) return;
+  const b = bookings.find(x=>x.id===id) || logBookings.find(x=>x.id===id); if(!b) return;
   currentId = id;
-  const rn = (rooms.find(r=>r.id===b.room)||{}).name || b.room;
   $('dTitle').textContent = b.name;
+  const ln = (k,v) => v ? `<div class="ln"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
+  const noteLines = (b.note||'').split(' · ').filter(Boolean).join('<br>');
   $('dBody').innerHTML =
-    `🏠 ${rn}<br>📅 ${thDate(b.checkin)} → ${thDate(b.checkout)}<br>` +
-    (b.phone?`📞 <a href="tel:${b.phone}" style="color:var(--glow)">${b.phone}</a><br>`:'') +
-    (b.note?`📝 ${b.note}<br>`:'') +
-    `<span style="opacity:.6;font-size:.8rem">${b.id} · จองเมื่อ ${b.created}${b.staff?' · โดย '+b.staff:''}</span>`;
+    ln('ห้อง', roomName(b.room)) +
+    ln('เช็คอิน', thDate(b.checkin) + ' (' + thDow(b.checkin) + ')') +
+    ln('เช็คเอาท์', thDate(b.checkout) + ' (' + thDow(b.checkout) + ')') +
+    ln('จำนวนคืน', nightsOf(b) + ' คืน') +
+    ln('เบอร์โทร', b.phone ? `<a href="tel:${b.phone}">${b.phone}</a>` : '') +
+    ln('รายละเอียด', noteLines) +
+    ln('รับจองโดย', b.staff) +
+    ln('จองเมื่อ', b.created) +
+    ln('สถานะ', b.status==='จอง' ? 'จอง ✓' : '<span style="color:#ffb0a5">ยกเลิกแล้ว</span>') +
+    ln('รหัส', b.id);
+  $('dCancel').style.display = b.status==='จอง' ? 'inline-block' : 'none';
   $('dMsg').className='msg';
   $('backdrop').classList.add('show'); $('detailSheet').classList.add('open');
 }
 $('dClose').onclick = closeSheets;
 $('dCancel').onclick = async () => {
-  const b = bookings.find(x=>x.id===currentId);
+  const b = bookings.find(x=>x.id===currentId) || logBookings.find(x=>x.id===currentId);
   const who = b ? `ของ "${b.name}" (${thDate(b.checkin)} → ${thDate(b.checkout)})` : 'นี้';
   if(!confirm('⚠️ ยืนยันยกเลิกการจอง' + who + '?\nยกเลิกแล้วห้องจะกลับเป็นว่างทันที')) return;
   const m=$('dMsg'); m.className='msg ok'; m.textContent='กำลังยกเลิก…';
@@ -412,7 +494,7 @@ $('dCancel').onclick = async () => {
     const r = await api({action:'cancel', id:currentId});
     if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
     m.className='msg ok'; m.textContent='ยกเลิกแล้ว ✓';
-    setTimeout(()=>{ closeSheets(); load(); }, 600);
+    setTimeout(()=>{ closeSheets(); load(); if(view==='log') loadLog(); }, 600);
   }catch(e){ m.className='msg err'; m.textContent='ส่งไม่สำเร็จ ลองใหม่'; }
 };
 
