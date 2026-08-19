@@ -484,6 +484,14 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
 
   const freeCount = d => D.rooms.length - D.rooms.filter(r => isBusy(r.id, d)).length;
 
+  const ROOM_IMG = {
+    R1:'/images/room-mahasetthi.webp', R2:'/images/room-choklap.webp',
+    R3:'/images/room-jaosua1.webp',    R4:'/images/room-jaosua2.webp',
+    R5:'/images/room-mangmee.webp',    R6:'/images/room-ramruay.webp',
+    R7:'/images/room-udomsuk.webp',    R8:'/images/room-mangkhang.webp',
+    R9:'/images/room-mahaheng.webp',   T1:'/images/room-tent.webp',
+  };
+
   const render = () => {
     monthEl.textContent = thMonth(month);
     prev.disabled = month <= monthOf(today);
@@ -507,17 +515,21 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
         <span class="dn">${n}</span>${d === today ? '<span class="td">วันนี้</span>' : ''}${sub}</button>`;
     }
     grid.innerHTML = s;
-    selEl.textContent = 'ห้องว่างคืน' + thFull(sel);
+    const nFree = freeCount(sel);
+    selEl.innerHTML = 'ห้องว่างคืน' + thFull(sel) +
+      ` — <b class="${nFree === 0 ? 'sum-full' : 'sum-free'}">ว่าง ${nFree} จาก ${D.rooms.length} ห้อง</b>`;
 
     roomsEl.innerHTML = D.rooms.map(r => {
       const busy = isBusy(r.id, sel);
       const nf = busy ? nextFree(r.id, sel) : null;
-      return `<div class="avw-room"><span class="nm">${r.name}</span>` +
-        (busy
-          ? `<span class="avw-pill full">เต็ม</span>` +
-            (nf ? `<button class="avw-next" data-d="${nf}">ว่างอีกที ${thDate(nf)} →</button>` : '')
-          : `<span class="avw-pill free">ว่าง</span>`) +
-        `</div>`;
+      const img = ROOM_IMG[r.id];
+      return `<div class="avw-tile${busy ? ' busy' : ''}">
+        <span class="ph">${img ? `<img src="${img}" alt="${r.name}" loading="lazy">` : ''}
+          <span class="avw-pill ${busy ? 'full' : 'free'}">${busy ? 'เต็ม' : 'ว่าง'}</span>
+        </span>
+        <span class="nm">${r.name}</span>` +
+        (busy && nf ? `<button class="avw-next" data-d="${nf}">ว่างอีกที ${thDate(nf)} →</button>` : '') +
+      `</div>`;
     }).join('');
   };
 
