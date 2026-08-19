@@ -215,3 +215,7 @@ footer a{color:var(--glow)}
   .hero3 p.tag{font-size:.98rem}
   .hero3 .cta-row .btn{width:100%;text-align:center}
 }
+
+/* ---- gallery group label ---- */
+.gal-label{margin:34px 2px 4px;font-size:.9rem;color:var(--ink-soft)}
+.gal-label strong{color:var(--pine)}
