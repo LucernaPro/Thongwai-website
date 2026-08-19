@@ -196,3 +196,20 @@ footer a{color:var(--glow)}
   .hero2 h1{font-size:2rem}
   .hero2 .cta-row .btn{width:100%;text-align:center}
 }
+
+/* ---- hero v3: full-bleed, bottom-anchored text, gradient only at the base ---- */
+.hero3{position:relative;min-height:86vh;display:flex;align-items:flex-end;color:var(--white);isolation:isolate;overflow:hidden}
+.hero3 img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 38%;z-index:-2}
+.hero3::after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg, rgba(21,34,39,0) 42%, rgba(21,34,39,.38) 68%, rgba(21,34,39,.88) 100%)}
+.hero3-inner{padding-top:180px;padding-bottom:56px}
+.hero3 .lao{font-family:'Noto Sans Lao Looped','Mitr',sans-serif;color:var(--glow);font-size:1rem;letter-spacing:.05em;margin-bottom:8px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+.hero3 h1{font-size:clamp(2.2rem,5vw,3.6rem);text-shadow:0 2px 22px rgba(0,0,0,.65);line-height:1.2}
+.hero3 .en{font-size:.78rem;letter-spacing:.24em;opacity:.9;margin-top:8px;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.hero3 p.tag{max-width:580px;margin-top:14px;font-size:1.06rem;text-shadow:0 1px 12px rgba(0,0,0,.7)}
+@media(max-width:860px){
+  .hero3{min-height:70vh}
+  .hero3 img.bg{object-position:60% 35%}
+  .hero3-inner{padding-top:90px;padding-bottom:34px}
+  .hero3 .cta-row .btn{width:100%;text-align:center}
+}
