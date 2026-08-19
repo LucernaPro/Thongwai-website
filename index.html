@@ -123,36 +123,109 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">ห้องพักและเต็นท์</div>
     <h2>เลือกนอนแบบที่ชอบ</h2>
-    <p class="lead">ห้องพักหลายแบบ ตั้งแต่บ้านไม้ริมลำธารไปจนถึงลานกางเต็นท์ — รายละเอียดและราคาแต่ละแบบกำลังทยอยอัปเดต สอบถามได้ทันทีทางโทรศัพท์หรือเพจ</p>
-    <div class="room-grid">
-      <article class="room">
-        <img src="/images/cabin-terrace.webp" alt="บ้านไม้พร้อมระเบียงนั่งเล่น บรรยากาศยามค่ำ" loading="lazy">
+    <p class="lead">เรือนพัก 9 หลัง และเต็นท์กลางสนาม ราคาต่อคืน มีทั้งแบบรวมและไม่รวมอาหารเช้า</p>
+    <div class="room-grid" id="roomGrid">
+      <article class="room" data-room="R1">
+        <img src="/images/room-mahasetthi.webp" alt="เรือนมหาเศรษฐี ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
         <div class="body">
-          <span class="badge">บ้านพัก</span>
-          <h3>บ้านไม้พร้อมระเบียง</h3>
-          <p>บ้านไม้หลังใหญ่ ระเบียงกว้างนั่งได้ทั้งแก๊ง วิวสวนสนและภูเขา</p>
-          <div class="price">ราคา · สอบถาม</div>
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R1"></span></div>
+          <h3>เรือนมหาเศรษฐี</h3>
+          <p class="spec">3 ห้องนอน · 2 ห้องน้ำ · ระเบียงหน้า-หลังบ้าน · พักห้องละ 2 ท่าน (เสริมเตียงได้)</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>2,300฿</b> <small>(1,495,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,800฿</b> <small>(1,820,000 กีบ)</small></div>
         </div>
       </article>
-      <article class="room">
-        <img src="/images/lawn-lights.webp" alt="บ้านไม้เรียงรายรอบสนามหญ้า พร้อมไฟราวและวงกองไฟ" loading="lazy">
+      <article class="room" data-room="R2">
+        <img src="/images/room-choklap.webp" alt="เรือนโชคลาภเงินทอง ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
         <div class="body">
-          <span class="badge">บ้านพัก</span>
-          <h3>บ้านไม้ริมสนาม</h3>
-          <p>บ้านไม้รอบลานกิจกรรม มีวงกองไฟตรงกลาง เหมาะมาเป็นครอบครัวหรือหมู่คณะ</p>
-          <div class="price">ราคา · สอบถาม</div>
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R2"></span></div>
+          <h3>เรือนโชคลาภเงินทอง</h3>
+          <p class="spec">2 ห้องนอน · 2 ห้องน้ำ · โซนวิวริมน้ำ ติดระเบียงริมน้ำ · พักได้ 4 ท่าน (เสริมเตียงได้)</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>1,600฿</b> <small>(1,040,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,000฿</b> <small>(1,300,000 กีบ)</small></div>
         </div>
       </article>
-      <article class="room">
-        <img src="/images/river-hut.webp" alt="ศาลามุงหญ้าริมลำธาร มีบันไดลงเล่นน้ำ" loading="lazy">
+      <article class="room" data-room="R3">
+        <img src="/images/room-jaosua1.webp" alt="เรือนเจ้าสัว 1 ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
         <div class="body">
-          <span class="badge">เต็นท์ / ริมน้ำ</span>
-          <h3>โซนริมลำธารและลานเต็นท์</h3>
-          <p>กางเต็นท์ริมน้ำหรือนั่งศาลากลางลำธาร ใกล้จุดเล่นน้ำและคายัค</p>
-          <div class="price">ราคา · สอบถาม</div>
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R3"></span></div>
+          <h3>เรือนเจ้าสัว 1</h3>
+          <p class="spec">1 ห้องนอน · 1 ห้องน้ำ · ระเบียงหลังบ้าน · พักได้ 4 ท่าน</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>1,800฿</b> <small>(1,170,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,200฿</b> <small>(1,430,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="R4">
+        <img src="/images/room-jaosua2.webp" alt="เรือนเจ้าสัว 2 ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R4"></span></div>
+          <h3>เรือนเจ้าสัว 2</h3>
+          <p class="spec">1 ห้องนอน · 1 ห้องน้ำ · ระเบียงหลังบ้าน · พักได้ 4 ท่าน</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>1,800฿</b> <small>(1,170,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,200฿</b> <small>(1,430,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="R5">
+        <img src="/images/room-mangmee.webp" alt="เรือนมั่งมีเงินทอง ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R5"></span></div>
+          <h3>เรือนมั่งมีเงินทอง</h3>
+          <p class="spec">ระเบียงหน้าบ้าน · โซนวิวแคมป์ปิ้ง · พักได้ 2 ท่าน (เสริมเตียงได้)</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>800฿</b> <small>(520,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>1,000฿</b> <small>(650,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="R6">
+        <img src="/images/room-ramruay.webp" alt="เรือนร่ำรวย ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R6"></span></div>
+          <h3>เรือนร่ำรวย</h3>
+          <p class="spec">1 ห้องนอน · 1 ห้องน้ำ · โซนหน้ารีสอร์ท · พักได้ 2 ท่าน (เสริมเตียงได้)</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>800฿</b> <small>(520,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>1,000฿</b> <small>(650,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="R7">
+        <img src="/images/room-udomsuk.webp" alt="เรือนอุดมสุข ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R7"></span></div>
+          <h3>เรือนอุดมสุข</h3>
+          <p class="spec">2 ห้องนอน · 2 ห้องน้ำ · ห้องโถงตรงกลาง · โซนวิวแคมป์ปิ้ง · พักห้องละ 2 ท่าน (เสริมได้)</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>1,600฿</b> <small>(1,040,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,000฿</b> <small>(1,300,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="R8">
+        <img src="/images/room-mangkhang.webp" alt="เรือนมั่งคั่ง ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R8"></span></div>
+          <h3>เรือนมั่งคั่ง</h3>
+          <p class="spec">2 ห้องนอน · 2 ห้องน้ำ · ระเบียงหน้าห้อง · โซนวิวแคมป์ปิ้ง · พักได้ 10 ท่าน</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>3,000฿</b> <small>(1,950,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>4,000฿</b> <small>(2,600,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="R9">
+        <img src="/images/room-mahaheng.webp" alt="เรือนมหาเฮง ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R9"></span></div>
+          <h3>เรือนมหาเฮง</h3>
+          <p class="spec">2 ห้องนอน · 2 ห้องน้ำ · ระเบียงหน้าบ้าน · โซนวิวแคมป์ปิ้ง · พักได้ 10 ท่าน (เสริมเตียงได้)</p>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>3,000฿</b> <small>(1,950,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>4,000฿</b> <small>(2,600,000 กีบ)</small></div>
+        </div>
+      </article>
+      <article class="room" data-room="T1">
+        <img src="/images/room-tent.webp" alt="เต็นท์กลางสนาม ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800">
+        <div class="body">
+          <div class="row-top"><span class="badge">เต็นท์</span><span class="avail" data-avail="T1"></span></div>
+          <h3>เต็นท์กลางสนาม</h3>
+          <p class="spec">เต็นท์พร้อมฟลายชีท กลางสนามหญ้า วิวภูเขา ใกล้วงกองไฟ</p>
+          <div class="price"><b>ราคา · สอบถาม</b></div>
         </div>
       </article>
     </div>
+    <p class="footnote">เตียงเสริม 200฿ (130,000 กีบ) ไม่รวมอาหารเช้า · 320฿ (200,000 กีบ) รวมอาหารเช้า</p>
   </div>
 </section>
 
@@ -230,5 +303,26 @@ if (location.hostname.endsWith('workers.dev')) {
   </div>
 </footer>
 
+<script>
+// ป้าย "ว่างวันนี้" — จะทำงานเมื่อใส่ URL ของ Apps Script (/exec) ด้านล่าง
+const BOOKING_API = '';   // ★ วาง URL /exec ตรงนี้เมื่อระบบจองพร้อม
+(async () => {
+  if (!BOOKING_API) return;
+  try {
+    const r = await fetch(BOOKING_API + '?action=availability&days=1');
+    const d = await r.json();
+    if (!d.ok) return;
+    const today = d.from;
+    document.querySelectorAll('[data-avail]').forEach(el => {
+      const id = el.dataset.avail;
+      if (!d.rooms.some(x => x.id === id)) return;
+      const busy = (d.booked[id] || []).includes(today);
+      el.textContent = busy ? 'คืนนี้เต็ม · ดูวันว่าง' : 'คืนนี้ว่าง';
+      el.className = 'avail ' + (busy ? 'full' : 'free');
+      if (busy) { el.style.cursor='pointer'; el.onclick = () => location.hash = 'availability'; }
+    });
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

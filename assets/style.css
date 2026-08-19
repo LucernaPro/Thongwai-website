@@ -155,3 +155,15 @@ footer a{color:var(--glow)}
   *{transition:none!important;animation:none!important}
   html{scroll-behavior:auto}
 }
+
+/* ---- room cards v2 ---- */
+.room .row-top{display:flex;justify-content:space-between;align-items:center}
+.room .spec{font-size:.85rem;color:var(--ink-soft);flex:1}
+.room .price{font-family:'Sarabun',sans-serif;font-size:.9rem;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.room .price .pl{color:var(--ink-soft);font-size:.8rem}
+.room .price b{font-family:'Mitr',sans-serif;color:var(--pine);font-size:1.02rem}
+.room .price small{color:var(--ink-soft)}
+.avail{font-size:.75rem;font-family:'Mitr',sans-serif;padding:3px 10px;border-radius:999px;display:none}
+.avail.free{display:inline-block;background:rgba(61,139,95,.15);color:#2e7d4f}
+.avail.full{display:inline-block;background:rgba(199,75,60,.12);color:#b0442f}
+.footnote{margin-top:18px;font-size:.85rem;color:var(--ink-soft)}
