@@ -48,6 +48,7 @@
 /index.html            หน้าแรก (ไทย) — หน้าเดียว ครบทุก section
 /rooms/jaosua1/index.html  หน้า detail เฮือนเจ้าสัว 1 (template สำหรับหน้า detail เฮือนอื่นๆ ต่อไป)
 /rooms/jaosua2/index.html  หน้า detail เฮือนเจ้าสัว 2 (twin ของ jaosua1)
+/availability/index.html   หน้าปฏิทินห้องว่างเต็มระบบ (body class="avpage")
 /assets/style.css      สไตล์รวม (โทน "ค่ำที่ทุ่งหวาย": เขียวสน/ฟ้าค่ำ/ส้มโคมหวาย/ครีม)
 /assets/lightbox.js    lightbox แกลเลอรีใช้ร่วมทุกหน้า (โหลดแบบ defer)
 /admin/index.html      หน้าจัดการจอง (สร้างเสร็จ รอ API) — noindex

@@ -340,13 +340,23 @@ footer a{color:var(--glow)}
 .avw-rooms{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 @media(max-width:1000px){.avw-rooms{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:720px){.avw-rooms{grid-template-columns:repeat(2,1fr)}}
-.avw-tile{display:flex;flex-direction:column;gap:6px;background:rgba(245,239,227,.05);border:1px solid rgba(246,200,119,.18);border-radius:12px;padding:8px;font-size:.88rem}
-.avw-tile .ph{position:relative;display:block;border-radius:8px;overflow:hidden;aspect-ratio:4/3;background:rgba(245,239,227,.06)}
+.avw-tile{position:relative;display:flex;flex-direction:column;background:rgba(245,239,227,.05);border:1px solid rgba(246,200,119,.18);border-radius:12px;padding:8px;font-size:.88rem}
+.avw-tile .tl{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;min-width:0;flex:1}
+a.tl:hover .nm{color:var(--glow)}
+.avw-tile .ph{display:block;border-radius:8px;overflow:hidden;aspect-ratio:4/3;background:rgba(245,239,227,.06)}
 .avw-tile .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .avw-tile.busy .ph img{filter:grayscale(.65) brightness(.65)}
-.avw-tile .ph .avw-pill{position:absolute;top:6px;right:6px}
+.avw-tile>.avw-pill{position:absolute;top:14px;right:14px}
 .avw-tile .nm{font-family:'Mitr',sans-serif;line-height:1.3;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.avw-tile .avw-next{align-self:flex-start;margin:0 2px 2px}
+.avw-tile .avw-next{align-self:flex-start;margin:6px 2px 2px}
+@media(max-width:720px){
+  .avw-tile{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;padding:7px 9px}
+  .avw-tile .tl{flex-direction:row;align-items:center;gap:9px}
+  .avw-tile .ph{width:46px;height:46px;aspect-ratio:1/1;flex:none;border-radius:9px}
+  .avw-tile .nm{font-size:.8rem;padding:0}
+  .avw-tile>.avw-pill{position:static;font-size:.68rem;padding:2px 9px}
+  .avw-tile .avw-next{width:100%;margin:0;text-align:center}
+}
 .avw-pill{flex:none;font-size:.78rem;font-family:'Mitr',sans-serif;padding:3px 12px;border-radius:999px}
 .avw-pill.free{background:rgba(84,160,110,.25);color:#9fe0b7;border:1px solid rgba(84,160,110,.5)}
 .avw-pill.full{background:rgba(200,90,70,.2);color:#f0a898;border:1px solid rgba(200,90,70,.45)}
@@ -354,7 +364,7 @@ footer a{color:var(--glow)}
 .avw-next:active{background:rgba(246,200,119,.15)}
 .avw-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
 .avw-note{font-size:.8rem;opacity:.6;margin-top:12px}
-@media(max-width:720px){.avw-rooms{grid-template-columns:1fr}.avw-day .dn{font-size:1rem}.avw-day .fc{font-size:.54rem}}
+@media(max-width:720px){.avw-day .dn{font-size:1rem}.avw-day .fc{font-size:.54rem}}
 /* ===== ปุ่ม LINE / แผนที่ / QR / กล่องเพจ FB ===== */
 .btn-lineapp{background:#06C755;color:#fff;box-shadow:0 4px 14px rgba(6,199,85,.35)}
 .btn-maps{border:1.5px solid var(--pine);color:var(--pine)}
@@ -374,3 +384,13 @@ footer a{color:var(--glow)}
 .fb-names b{display:block;font-family:'Mitr',sans-serif;font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fb-names small{color:var(--ink-soft);font-size:.78rem}
 .fb-btn{flex:none;background:#1877F2;color:#fff;font-family:'Mitr',sans-serif;font-size:.85rem;padding:8px 16px;border-radius:8px}
+
+/* ===== แถบ CTA เช็คห้องว่าง (หน้าแรกแบบย่อ) ===== */
+.avcta{margin-top:32px;border:1px solid rgba(246,200,119,.3);border-radius:var(--radius);padding:26px 24px;background:rgba(246,200,119,.05)}
+.avcta-sum{font-family:'Mitr',sans-serif;font-size:1.05rem;color:var(--glow);margin-bottom:18px}
+.avcta-sum b{color:#9fe0b7}
+.avcta .cta-row{margin-top:0}
+/* หน้า /availability/ */
+.avpage{background:var(--dusk-deep);color:var(--cream);min-height:100vh}
+.avpage section{padding:52px 0 72px}
+.avw-load{margin-top:34px;opacity:.7}

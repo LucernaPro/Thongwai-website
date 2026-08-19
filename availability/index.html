@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เช็คห้องว่าง — ปฏิทินห้องว่างทุกเฮือน | ทุ่งหวายโฮมสเตย์ ปากซอง</title>
+<meta name="description" content="เช็คห้องว่างทุ่งหวายโฮมสเตย์ด้วยตัวเอง — ปฏิทินห้องว่างทุกเฮือนและเต็นท์ ดูล่วงหน้าได้ 3 เดือน อัปเดตจากสมุดจองจริง จองตรงกับเจ้าของ โทร +856 20 91 555 288">
+<link rel="icon" type="image/png" href="/images/favicon.png">
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="canonical" href="https://thongwaihomestay.com/availability/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thongwaihomestay.com/availability/">
+<meta property="og:title" content="เช็คห้องว่าง | ทุ่งหวายโฮมสเตย์ ปากซอง">
+<meta property="og:description" content="ปฏิทินห้องว่างทุกเฮือนและเต็นท์ ดูล่วงหน้าได้ 3 เดือน จองตรงกับเจ้าของ">
+<meta property="og:image" content="https://thongwaihomestay.com/images/hero-entrance.webp">
+<meta property="og:locale" content="th_TH">
+<script>
+if (location.hostname.endsWith('workers.dev')) {
+  location.replace('https://thongwaihomestay.com' + location.pathname + location.search + location.hash);
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css?v=av2">
+</head>
+<body class="avpage">
+
+<header class="topbar">
+  <div class="wrap">
+    <button class="menu-btn" id="mnavBtn" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
+    <a class="brand" href="/" style="display:flex;align-items:center;gap:9px"><img src="/images/logo-emblem.png" alt="" style="height:34px;width:auto"><span>ทุ่งหวายโฮมสเตย์<small>Thongwai Homestay · Paksong</small></span></a>
+    <nav class="main">
+      <a href="/#rooms">ห้องพัก</a>
+      <a href="/#reviews">คลิปพาชม</a>
+      <a href="/#gallery">แกลเลอรี</a>
+      <a href="/#dining">ห้องอาหาร</a>
+      <a href="/#visit">การเดินทาง</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ MOBILE DRAWER MENU (แพทเทิร์นเดียวกับ lucernapro) ═══ -->
+<div class="mnav-scrim" id="mnavScrim" aria-hidden="true"></div>
+<aside class="mnav" id="mnav" aria-label="เมนูหลัก">
+  <div class="mnav-head">
+    <span class="mnav-brand"><img src="/images/logo-emblem.png" alt="" width="26" height="26" style="object-fit:contain;vertical-align:-6px;margin-right:8px">ทุ่งหวายโฮมสเตย์</span>
+    <button class="mnav-close" id="mnavClose" aria-label="ปิดเมนู">✕</button>
+  </div>
+  <div class="mnav-tag">Thongwai Homestay · Paksong</div>
+  <nav class="mnav-links">
+    <a href="/#rooms">ห้องพัก <span>→</span></a>
+    <a href="/#reviews">คลิปพาชม <span>→</span></a>
+    <a href="/availability/">เช็คห้องว่าง <span>→</span></a>
+    <a href="/#gallery">แกลเลอรี <span>→</span></a>
+    <a href="/#dining">ห้องอาหาร <span>→</span></a>
+    <a href="/#visit">การเดินทาง <span>→</span></a>
+  </nav>
+  <div class="mnav-langs">
+    <span class="on">ไทย</span><span class="soon">ລາວ</span><span class="soon">EN</span>
+  </div>
+  <a class="btn btn-lantern mnav-call" href="tel:+8562091555288">โทรจอง +856 20 91 555 288</a>
+</aside>
+
+<section id="availability" style="padding-top:44px">
+  <div class="wrap">
+    <div class="eyebrow">เช็คห้องว่าง</div>
+    <h2 style="color:var(--white)">เลือกวันเข้าพัก แล้วดูว่าเฮือนไหนว่าง</h2>
+    <p class="lead">กดวันในปฏิทิน — ทุกห้องขึ้นทันทีว่าว่างหรือเต็ม ดูล่วงหน้าได้ 3 เดือน ถ้าห้องที่ชอบเต็ม กด "ว่างอีกที" เพื่อกระโดดไปวันว่างถัดไปได้เลย</p>
+
+    <div class="avw-load" id="avwLoad">กำลังโหลดปฏิทิน…</div>
+
+    <div class="avw" id="avw" style="display:none">
+      <div class="avw-mbar">
+        <button class="avw-nav" id="avwPrev" aria-label="เดือนก่อนหน้า">‹</button>
+        <div class="avw-month" id="avwMonth"></div>
+        <button class="avw-nav" id="avwNext" aria-label="เดือนถัดไป">›</button>
+      </div>
+      <div class="avw-dow">
+        <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
+      </div>
+      <div class="avw-grid" id="avwGrid"></div>
+      <div class="avw-sel" id="avwSel"></div>
+      <div class="avw-rooms" id="avwRooms"></div>
+      <div class="avw-cta">
+        <a class="btn btn-lantern" href="tel:+8562091555288">โทรจอง +856 20 91 555 288</a>
+        <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx" target="_blank" rel="noopener">แอดไลน์จอง</a>
+        <a class="btn btn-ghost" href="https://m.me/thongwaihomestay" target="_blank" rel="noopener">ทักเพจ Facebook</a>
+      </div>
+      <p class="avw-note">อัปเดตจากสมุดจองจริงของที่พัก · การจองยืนยันทางโทรศัพท์ ไลน์ หรือเพจ</p>
+    </div>
+
+    <div class="avail-box" id="availBox" style="display:none">
+      <div class="lant">🏮</div>
+      <h3>ปฏิทินเปิดไม่ขึ้นชั่วคราว</h3>
+      <p>เช็คห้องว่างได้ทันทีทางโทรศัพท์ ไลน์ หรือกล่องข้อความเพจ ตอบไวแน่นอน</p>
+      <div class="cta-row" style="justify-content:center">
+        <a class="btn btn-lantern" href="tel:+8562091555288">โทร +856 20 91 555 288</a>
+        <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx" target="_blank" rel="noopener">แอดไลน์</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="names">ทุ่งหวายโฮมสเตย์ · ທົ່ງຫວາຍໂຮມສະເຕ · Thongwai Homestay</div>
+    <div>บ้านทุ่งหวาย เมืองปากซอง แขวงจำปาสัก สปป.ลาว · โทร <a href="tel:+8562091555288">+856 20 91 555 288</a></div>
+    <div style="opacity:.6">© 2026 Thongwai Homestay — เว็บไซต์ทางการ</div>
+  </div>
+</footer>
+
+<script>
+// ═══ ปฏิทินห้องว่างรายเดือน (ย้ายจากหน้าแรก 19 ส.ค. 2026) ═══
+const BOOKING_API = '/api';
+const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
+(async () => {
+  const fail = () => {
+    document.getElementById('avwLoad').style.display = 'none';
+    document.getElementById('availBox').style.display = 'block';
+  };
+  if (!BOOKING_API) return fail();
+  let D;
+  try {
+    const r = await fetch(BOOKING_API + '?action=availability&days=' + AVW_DAYS, { redirect: 'follow' });
+    D = await r.json();
+    if (!D.ok) return fail();
+  } catch (e) { return fail(); }
+
+  const addDays = (s, n) => { const d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const thDate = s => new Date(s + 'T00:00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+  const thFull = s => new Date(s + 'T00:00:00').toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long' });
+  const today = D.from;
+  const isBusy = (room, d) => (D.booked[room] || []).includes(d);
+  const nextFree = (room, d) => {
+    for (let x = d; x < D.to; x = addDays(x, 1)) if (!isBusy(room, x)) return x;
+    return null;
+  };
+
+  const avw = document.getElementById('avw');
+  const maxDate = addDays(today, AVW_DAYS - 1);
+  let sel = today;
+  let month = today.slice(0, 7);
+  const monthOf = s => s.slice(0, 7);
+  const thMonth = m => new Date(m + '-01T00:00:00').toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+
+  const grid = document.getElementById('avwGrid'),
+        monthEl = document.getElementById('avwMonth'),
+        roomsEl = document.getElementById('avwRooms'),
+        selEl = document.getElementById('avwSel'),
+        prev = document.getElementById('avwPrev'),
+        next = document.getElementById('avwNext');
+
+  const freeCount = d => D.rooms.length - D.rooms.filter(r => isBusy(r.id, d)).length;
+
+  const ROOM_URL = { R3: '/rooms/jaosua1/', R4: '/rooms/jaosua2/' };  // เพิ่มเมื่อหน้า detail เฮือนอื่นเสร็จ
+  const ROOM_IMG = {
+    R1:'/images/room-mahasetthi.webp', R2:'/images/room-choklap.webp',
+    R3:'/images/room-jaosua1.webp',    R4:'/images/room-jaosua2.webp',
+    R5:'/images/room-mangmee.webp',    R6:'/images/room-ramruay.webp',
+    R7:'/images/room-udomsuk.webp',    R8:'/images/room-mangkhang.webp',
+    R9:'/images/room-mahaheng.webp',   T1:'/images/room-tent.webp',
+  };
+
+  const render = () => {
+    monthEl.textContent = thMonth(month);
+    prev.disabled = month <= monthOf(today);
+    next.disabled = month >= monthOf(maxDate);
+
+    const first = month + '-01';
+    const startDow = new Date(first + 'T00:00:00').getDay();
+    const nDays = new Date(Number(month.slice(0,4)), Number(month.slice(5,7)), 0).getDate();
+    let s = '';
+    for (let i = 0; i < startDow; i++) s += '<span class="avw-day blank"></span>';
+    for (let n = 1; n <= nDays; n++) {
+      const d = month + '-' + String(n).padStart(2, '0');
+      const out = d < today || d > maxDate;
+      const fc = out ? null : freeCount(d);
+      const full = fc === 0;
+      let sub = '';
+      if (!out && full) sub = '<span class="fc full">เต็ม</span>';
+      else if (!out && fc < D.rooms.length) sub = `<span class="fc">ว่าง ${fc}</span>`;
+      s += `<button class="avw-day${d === sel ? ' sel' : ''}${out ? ' dis' : ''}${full ? ' isfull' : ''}"
+        ${out ? 'disabled' : ''} data-d="${d}">
+        <span class="dn">${n}</span>${d === today ? '<span class="td">วันนี้</span>' : ''}${sub}</button>`;
+    }
+    grid.innerHTML = s;
+    const nFree = freeCount(sel);
+    selEl.innerHTML = 'ห้องว่างคืน' + thFull(sel) +
+      ` — <b class="${nFree === 0 ? 'sum-full' : 'sum-free'}">ว่าง ${nFree} จาก ${D.rooms.length} ห้อง</b>`;
+
+    roomsEl.innerHTML = D.rooms.map(r => {
+      const busy = isBusy(r.id, sel);
+      const nf = busy ? nextFree(r.id, sel) : null;
+      const img = ROOM_IMG[r.id];
+      const url = ROOM_URL[r.id];
+      const inner = `<span class="ph">${img ? `<img src="${img}" alt="${r.name}" loading="lazy">` : ''}</span><span class="nm">${r.name}</span>`;
+      return `<div class="avw-tile${busy ? ' busy' : ''}">` +
+        (url ? `<a class="tl" href="${url}">${inner}</a>` : `<span class="tl">${inner}</span>`) +
+        `<span class="avw-pill ${busy ? 'full' : 'free'}">${busy ? 'เต็ม' : 'ว่าง'}</span>` +
+        (busy && nf ? `<button class="avw-next" data-d="${nf}">ว่างอีกที ${thDate(nf)} →</button>` : '') +
+      `</div>`;
+    }).join('');
+  };
+
+  avw.addEventListener('click', e => {
+    const day = e.target.closest('.avw-day:not(.dis):not(.blank), .avw-next');
+    if (!day || !day.dataset.d) return;
+    sel = day.dataset.d;
+    month = monthOf(sel);
+    render();
+  });
+  const shiftMonth = (m, k) => {
+    const d = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)) - 1 + k, 1));
+    return d.toISOString().slice(0, 7);
+  };
+  prev.onclick = () => { month = shiftMonth(month, -1); render(); };
+  next.onclick = () => { month = shiftMonth(month, +1); render(); };
+
+  document.getElementById('avwLoad').style.display = 'none';
+  avw.style.display = 'block';
+  render();
+})();
+</script>
+<script src="/assets/lightbox.js?v=3" defer></script>
+</body>
+</html>
