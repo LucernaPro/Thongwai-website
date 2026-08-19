@@ -250,7 +250,7 @@ if (location.hostname.endsWith('workers.dev')) {
         <div class="body">
           <div class="row-top"><span class="badge">เต็นท์</span><span class="avail" data-avail="T1"></span></div>
           <h3>เต็นท์กลางสนาม</h3>
-          <p class="spec">เต็นท์พร้อมฟลายชีท กลางสนามหญ้า วิวภูเขา ใกล้วงกองไฟ</p>
+          <p class="spec">เต็นท์พร้อมฟลายชีท มีทั้งหมด 6 หลัง กลางสนามหญ้า วิวภูเขา ใกล้วงกองไฟ · หลังละ 2 ท่าน</p>
           <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>600฿</b> <small>(390,000 กีบ)</small></div>
           <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>800฿</b> <small>(520,000 กีบ)</small></div>
         </div>
@@ -425,6 +425,16 @@ const BOOKING_API = '/api';
   const isBusy = id => (D.booked[id] || []).includes(today);
   document.querySelectorAll('[data-avail]').forEach(el => {
     const id = el.dataset.avail;
+    if (id === 'T1') {
+      // การ์ดเต็นท์ใบเดียวแทนเต็นท์ทั้ง 6 หลัง — นับรวม
+      const tents = D.rooms.filter(x => x.id.startsWith('T'));
+      if (!tents.length) return;
+      const free = tents.filter(t => !isBusy(t.id)).length;
+      el.textContent = free === 0 ? 'คืนนี้เต็ม · ดูวันว่าง' : `คืนนี้ว่าง ${free}/${tents.length} หลัง`;
+      el.className = 'avail ' + (free === 0 ? 'full' : 'free');
+      if (free === 0) { el.style.cursor = 'pointer'; el.onclick = () => location.href = '/availability/'; }
+      return;
+    }
     if (!D.rooms.some(x => x.id === id)) return;
     const busy = isBusy(id);
     el.textContent = busy ? 'คืนนี้เต็ม · ดูวันว่าง' : 'คืนนี้ว่าง';

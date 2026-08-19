@@ -71,21 +71,20 @@ table.cal{border-collapse:collapse;min-width:100%}
   <h1>ทุ่งหวายโฮมสเตย์ · การจอง</h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
-  <button id="btnSettings" title="ตั้งค่า">⚙︎</button>
+  <button id="btnUsers" title="จัดการผู้ใช้" style="display:none">👥</button>
+  <button id="btnSettings" title="ออกจากระบบ / สลับผู้ใช้">⚙︎</button>
 </header>
 
 <div class="wrap">
 
-  <!-- จอตั้งค่าครั้งแรก -->
+  <!-- จอเข้าสู่ระบบ -->
   <div class="card" id="setupCard" style="display:none">
-    <h2>ตั้งค่าครั้งแรก</h2>
-    <label>API URL (ปกติใช้ค่านี้ได้เลย)</label>
-    <input id="cfgApi" value="/api" placeholder="/api">
-    <label>PIN</label>
-    <input id="cfgPin" type="password" placeholder="รหัสที่ตั้งไว้ในสคริปต์">
-    <label>ชื่อคนใช้เครื่องนี้ (จะติดในทุกการจองที่บันทึก)</label>
-    <input id="cfgStaff" placeholder="เช่น เจ้าของ / นก / บอย">
-    <div style="margin-top:14px"><button class="btn btn-l" id="cfgSave">บันทึกและเชื่อมต่อ</button></div>
+    <h2>เข้าสู่ระบบ</h2>
+    <label>ชื่อผู้ใช้</label>
+    <input id="cfgUser" autocomplete="username" placeholder="เช่น admin">
+    <label>รหัสผ่าน</label>
+    <input id="cfgPass" type="password" autocomplete="current-password">
+    <div style="margin-top:14px"><button class="btn btn-l" id="cfgSave">เข้าสู่ระบบ</button></div>
     <div class="msg" id="cfgMsg"></div>
   </div>
 
@@ -133,6 +132,22 @@ table.cal{border-collapse:collapse;min-width:100%}
   <div class="msg" id="fMsg"></div>
 </div>
 
+<!-- bottom sheet: จัดการผู้ใช้ (admin เท่านั้น) -->
+<div class="sheet" id="userSheet">
+  <h2 style="color:var(--glow);margin-bottom:6px">จัดการผู้ใช้</h2>
+  <div class="list" id="userList" style="margin-bottom:14px"></div>
+  <h3 style="color:var(--glow);font-size:.95rem;margin-bottom:2px">เพิ่มผู้ใช้ใหม่ (ลูกทีม)</h3>
+  <div class="grid2">
+    <div><label>ชื่อผู้ใช้</label><input id="uName" placeholder="เช่น นก"></div>
+    <div><label>รหัสผ่าน</label><input id="uPass" placeholder="อย่างน้อย 4 ตัว"></div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn btn-l" id="uAdd">เพิ่มผู้ใช้</button>
+    <button class="btn btn-g" id="uClose">ปิด</button>
+  </div>
+  <div class="msg" id="uMsg"></div>
+</div>
+
 <!-- bottom sheet: รายละเอียดการจอง -->
 <div class="sheet" id="detailSheet">
   <h2 style="color:var(--glow)" id="dTitle">รายละเอียด</h2>
@@ -146,11 +161,13 @@ table.cal{border-collapse:collapse;min-width:100%}
 
 <script>
 /* ================= config ================= */
+const API = '/api';
 const store = {
-  get api(){ return localStorage.getItem('tw_api') || '' },
-  get pin(){ return localStorage.getItem('tw_pin') || '' },
-  get staff(){ return localStorage.getItem('tw_staff') || '' },
-  save(a,p,s){ localStorage.setItem('tw_api',a); localStorage.setItem('tw_pin',p); localStorage.setItem('tw_staff',s); }
+  get user(){ return localStorage.getItem('tw_user') || '' },
+  get pass(){ return localStorage.getItem('tw_pass') || '' },
+  get role(){ return localStorage.getItem('tw_role') || '' },
+  save(u,p,r){ localStorage.setItem('tw_user',u); localStorage.setItem('tw_pass',p); localStorage.setItem('tw_role',r); },
+  clear(){ ['tw_user','tw_pass','tw_role','tw_api','tw_pin','tw_staff'].forEach(k=>localStorage.removeItem(k)); }
 };
 const $ = id => document.getElementById(id);
 const DAYS = window.innerWidth < 700 ? 10 : 21;   // จำนวนวันต่อจอ
@@ -163,7 +180,9 @@ function thDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString
 function thDow(s){ const d=new Date(s+'T00:00:00'); return ['อา','จ','อ','พ','พฤ','ศ','ส'][d.getDay()]; }
 
 async function api(params){
-  const u = new URL(store.api, location.origin);
+  const u = new URL(API, location.origin);
+  u.searchParams.set('user', store.user);
+  u.searchParams.set('pass', store.pass);
   Object.entries(params).forEach(([k,v]) => u.searchParams.set(k,v));
   const r = await fetch(u, {redirect:'follow'});
   return r.json();
@@ -171,30 +190,81 @@ async function api(params){
 
 /* ================= boot ================= */
 function boot(){
-  if(!store.api || !store.pin){ $('setupCard').style.display='block'; return; }
+  if(!store.user || !store.pass){ $('setupCard').style.display='block'; return; }
   $('setupCard').style.display='none';
   $('board').style.display='block';
   $('fabAdd').style.display='block';
-  $('whoami').textContent = store.staff || '';
+  $('whoami').textContent = store.user + (store.role==='admin' ? ' · เจ้าของ' : '');
+  $('btnUsers').style.display = store.role==='admin' ? 'inline' : 'none';
   load();
 }
 $('cfgSave').onclick = async () => {
-  const a=$('cfgApi').value.trim(), p=$('cfgPin').value.trim(), s=$('cfgStaff').value.trim();
+  const u=$('cfgUser').value.trim(), p=$('cfgPass').value;
   const m=$('cfgMsg'); m.className='msg';
-  if(!a){ m.className='msg err'; m.textContent='กรอก API URL (ปกติคือ /api)'; return; }
-  store.save(a,p,s);
-  m.className='msg ok'; m.textContent='กำลังทดสอบการเชื่อมต่อ…';
+  if(!u || !p){ m.className='msg err'; m.textContent='กรอกชื่อผู้ใช้และรหัสผ่าน'; return; }
+  m.className='msg ok'; m.textContent='กำลังเข้าสู่ระบบ…';
   try{
-    const r = await api({action:'rooms', pin:store.pin});
-    if(!r.ok){ m.className='msg err'; m.textContent='เชื่อมต่อได้แต่ PIN ไม่ถูก'; return; }
-    m.className='msg ok'; m.textContent='เชื่อมต่อสำเร็จ ✓';
-    setTimeout(boot, 600);
-  }catch(e){ m.className='msg err'; m.textContent='เชื่อมต่อไม่ได้ เช็ค URL อีกครั้ง'; }
+    const url = new URL(API, location.origin);
+    url.searchParams.set('action','login'); url.searchParams.set('user',u); url.searchParams.set('pass',p);
+    const r = await (await fetch(url, {redirect:'follow'})).json();
+    if(!r.ok){ m.className='msg err'; m.textContent=r.error || 'เข้าไม่ได้'; return; }
+    store.save(u, p, r.role);
+    m.className='msg ok'; m.textContent='เข้าสู่ระบบสำเร็จ ✓';
+    $('cfgPass').value='';
+    setTimeout(boot, 400);
+  }catch(e){ m.className='msg err'; m.textContent='เชื่อมต่อไม่ได้ ลองใหม่'; }
 };
 $('btnSettings').onclick = () => {
-  $('board').style.display='none'; $('fabAdd').style.display='none';
-  $('setupCard').style.display='block';
-  $('cfgApi').value=store.api; $('cfgPin').value=store.pin; $('cfgStaff').value=store.staff;
+  if(!confirm('ออกจากระบบ / สลับผู้ใช้?')) return;
+  store.clear();
+  $('board').style.display='none'; $('fabAdd').style.display='none'; $('btnUsers').style.display='none';
+  $('whoami').textContent='';
+  $('setupCard').style.display='block'; $('cfgUser').value=''; $('cfgPass').value='';
+  $('cfgMsg').className='msg';
+};
+
+/* ================= จัดการผู้ใช้ (admin) ================= */
+async function loadUsers(){
+  $('userList').innerHTML = '<div style="opacity:.6;padding:6px 2px">กำลังโหลด…</div>';
+  const r = await api({action:'users'});
+  if(!r.ok){ $('userList').innerHTML = '<div style="opacity:.6">'+r.error+'</div>'; return; }
+  $('userList').innerHTML = r.users.map(u => `
+    <div class="bk"><span class="d">${u.role==='admin'?'👑 admin':'ลูกทีม'}</span>
+      <span style="flex:1"><b>${u.username}</b></span>
+      <button class="btn btn-g" style="padding:6px 12px;font-size:.8rem" onclick="setPw('${u.username}')">เปลี่ยนรหัส</button>
+      ${u.username!==store.user && u.role!=='admin' ? `<button class="btn btn-r" style="padding:6px 12px;font-size:.8rem" onclick="delUser('${u.username}')">ลบ</button>` : ''}
+    </div>`).join('');
+}
+window.setPw = async username => {
+  const p = prompt('รหัสผ่านใหม่ของ "'+username+'" (อย่างน้อย 4 ตัว)');
+  if(p === null) return;
+  const r = await api({action:'user_setpw', username, password:p});
+  const m=$('uMsg');
+  if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
+  m.className='msg ok'; m.textContent='เปลี่ยนรหัสของ '+username+' แล้ว ✓';
+  if(username === store.user) store.save(store.user, p, store.role);   // อัปเดตรหัสตัวเองในเครื่อง
+};
+window.delUser = async username => {
+  if(!confirm('ลบผู้ใช้ "'+username+'"? การจองเก่าที่คนนี้บันทึกยังอยู่ครบ')) return;
+  const r = await api({action:'user_del', username});
+  const m=$('uMsg');
+  if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
+  m.className='msg ok'; m.textContent='ลบ '+username+' แล้ว ✓';
+  loadUsers();
+};
+$('btnUsers').onclick = () => {
+  $('uMsg').className='msg'; $('uName').value=''; $('uPass').value='';
+  $('backdrop').classList.add('show'); $('userSheet').classList.add('open');
+  loadUsers();
+};
+$('uClose').onclick = closeSheets;
+$('uAdd').onclick = async () => {
+  const m=$('uMsg'); m.className='msg ok'; m.textContent='กำลังเพิ่ม…';
+  const r = await api({action:'user_add', username:$('uName').value.trim(), password:$('uPass').value});
+  if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
+  m.className='msg ok'; m.textContent='เพิ่มแล้ว ✓';
+  $('uName').value=''; $('uPass').value='';
+  loadUsers();
 };
 $('btnRefresh').onclick = () => load();
 
@@ -203,8 +273,8 @@ async function load(){
   $('loading').style.display='block'; $('cal').style.display='none';
   try{
     const [rr, rb] = await Promise.all([
-      api({action:'rooms', pin:store.pin}),
-      api({action:'bookings', pin:store.pin, from:addDays(viewStart,-60), to:addDays(viewStart, DAYS+90)})
+      api({action:'rooms'}),
+      api({action:'bookings', from:addDays(viewStart,-60), to:addDays(viewStart, DAYS+90)})
     ]);
     if(!rr.ok || !rb.ok) throw new Error('unauthorized');
     rooms = rr.rooms; bookings = rb.bookings;
@@ -266,11 +336,11 @@ function openForm(room, date){
 $('fabAdd').onclick = () => openForm();
 $('fClose').onclick = closeSheets;
 $('backdrop').onclick = closeSheets;
-function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').classList.remove('open'); $('detailSheet').classList.remove('open'); }
+function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').classList.remove('open'); $('detailSheet').classList.remove('open'); $('userSheet').classList.remove('open'); }
 
 $('fSave').onclick = async () => {
   const m=$('fMsg'); m.className='msg';
-  const p = { action:'add', pin:store.pin, staff:store.staff,
+  const p = { action:'add',
     name:$('fName').value.trim(), phone:$('fPhone').value.trim(),
     room:$('fRoom').value, checkin:$('fIn').value, checkout:$('fOut').value, note:$('fNote').value.trim() };
   if(!p.name || !p.checkin || !p.checkout){ m.className='msg err'; m.textContent='กรอกชื่อและวันที่ให้ครบ'; return; }
@@ -303,7 +373,7 @@ $('dCancel').onclick = async () => {
   if(!confirm('ยืนยันยกเลิกการจองนี้?')) return;
   const m=$('dMsg'); m.className='msg ok'; m.textContent='กำลังยกเลิก…';
   try{
-    const r = await api({action:'cancel', pin:store.pin, id:currentId});
+    const r = await api({action:'cancel', id:currentId});
     if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
     m.className='msg ok'; m.textContent='ยกเลิกแล้ว ✓';
     setTimeout(()=>{ closeSheets(); load(); }, 600);

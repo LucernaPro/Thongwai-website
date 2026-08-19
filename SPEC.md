@@ -122,7 +122,9 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
   | R7 | เฮือนอุดมสุข | 2นอน/2น้ำ โถงกลาง ห้องละ2ท่าน | 1,600 / 2,000 |
   | R8 | เฮือนมั่งคั่ง | 2นอน/2น้ำ โซนแคมป์ปิ้ง 10ท่าน | 3,000 / 4,000 |
   | R9 | เฮือนมหาเฮง | 2นอน/2น้ำ 10ท่าน (ป้าย VIP 01) | 3,000 / 4,000 |
-  | T1 | เต็นท์กลางสนาม | เต็นท์พร้อมฟลายชีท กลางสนาม | 600 / 800 (ยืนยัน 19 ส.ค. 2026) |
+  | T1–T6 | เต็นท์ 1-6 (6 หลัง — Pist ยืนยัน 19 ส.ค. 2026) | หลังละ 2 ท่าน | 600 / 800 |
+  (การ์ดหน้าแรกยังเป็นใบเดียว "เต็นท์กลางสนาม" — ป้าย data-avail="T1" นับรวมทุก T*
+   แสดง "คืนนี้ว่าง N/6 หลัง" / migration T2-T6 อยู่ใน init() ของ worker.js)
 - เตียงเสริม: 200฿ ไม่รวม / 320฿ รวมอาหารเช้า (130,000 / 200,000 กีบ)
 - อัตรากีบดูจากการ์ดโปรโมทเดิม (650,000 กีบ = 1,000฿)
 - จุดขาย: ลำธารไหลผ่านที่พัก / อากาศเย็น (โบโลเวน >1,000ม.) / **กาแฟลาวแท้จากแหล่งปลูก จิบริมลำธาร**
@@ -132,14 +134,19 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
 เหตุผล: ตัด dependency บัญชี Google ของคน (โอนเจ้าของแล้ว API พัง) — ทุกอย่างอยู่ใน
 บัญชี Cloudflare เดียวกับเว็บ: โดเมน + เว็บ + ฐานข้อมูล โอนก้อนเดียวจบ
 - **worker.js (อยู่ root repo):** API ที่ /api?action=... contract เดิมเป๊ะ:
-  availability (สาธารณะ ไม่มีชื่อลูกค้า days≤120) / rooms, bookings, add, cancel (PIN)
-  PIN = const ในไฟล์ (ตอนนี้ 2569 — เปลี่ยนแล้ว push ใหม่) / ตาราง rooms+bookings
-  auto-create + seed 10 ห้องครั้งแรกเอง ไม่ต้องรัน SQL มือ / กันจองซ้อนด้วย
+  availability (สาธารณะ ไม่มีชื่อลูกค้า days≤120) / login, rooms, bookings, add, cancel
+  (**auth v2 19 ส.ค. 2026: user+password รายคน** — ตาราง users, hash salted SHA-256,
+  seed คนแรก admin/2569 role=admin, "บันทึกโดย" ใช้ชื่อคนล็อกอินฝั่ง server ปลอมไม่ได้)
+  / จัดการผู้ใช้เฉพาะ admin: users, user_add (role=staff เท่านั้น — admin มีคนเดียว),
+  user_del (ห้ามลบตัวเอง/ห้ามลบ admin), user_setpw / ตาราง rooms+bookings+users
+  auto-create + seed + migrate ครั้งแรกเอง ไม่ต้องรัน SQL มือ / กันจองซ้อนด้วย
   INSERT..WHERE NOT EXISTS (atomic) / ยกเลิก = เปลี่ยนสถานะ ไม่ลบแถว / เวลา UTC+7
 - **.assetsignore (สำคัญ):** กัน worker.js, wrangler.jsonc, SPEC.md, README.md, tools,
   node_modules ไม่ให้เสิร์ฟสาธารณะ (เดิม directory "./" เสิร์ฟทั้ง repo!) — ไฟล์ลับ/โค้ด
   ใหม่ทุกไฟล์ต้องเช็คว่าควรเข้า .assetsignore ไหม
-- **/admin:** default API URL = /api (แก้แล้ว รองรับ relative path), PIN เดียวกับ worker
+- **/admin (v2):** จอ login = ชื่อผู้ใช้+รหัสผ่านเท่านั้น (API URL ฝังตายตัว /api ไม่มีช่องกรอก)
+  / ⚙︎ = ออกจากระบบ/สลับผู้ใช้ / ปุ่ม 👥 จัดการผู้ใช้โผล่เฉพาะ admin: ลิสต์-เพิ่ม-ลบ-
+  เปลี่ยนรหัสลูกทีม / whoami แสดง "admin · เจ้าของ"
 - **หน้าแรก:** BOOKING_API = '/api' แล้ว — fetch fail เงียบๆ จนกว่า worker จะ deploy
   (ปฏิทิน+ป้ายจะติดเองทันทีที่เปิดสวิตช์)
 - **⏳ เปิดสวิตช์ (ขั้นเดียวที่เหลือ):** Pist เข้า Cloudflare dashboard → Storage & Databases
@@ -157,11 +164,9 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
    มหาเศรษฐีกลางคืน, เด็คคาเฟ่เก้าอี้โยก, ผังมุมสูงกลางวัน, ชุด SepSook ที่เหลือ
 5. พิกัด Google Maps + geo ใน schema + หน้าการเดินทางละเอียด (มีรูปผังมุมสูงรอ)
 6. หน้า ລາວ (/lo) และ EN (/en) — ปุ่มบน topbar ขึ้น "เร็วๆนี้" อยู่
-7. ★ เต็นท์มี 6 หลัง (Pist แจ้ง 19 ส.ค. 2026 — "ตอนแก้รอบหน้าค่อยทำ"): ปรับการ์ดหน้าแรก
-   + ระบบจอง T1 เป็น T1-T6 (แก้ SEED_ROOMS ใน worker.js + migration แถว rooms ใน D1)
-8. ลิงก์เพจ SepSook / เปลี่ยนโลโก้บนเพจ FB เป็นชุด Thongwai ใหม่
-9. Google Business Profile ผูกเว็บ + Search Console submit sitemap
-10. อนาคต: Cloudflare Email Routing ถ้าอยากมี email@thongwaihomestay.com
+7. ลิงก์เพจ SepSook / เปลี่ยนโลโก้บนเพจ FB เป็นชุด Thongwai ใหม่
+8. Google Business Profile ผูกเว็บ + Search Console submit sitemap
+9. อนาคต: Cloudflare Email Routing ถ้าอยากมี email@thongwaihomestay.com
 
 ## 8. ประวัติย่อ (19 ส.ค. 2026 — วันเดียวจบทั้งหมดนี้)
 จดโดเมน+ผูก Cloudflare+www+SSL / เว็บหน้าแรก v1: hero drone full-bleed (เงาเฉพาะฐาน),

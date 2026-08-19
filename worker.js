@@ -7,7 +7,23 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-const PIN = '2569';   // ★ รหัสทีมสำหรับหน้า /admin — เปลี่ยนได้ตามใจ แล้ว push ใหม่
+// ระบบผู้ใช้: user+password รายคน เก็บใน D1 (ตาราง users) — คนแรก admin/2569 seed อัตโนมัติ
+// จัดการผู้ใช้ (เพิ่ม/ลบ/เปลี่ยนรหัส) ทำได้เฉพาะ role=admin ผ่านหน้า /admin
+
+const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+async function hashPw(password, salt) {
+  const data = new TextEncoder().encode(salt + ':' + password);
+  return hex(await crypto.subtle.digest('SHA-256', data));
+}
+async function makePw(password) {
+  const salt = hex(crypto.getRandomValues(new Uint8Array(12)));
+  return salt + '$' + await hashPw(password, salt);
+}
+async function checkPw(password, stored) {
+  const [salt, h] = String(stored).split('$');
+  if (!salt || !h) return false;
+  return (await hashPw(password, salt)) === h;
+}
 
 const SEED_ROOMS = [
   ['R1', 'เฮือนมหาเศรษฐี',      6,  2300, 1],
@@ -19,7 +35,12 @@ const SEED_ROOMS = [
   ['R7', 'เฮือนอุดมสุข',         4,  1600, 7],
   ['R8', 'เฮือนมั่งคั่ง',       10,  3000, 8],
   ['R9', 'เฮือนมหาเฮง',         10,  3000, 9],
-  ['T1', 'เต็นท์กลางสนาม',       2,   600, 10],
+  ['T1', 'เต็นท์ 1',              2,   600, 10],
+  ['T2', 'เต็นท์ 2',              2,   600, 11],
+  ['T3', 'เต็นท์ 3',              2,   600, 12],
+  ['T4', 'เต็นท์ 4',              2,   600, 13],
+  ['T5', 'เต็นท์ 5',              2,   600, 14],
+  ['T6', 'เต็นท์ 6',              2,   600, 15],
 ];
 
 /* ── เวลา สปป.ลาว (UTC+7 ไม่มี DST) ── */
@@ -52,13 +73,67 @@ async function init(db) {
       name TEXT NOT NULL, phone TEXT, note TEXT, status TEXT NOT NULL,
       created TEXT, staff TEXT)`),
     db.prepare(`CREATE INDEX IF NOT EXISTS ix_book ON bookings (room, status, checkin, checkout)`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS users (
+      username TEXT PRIMARY KEY, pass TEXT NOT NULL, role TEXT NOT NULL, created TEXT)`),
   ]);
   const { c } = await db.prepare('SELECT COUNT(*) AS c FROM rooms').first();
   if (c === 0) {
     await db.batch(SEED_ROOMS.map(r =>
       db.prepare('INSERT INTO rooms (id,name,capacity,price,sort) VALUES (?,?,?,?,?)').bind(...r)));
+  } else {
+    // migration 19 ส.ค. 2026: เต็นท์มี 6 หลัง — DB เก่ามีแค่ T1
+    const t2 = await db.prepare("SELECT id FROM rooms WHERE id = 'T2'").first();
+    if (!t2) {
+      await db.prepare("UPDATE rooms SET name = 'เต็นท์ 1' WHERE id = 'T1'").run();
+      await db.batch(SEED_ROOMS.filter(r => /^T[2-6]$/.test(r[0])).map(r =>
+        db.prepare('INSERT OR IGNORE INTO rooms (id,name,capacity,price,sort) VALUES (?,?,?,?,?)').bind(...r)));
+    }
+  }
+  const { u } = await db.prepare('SELECT COUNT(*) AS u FROM users').first();
+  if (u === 0) {
+    await db.prepare('INSERT INTO users (username,pass,role,created) VALUES (?,?,?,?)')
+      .bind('admin', await makePw('2569'), 'admin', nowStamp()).run();
   }
   ready = true;
+}
+
+/* ── ตรวจตัวตนต่อคำขอ: คืน {username, role} หรือ null ── */
+async function auth(db, p) {
+  const username = (p.get('user') || '').trim();
+  const row = await db.prepare('SELECT username, pass, role FROM users WHERE username = ?').bind(username).first();
+  if (!row) return null;
+  if (!(await checkPw(p.get('pass') || '', row.pass))) return null;
+  return { username: row.username, role: row.role };
+}
+
+/* ── จัดการผู้ใช้ (เฉพาะ admin) ── */
+async function userAdd(db, p) {
+  const username = (p.get('username') || '').trim();
+  const password = p.get('password') || '';
+  if (!/^[a-zA-Z0-9ก-๙_.-]{2,32}$/.test(username)) return { ok: false, error: 'ชื่อผู้ใช้ 2-32 ตัว (ไทย/อังกฤษ/ตัวเลข)' };
+  if (password.length < 4) return { ok: false, error: 'รหัสผ่านอย่างน้อย 4 ตัว' };
+  const dup = await db.prepare('SELECT username FROM users WHERE username = ?').bind(username).first();
+  if (dup) return { ok: false, error: 'มีชื่อผู้ใช้นี้แล้ว' };
+  await db.prepare('INSERT INTO users (username,pass,role,created) VALUES (?,?,?,?)')
+    .bind(username, await makePw(password), 'staff', nowStamp()).run();
+  return { ok: true };
+}
+async function userDel(db, p, me) {
+  const username = (p.get('username') || '').trim();
+  if (username === me.username) return { ok: false, error: 'ลบบัญชีตัวเองไม่ได้' };
+  const row = await db.prepare('SELECT role FROM users WHERE username = ?').bind(username).first();
+  if (!row) return { ok: false, error: 'ไม่พบผู้ใช้ ' + username };
+  if (row.role === 'admin') return { ok: false, error: 'ลบบัญชี admin ไม่ได้' };
+  await db.prepare('DELETE FROM users WHERE username = ?').bind(username).run();
+  return { ok: true };
+}
+async function userSetPw(db, p) {
+  const username = (p.get('username') || '').trim();
+  const password = p.get('password') || '';
+  if (password.length < 4) return { ok: false, error: 'รหัสผ่านอย่างน้อย 4 ตัว' };
+  const res = await db.prepare('UPDATE users SET pass = ? WHERE username = ?')
+    .bind(await makePw(password), username).run();
+  return res.meta.changes ? { ok: true } : { ok: false, error: 'ไม่พบผู้ใช้ ' + username };
 }
 
 /* ── actions ── */
@@ -89,7 +164,7 @@ async function listBookings(db, p) {
   return { ok: true, bookings };
 }
 
-async function addBooking(db, p) {
+async function addBooking(db, p, me) {
   const room = p.get('room'), checkin = p.get('checkin'), checkout = p.get('checkout'),
         name = (p.get('name') || '').trim();
   if (!room || !name) return { ok: false, error: 'ข้อมูลไม่ครบ' };
@@ -107,7 +182,7 @@ async function addBooking(db, p) {
        SELECT 1 FROM bookings
        WHERE room = ? AND status = 'จอง' AND checkin < ? AND ? < checkout)`)
     .bind(id, room, checkin, checkout, name, p.get('phone') || '', p.get('note') || '',
-          'จอง', nowStamp(), p.get('staff') || '',
+          'จอง', nowStamp(), me.username,
           room, checkout, checkin)
     .run();
   if (res.meta.changes === 0) {
@@ -137,16 +212,31 @@ export default {
       const p = url.searchParams;
       const action = p.get('action');
       if (action === 'availability') return json(await availability(env.DB, p));
-      if (String(p.get('pin')) !== PIN) return json({ ok: false, error: 'PIN ไม่ถูกต้อง' });
+
+      const me = await auth(env.DB, p);
+      if (!me) return json({ ok: false, error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+
       switch (action) {
+        case 'login': return json({ ok: true, user: me.username, role: me.role });
         case 'rooms': {
           const rooms = (await env.DB.prepare('SELECT id,name,capacity,price FROM rooms ORDER BY sort').all()).results;
           return json({ ok: true, rooms });
         }
         case 'bookings': return json(await listBookings(env.DB, p));
-        case 'add':      return json(await addBooking(env.DB, p));
+        case 'add':      return json(await addBooking(env.DB, p, me));
         case 'cancel':   return json(await cancelBooking(env.DB, p));
-        default:         return json({ ok: false, error: 'unknown action' });
+        // ── เฉพาะ admin ──
+        case 'users': case 'user_add': case 'user_del': case 'user_setpw': {
+          if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
+          if (action === 'users') {
+            const users = (await env.DB.prepare('SELECT username, role, created FROM users ORDER BY role, username').all()).results;
+            return json({ ok: true, users });
+          }
+          if (action === 'user_add')   return json(await userAdd(env.DB, p));
+          if (action === 'user_del')   return json(await userDel(env.DB, p, me));
+          if (action === 'user_setpw') return json(await userSetPw(env.DB, p));
+        }
+        default: return json({ ok: false, error: 'unknown action' });
       }
     } catch (err) {
       return json({ ok: false, error: String(err) });
