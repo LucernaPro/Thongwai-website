@@ -65,8 +65,8 @@ if (location.hostname.endsWith('workers.dev')) {
 <section id="availability" style="padding-top:44px">
   <div class="wrap">
     <div class="eyebrow">เช็คห้องว่าง</div>
-    <h2 style="color:var(--white)">เลือกวันเข้าพัก แล้วดูว่าเฮือนไหนว่าง</h2>
-    <p class="lead">กดวันในปฏิทิน — ทุกห้องขึ้นทันทีว่าว่างหรือเต็ม ดูล่วงหน้าได้ 3 เดือน ถ้าห้องที่ชอบเต็ม กด "ว่างอีกที" เพื่อกระโดดไปวันว่างถัดไปได้เลย</p>
+    <h2 style="color:var(--white)">เลือกวันที่เข้าพัก</h2>
+    <p class="lead">เลือกวันที่ในปฏิทินเพื่อตรวจสอบห้องว่างของทุกเฮือนและเต็นท์ ตรวจสอบล่วงหน้าได้สูงสุด 3 เดือน</p>
 
     <div class="avw-load" id="avwLoad">กำลังโหลดปฏิทิน…</div>
 
@@ -87,13 +87,13 @@ if (location.hostname.endsWith('workers.dev')) {
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">แอดไลน์จอง</a>
         <a class="btn btn-ghost" href="https://m.me/thongwaihomestay">ทักเพจ Facebook</a>
       </div>
-      <p class="avw-note">อัปเดตจากสมุดจองจริงของที่พัก · การจองยืนยันทางโทรศัพท์ ไลน์ หรือเพจ</p>
+      <p class="avw-note">ข้อมูลห้องว่างอัปเดตจากระบบจองของที่พัก · ยืนยันการจองทางโทรศัพท์ LINE หรือ Facebook</p>
     </div>
 
     <div class="avail-box" id="availBox" style="display:none">
       <div class="lant">🏮</div>
-      <h3>ปฏิทินเปิดไม่ขึ้นชั่วคราว</h3>
-      <p>เช็คห้องว่างได้ทันทีทางโทรศัพท์ ไลน์ หรือกล่องข้อความเพจ ตอบไวแน่นอน</p>
+      <h3>ระบบปฏิทินไม่พร้อมใช้งานชั่วคราว</h3>
+      <p>ขออภัยในความไม่สะดวก กรุณาสอบถามห้องว่างทางโทรศัพท์ LINE หรือ Facebook</p>
       <div class="cta-row" style="justify-content:center">
         <a class="btn btn-lantern" href="tel:+8562091555288">โทร +856 20 91 555 288</a>
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">แอดไลน์</a>
@@ -189,7 +189,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     grid.innerHTML = s;
     const nFree = freeCount(sel);
     selEl.innerHTML = 'ห้องว่างคืน' + thFull(sel) +
-      ` — <b class="${nFree === 0 ? 'sum-full' : 'sum-free'}">ว่าง ${nFree} จาก ${D.rooms.length} ห้อง</b>`;
+      ` — <b class="${nFree === 0 ? 'sum-full' : 'sum-free'}">ว่าง ${nFree} จาก ${D.rooms.length} หลัง</b>`;
 
     roomsEl.innerHTML = D.rooms.map(r => {
       const busy = isBusy(r.id, sel);
@@ -200,7 +200,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       return `<div class="avw-tile${busy ? ' busy' : ''}">` +
         (url ? `<a class="tl" href="${url}">${inner}</a>` : `<span class="tl">${inner}</span>`) +
         `<span class="avw-pill ${busy ? 'full' : 'free'}">${busy ? 'เต็ม' : 'ว่าง'}</span>` +
-        (busy && nf ? `<button class="avw-next" data-d="${nf}">ว่างอีกที ${thDate(nf)} →</button>` : '') +
+        (busy && nf ? `<button class="avw-next" data-d="${nf}">ว่างถัดไป ${thDate(nf)} →</button>` : '') +
       `</div>`;
     }).join('');
   };

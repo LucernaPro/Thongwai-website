@@ -291,12 +291,12 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">เช็คห้องว่าง</div>
     <h2 style="color:var(--white)">ดูวันว่างก่อนโทรจอง</h2>
-    <p class="lead">ปฏิทินห้องว่างทุกเฮือน ดูล่วงหน้าได้ 3 เดือน อัปเดตจากสมุดจองจริงของที่พัก</p>
+    <p class="lead">เลือกวันที่เข้าพักเพื่อตรวจสอบห้องว่างของทุกเฮือนและเต็นท์ ตรวจสอบล่วงหน้าได้สูงสุด 3 เดือน</p>
     <div class="avcta">
-      <div class="avcta-sum" id="avctaSum">🏮 เช็คห้องว่างทุกเฮือนได้ด้วยตัวเอง</div>
+      <div class="avcta-sum" id="avctaSum">🏮 ตรวจสอบห้องว่างได้ด้วยตนเองตลอด 24 ชั่วโมง</div>
       <div class="cta-row">
         <a class="btn btn-lantern" href="/availability/">เปิดปฏิทินห้องว่าง →</a>
-        <a class="btn btn-ghost" href="tel:+8562091555288">โทรถามเลย +856 20 91 555 288</a>
+        <a class="btn btn-ghost" href="tel:+8562091555288">โทรสอบถาม +856 20 91 555 288</a>
       </div>
     </div>
   </div>
@@ -445,8 +445,8 @@ const BOOKING_API = '/api';
   if (sum) {
     const nFree = D.rooms.filter(r => !isBusy(r.id)).length;
     sum.innerHTML = nFree === 0
-      ? '🏮 คืนนี้เต็มทุกหลัง — เปิดปฏิทินดูคืนที่ว่างได้เลย'
-      : `🏮 คืนนี้ว่าง <b>${nFree} จาก ${D.rooms.length} ห้อง</b> — เปิดปฏิทินเลือกวันเข้าพักได้เลย`;
+      ? '🏮 คืนนี้ห้องพักเต็มทุกหลัง — กรุณาเลือกวันอื่นในปฏิทิน'
+      : `🏮 คืนนี้มีห้องว่าง <b>${nFree} จาก ${D.rooms.length} หลัง</b>`;
   }
 })();
 </script>
