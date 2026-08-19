@@ -24,7 +24,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=mn1">
+<link rel="stylesheet" href="/assets/style.css?v=rl1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -53,7 +53,7 @@ if (location.hostname.endsWith('workers.dev')) {
     <a class="brand" href="/" style="display:flex;align-items:center;gap:9px"><img src="/images/logo-emblem.png" alt="" style="height:34px;width:auto"><span>ทุ่งหวายโฮมสเตย์<small>Thongwai Homestay · Paksong</small></span></a>
     <nav class="main">
       <a href="#rooms">ห้องพัก</a>
-      <a href="#reviews">รีวิว</a>
+      <a href="#reviews">คลิปพาชม</a>
       <a href="#availability">เช็คห้องว่าง</a>
       <a href="#gallery">แกลเลอรี</a>
       <a href="#visit">การเดินทาง</a>
@@ -239,17 +239,17 @@ if (location.hostname.endsWith('workers.dev')) {
 
 <section id="reviews">
   <div class="wrap">
-    <div class="eyebrow">เสียงจากผู้เข้าพัก</div>
-    <h2>รีวิวจริงจากคนที่มานอนจริง</h2>
-    <p class="lead">คลิปรีวิวจากผู้เข้าพักและเพจท่องเที่ยว — แตะเพื่อเปิดเสียง</p>
+    <div class="eyebrow">คลิปจากทุ่งหวาย</div>
+    <h2>พาชมที่พักผ่านคลิปจริง</h2>
+    <p class="lead">คลิปพาชมจากเจ้าของ และรีวิวจากผู้เข้าพัก — แตะเพื่อเปิดเสียง</p>
     <div class="reel-row">
       <div class="reel-card">
         <div class="reel-frame">
-          <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1776247666851495&show_text=false&t=0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="คลิปรีวิวเฮือนมหาเศรษฐี ทุ่งหวายโฮมสเตย์"></iframe>
+          <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1776247666851495%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="คุณแดง เจ้าของทุ่งหวายโฮมสเตย์ พาชมเฮือนมหาเศรษฐี"></iframe>
         </div>
-        <div class="cap"><b>เฮือนมหาเศรษฐี</b><span>คลิปรีวิวจากผู้เข้าพัก</span></div>
+        <div class="cap"><b>เฮือนมหาเศรษฐี</b><span>คุณแดง เจ้าของ พาชมบ้าน</span></div>
       </div>
-      <!-- REVIEW: เพิ่มคลิปรีวิวใหม่ = ก๊อป .reel-card ด้านบนทั้งก้อน แล้วเปลี่ยน href (URL-encode) + ชื่อเฮือน -->
+      <!-- REVIEW: เพิ่มคลิปใหม่ = ก๊อป .reel-card ทั้งก้อน แล้วใช้โค้ด embed ทางการจาก Facebook (ปุ่ม Embed ใต้คลิป) วางแทน iframe + แก้ชื่อเฮือน/คำบรรยาย -->
     </div>
   </div>
 </section>

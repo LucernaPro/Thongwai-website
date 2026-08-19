@@ -70,9 +70,11 @@ JS แยกเป็น /assets/lightbox.js — แก้ style.css เมื�
 template จาก /rooms/jaosua1/ / เพิ่มหน้าใหม่ต้องเพิ่มใน sitemap.xml ด้วย
 Section รีวิว #reviews (19 ส.ค. 2026): อยู่ถัดจาก #rooms ทันที (social proof ติด
 จุดตัดสินใจ) — .reel-row รองรับหลายคลิป การ์ดละคลิป aspect 9:16 (Reel แนวตั้ง)
-embed ผ่าน facebook.com/plugins/video.php (href ต้อง URL-encode) — คลิปแรก:
-รีวิวเฮือนมหาเศรษฐี reel/1776247666851495 / เพิ่มคลิปใหม่: ก๊อป .reel-card ตาม
-comment ในโค้ด
+embed ต้องใช้โค้ดทางการจาก Facebook เป๊ะๆ (ปุ่ม Embed ใต้คลิป — href มี %2F
+ปิดท้าย + มี width/height ครบ) ห้ามแต่ง URL เอง และห้ามยืด iframe เต็มกรอบ
+(ปลั๊กอิน FB เรนเดอร์ขนาดตายตัว) — คลิปแรก: reel/1776247666851495
+คุณแดง (เจ้าของ) พาชมเฮือนมหาเศรษฐี **ไม่ใช่รีวิวลูกค้า** / เพิ่มคลิปใหม่:
+ก๊อป .reel-card ตาม comment ในโค้ด
 รูปเฮือนเจ้าสัว (19 ส.ค. 2026): jaosua-balcony.webp (ระเบียงหลังบ้าน A-frame),
 jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใช้ในแกลเลอรีหน้า detail ทั้งสองหลัง
 
