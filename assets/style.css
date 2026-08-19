@@ -219,3 +219,9 @@ footer a{color:var(--glow)}
 /* ---- gallery group label ---- */
 .gal-label{margin:34px 2px 4px;font-size:.9rem;color:var(--ink-soft)}
 .gal-label strong{color:var(--pine)}
+
+/* ---- gallery v2: masonry columns (no holes, no crops) ---- */
+.gal-grid{display:block;columns:3 300px;column-gap:14px;margin-top:22px}
+.gal-grid img{width:100%;height:auto;aspect-ratio:auto;object-fit:unset;display:block;margin:0 0 14px;border-radius:10px;break-inside:avoid}
+.gal-grid .tall{grid-row:auto;height:auto}
+@media(max-width:720px){.gal-grid{columns:2;column-gap:10px}.gal-grid img{margin-bottom:10px}}
