@@ -53,6 +53,10 @@
 Design tokens: --dusk #1d2d33, --pine #2e4a38, --lantern #e8963e, --glow #f6c877,
 --cream #f5efe3 / ฟอนต์ Mitr (display) + Sarabun (body) + Noto Sans Lao Looped
 Signature: เส้นไฟราว SVG คั่น section / แกลเลอรี = masonry columns
+Lightbox (19 ส.ค. 2026): คลิกรูปใน .gal-grid ขยายเต็มจอ — ลูกศร/swipe เลื่อนได้เฉพาะ
+ภายในชุดเดียวกัน (เคารพกติกาข้อ 6 — ชุด SepSook ไม่ปนกับชุดของเรา และ caption
+ชุด SepSook ติดเครดิตอัตโนมัติ) / ESC หรือคลิกพื้นหลังเพื่อปิด / CSS ท้าย style.css,
+JS ท้าย index.html — แก้ style.css เมื่อไรให้ bump `?v=` ที่ลิงก์ stylesheet (ตอนนี้ v=lb1)
 
 ## 5. ข้อมูลธุรกิจ (ยืนยันแล้ว)
 - โทร: +856 20 91 555 288 | Facebook: facebook.com/61563305080991
