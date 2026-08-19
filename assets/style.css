@@ -268,8 +268,8 @@ footer a{color:var(--glow)}
 #reviews{background:var(--cream)}
 .reel-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:38px}
 .reel-card{width:min(300px,100%);background:var(--white);border:1px solid var(--cream-2);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 18px rgba(36,49,44,.06)}
-.reel-frame{background:var(--dusk-deep);display:flex;align-items:center;justify-content:center;padding:12px 0}
-.reel-frame iframe{max-width:100%;display:block}
+.reel-frame{background:var(--dusk-deep)}
+.reel-frame video{width:100%;height:auto;display:block;aspect-ratio:9/16;object-fit:cover;background:var(--dusk-deep)}
 .reel-card .cap{padding:14px 16px;font-size:.9rem}
 .reel-card .cap b{font-family:'Mitr',sans-serif;color:var(--pine);display:block}
 .reel-card .cap span{color:var(--ink-soft);font-size:.84rem}

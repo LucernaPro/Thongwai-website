@@ -24,7 +24,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=dw1">
+<link rel="stylesheet" href="/assets/style.css?v=vd1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -262,15 +262,25 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">คลิปจากทุ่งหวาย</div>
     <h2>พาชมที่พักผ่านคลิปจริง</h2>
-    <p class="lead">คลิปพาชมจากเจ้าของ และรีวิวจากผู้เข้าพัก — แตะเพื่อเปิดเสียง</p>
+    <p class="lead">พาชมบรรยากาศภายในที่พัก และรีวิวจากผู้เข้าพัก — แตะเพื่อเปิดเสียง</p>
     <div class="reel-row">
       <div class="reel-card">
         <div class="reel-frame">
-          <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1776247666851495%2F&show_text=false&width=267&t=0" width="267" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="คุณแดง เจ้าของทุ่งหวายโฮมสเตย์ พาชมเฮือนมหาเศรษฐี"></iframe>
+          <video controls playsinline preload="metadata" poster="/images/review-resort-tour-poster.webp" width="720" height="1280">
+            <source src="/videos/review-resort-tour.mp4" type="video/mp4">
+          </video>
         </div>
-        <div class="cap"><b>เฮือนมหาเศรษฐี</b><span>คุณแดง เจ้าของ พาชมบ้าน</span></div>
+        <div class="cap"><b>พาชมรีสอร์ทและเฮือนพัก</b><span>รีวิวจากผู้เข้าพัก</span></div>
       </div>
-      <!-- REVIEW: เพิ่มคลิปใหม่ = ก๊อป .reel-card ทั้งก้อน แล้วใช้โค้ด embed ทางการจาก Facebook (ปุ่ม Embed ใต้คลิป) วางแทน iframe + แก้ชื่อเฮือน/คำบรรยาย -->
+      <div class="reel-card">
+        <div class="reel-frame">
+          <video controls playsinline preload="metadata" poster="/images/review-tent-poster.webp" width="720" height="1280">
+            <source src="/videos/review-tent.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="cap"><b>เต็นท์กลางสนาม</b><span>รีวิวจากผู้เข้าพัก</span></div>
+      </div>
+      <!-- REVIEW: เพิ่มคลิปใหม่ = แปลงเป็น H.264 mp4 (+faststart, <24MB) วางใน /videos/ + poster webp ใน /images/ แล้วก๊อป .reel-card -->
     </div>
   </div>
 </section>
