@@ -167,3 +167,7 @@ footer a{color:var(--glow)}
 .avail.free{display:inline-block;background:rgba(61,139,95,.15);color:#2e7d4f}
 .avail.full{display:inline-block;background:rgba(199,75,60,.12);color:#b0442f}
 .footnote{margin-top:18px;font-size:.85rem;color:var(--ink-soft)}
+
+/* ---- bulletproof room image ratio (v3) ---- */
+.room .imgbox{position:relative;width:100%;padding-top:66.67%;overflow:hidden;background:var(--dusk-deep)}
+.room .imgbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
