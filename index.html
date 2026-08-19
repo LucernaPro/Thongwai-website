@@ -24,7 +24,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=rd1">
+<link rel="stylesheet" href="/assets/style.css?v=mn1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -58,6 +58,7 @@ if (location.hostname.endsWith('workers.dev')) {
       <a href="#gallery">แกลเลอรี</a>
       <a href="#visit">การเดินทาง</a>
     </nav>
+    <button class="menu-btn" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
     <div class="langs">
       <span class="on">ไทย</span>
       <span class="soon" title="เร็ว ๆ นี้">ລາວ</span>
@@ -227,7 +228,8 @@ if (location.hostname.endsWith('workers.dev')) {
           <div class="row-top"><span class="badge">เต็นท์</span><span class="avail" data-avail="T1"></span></div>
           <h3>เต็นท์กลางสนาม</h3>
           <p class="spec">เต็นท์พร้อมฟลายชีท กลางสนามหญ้า วิวภูเขา ใกล้วงกองไฟ</p>
-          <div class="price"><b>ราคา · สอบถาม</b></div>
+          <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>600฿</b> <small>(390,000 กีบ)</small></div>
+          <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>800฿</b> <small>(520,000 กีบ)</small></div>
         </div>
       </article>
     </div>
@@ -282,7 +284,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <section id="gallery" style="padding-top:56px">
   <div class="wrap">
     <div class="eyebrow">บรรยากาศจริง</div>
-    <h2>ภาพจากที่พัก ไม่ปรุงแต่ง</h2>
+    <h2>ภาพจากที่พัก</h2>
     <p class="gal-label" style="margin-top:0">📷 ชุดภาพโดยลูกค้าของเรา — ขอบคุณเพจ <strong>SepSook</strong></p>
     <div class="gal-grid">
       <img src="/images/kayak-aerial.webp" class="tall" alt="มุมสูงพายคายัคในลำธารกลางป่า" loading="lazy">
@@ -292,7 +294,7 @@ if (location.hostname.endsWith('workers.dev')) {
       <img src="/images/kayaks-stream.webp" class="tall" alt="คายัคหลากสีริมลำธาร" loading="lazy">
       <img src="/images/aerial-garden-dusk.webp" alt="เฮือนพักและสวนดอกไม้ยามโพล้เพล้" loading="lazy">
     </div>
-    <p class="gal-label">ภาพบรรยากาศจากทุ่งหวาย</p>
+    <p class="gal-label">ภาพบรรยากาศภายในรีสอร์ท</p>
     <div class="gal-grid">
       <img src="/images/aerial-riverbend-dusk-v2.webp" alt="มุมสูงลำธารโค้งผ่านทุ่งหวายโฮมสเตย์ยามโพล้เพล้" loading="lazy">
       <img src="/images/river-dusk-wide-v2.webp" alt="ลำธารกว้างยามเย็นกับแสงไฟตามริมฝั่ง" loading="lazy">
@@ -359,6 +361,6 @@ const BOOKING_API = '';   // ★ วาง URL /exec ตรงนี้เมื
   } catch (e) {}
 })();
 </script>
-<script src="/assets/lightbox.js" defer></script>
+<script src="/assets/lightbox.js?v=2" defer></script>
 </body>
 </html>

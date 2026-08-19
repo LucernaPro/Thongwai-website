@@ -46,3 +46,20 @@
     if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
   }, { passive: true });
 })();
+
+// เมนูมือถือ (hamburger)
+(() => {
+  const btn = document.querySelector('.menu-btn'), nav = document.querySelector('nav.main');
+  if (!btn || !nav) return;
+  const set = open => {
+    nav.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+    btn.textContent = open ? '\u2715' : '\u2630';
+    btn.setAttribute('aria-label', open ? '\u0e1b\u0e34\u0e14\u0e40\u0e21\u0e19\u0e39' : '\u0e40\u0e1b\u0e34\u0e14\u0e40\u0e21\u0e19\u0e39');
+  };
+  btn.addEventListener('click', () => set(!nav.classList.contains('open')));
+  nav.addEventListener('click', e => { if (e.target.tagName === 'A') set(false); });
+  document.addEventListener('click', e => {
+    if (nav.classList.contains('open') && !nav.contains(e.target) && e.target !== btn) set(false);
+  });
+})();
