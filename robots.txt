@@ -1,0 +1,5 @@
+# thongwaihomestay.com — welcome, crawlers
+User-agent: *
+Allow: /
+
+Sitemap: https://thongwaihomestay.com/sitemap.xml
