@@ -222,7 +222,7 @@ footer a{color:var(--glow)}
 
 /* ---- gallery v2: masonry columns (no holes, no crops) ---- */
 .gal-grid{display:block;columns:3 300px;column-gap:14px;margin-top:22px}
-.gal-grid img{width:100%;height:auto;aspect-ratio:auto;object-fit:unset;display:block;margin:0 0 14px;border-radius:10px;break-inside:avoid}
+.gal-grid img{width:100%;height:auto;max-height:560px;aspect-ratio:auto;object-fit:cover;display:block;margin:0 0 14px;border-radius:10px;break-inside:avoid}
 .gal-grid .tall{grid-row:auto;height:auto}
 @media(max-width:720px){.gal-grid{columns:2;column-gap:10px}.gal-grid img{margin-bottom:10px}}
 
@@ -406,4 +406,13 @@ a.tl:hover .nm{color:var(--glow)}
   .gal-label{margin-top:24px}
   .hero .wrap{padding-top:84px;padding-bottom:48px}
   .rd-hero .wrap{padding-top:64px;padding-bottom:32px}
+  .gal-grid img{max-height:400px;margin-bottom:10px}
+  .visit-grid{margin-top:20px;gap:24px}
+  .rd-grid{margin-top:20px;gap:22px}
+  .fb-follow{margin-top:22px}
+  .avail-box{padding:30px 18px;margin-top:22px}
+  .avw,.avw-load{margin-top:20px}
+  .avcta{padding:20px 18px}
+  .rd-price-card{padding:20px 18px}
+  footer .wrap{padding:28px 20px 24px}
 }

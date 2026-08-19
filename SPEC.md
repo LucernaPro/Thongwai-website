@@ -76,6 +76,10 @@ JS แยกเป็น /assets/lightbox.js — แก้ style.css เมื�
 **หน้า detail = หน้าปิดการขาย (กติกา 19 ส.ค. 2026):** การ์ดราคาต้องมีปุ่มครบ 5:
 โทรจอง / แอดไลน์ (lin.ee/tvjr6Fx) / ทักเพจ Messenger (**m.me เท่านั้น ห้ามลิงก์หน้าเพจ**)
 / เปิดแผนที่นำทาง / ดูปฏิทินห้องว่าง — เฮือนใหม่ทุกหลังยึดชุดนี้
+ช่องไฟ (audit 19 ส.ค. 2026): masonry .gal-grid จำกัดสูงรูป 560px (มือถือ 400px)
+object-fit:cover — กันคอลัมน์ยาวไม่เท่ากันจนเกิดหลุมโล่งท้ายแกลเลอรี / มือถือบีบครบ:
+กริดทุกตัว 20px, fallback box, footer, การ์ดราคา, avw — แก้ spacing ที่ไหนให้แก้ใน
+บล็อกมือถือรวมท้าย style.css ที่เดียว
 Mobile spacing (19 ส.ค. 2026): มีบล็อก CSS บีบระยะหัว section ≤720px (padding 38px,
 override inline padding-top ด้วย !important, lights 38px) — Pist ติเรื่องเว้นหัวเยอะ
 Cache-bust ทุกครั้งที่แก้ style.css: ใช้ sed ตัวเดียว bump ทุกหน้า (index, availability,
