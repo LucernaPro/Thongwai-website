@@ -79,8 +79,8 @@ table.cal{border-collapse:collapse;min-width:100%}
   <!-- จอตั้งค่าครั้งแรก -->
   <div class="card" id="setupCard" style="display:none">
     <h2>ตั้งค่าครั้งแรก</h2>
-    <label>API URL (ลิงก์ Apps Script ลงท้าย /exec)</label>
-    <input id="cfgApi" placeholder="https://script.google.com/macros/s/..../exec">
+    <label>API URL (ปกติใช้ค่านี้ได้เลย)</label>
+    <input id="cfgApi" value="/api" placeholder="/api">
     <label>PIN</label>
     <input id="cfgPin" type="password" placeholder="รหัสที่ตั้งไว้ในสคริปต์">
     <label>ชื่อคนใช้เครื่องนี้ (จะติดในทุกการจองที่บันทึก)</label>
@@ -163,7 +163,7 @@ function thDate(s){ const d=new Date(s+'T00:00:00'); return d.toLocaleDateString
 function thDow(s){ const d=new Date(s+'T00:00:00'); return ['อา','จ','อ','พ','พฤ','ศ','ส'][d.getDay()]; }
 
 async function api(params){
-  const u = new URL(store.api);
+  const u = new URL(store.api, location.origin);
   Object.entries(params).forEach(([k,v]) => u.searchParams.set(k,v));
   const r = await fetch(u, {redirect:'follow'});
   return r.json();
@@ -181,7 +181,7 @@ function boot(){
 $('cfgSave').onclick = async () => {
   const a=$('cfgApi').value.trim(), p=$('cfgPin').value.trim(), s=$('cfgStaff').value.trim();
   const m=$('cfgMsg'); m.className='msg';
-  if(!a.endsWith('/exec')){ m.className='msg err'; m.textContent='URL ต้องลงท้ายด้วย /exec'; return; }
+  if(!a){ m.className='msg err'; m.textContent='กรอก API URL (ปกติคือ /api)'; return; }
   store.save(a,p,s);
   m.className='msg ok'; m.textContent='กำลังทดสอบการเชื่อมต่อ…';
   try{

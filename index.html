@@ -389,7 +389,7 @@ if (location.hostname.endsWith('workers.dev')) {
 
 <script>
 // ═══ ระบบห้องว่าง: fetch เดียว เลี้ยงทั้งป้ายการ์ด + ปฏิทิน ═══
-const BOOKING_API = '';   // ★ วาง URL /exec ของ Apps Script ตรงนี้เมื่อระบบจองพร้อม
+const BOOKING_API = '/api';   // Cloudflare Worker + D1 (เปิดใช้เมื่อ wrangler.jsonc ผูก DB แล้ว)
 const AVW_DAYS = 60;      // ดูล่วงหน้าได้กี่วัน
 (async () => {
   if (!BOOKING_API) return;

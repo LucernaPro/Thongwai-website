@@ -101,28 +101,26 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
 - จุดขาย: ลำธารไหลผ่านที่พัก / อากาศเย็น (โบโลเวน >1,000ม.) / **กาแฟลาวแท้จากแหล่งปลูก จิบริมลำธาร**
 - เครดิตภาพ: เพจ SepSook (ลูกค้า) — ยังไม่มีลิงก์เพจ ถ้าได้มาให้ทำเป็นลิงก์
 
-## 6. ระบบจอง (สถานะ: ฝั่งเว็บเสร็จหมด รอ Pist ติดตั้ง Apps Script อย่างเดียว)
-สถาปัตยกรรม: Google Sheet = database → Apps Script = API (ฟรี) → เว็บ 2 หน้า
-- **สคริปต์อยู่ใน repo แล้ว: `tools/thongwai-booking-script.gs`** (19 ส.ค. 2026 — เขียนใหม่
-  ตรง contract ที่ /admin เรียก ไม่หายกับแชทอีก มีวิธีติดตั้งอยู่หัวไฟล์): Sheet 2 tabs
-  (Rooms seed 10 ห้อง / Bookings 10 คอลัมน์รวม "บันทึกโดย"), `setup()` สร้างตารางเอง,
-  doGet actions: availability (สาธารณะ ไม่มีชื่อลูกค้า, days≤120) / rooms, bookings, add,
-  cancel (ต้องมี PIN), กันจองซ้อนด้วย LockService, TZ Asia/Vientiane, วันที่ text yyyy-MM-dd,
-  id = B+timestamp, ยกเลิก = เปลี่ยนสถานะไม่ลบแถว
-- **ปฏิทินห้องว่างหน้าแรก (19 ส.ค. 2026, เสร็จแล้ว):** ใน #availability — แถบวัน 14 วัน
-  เลื่อน ‹› ทีละ 7 วัน สูงสุด 60 วัน (AVW_DAYS) กดวันไหนทุกห้องขึ้น ว่าง/เต็ม ทันที
-  ห้องเต็มมีปุ่ม "ว่างอีกที [วันที่] →" กดกระโดดไปวันนั้น / fetch availability ครั้งเดียว
-  เลี้ยงทั้งป้าย "คืนนี้ว่าง/เต็ม" บนการ์ดและปฏิทิน / BOOKING_API ว่าง = โชว์กล่อง
-  placeholder เดิม (avail-box), ต่อ API สำเร็จ = สลับเป็นปฏิทินอัตโนมัติ
-- **ขั้นติดตั้งฝั่ง Pist (ค้างอยู่):** สร้าง Sheet "Thongwai Booking" → Extensions→Apps Script
-  → วางโค้ด → เปลี่ยน PIN → Run setup → Deploy Web app (Execute as Me / Anyone) → ส่ง URL /exec
-- **/admin (live แล้ว):** จอตั้งค่าครั้งแรก (API URL + PIN + ชื่อผู้ใช้ → localStorage),
-  ผังแบบตั๋วหนัง แถว=ห้อง คอลัมน์=วัน (มือถือ 10 วัน คอม 21 วัน), แท่งส้ม=จอง กดดู/ยกเลิก/โทร,
-  กดช่องว่าง=ฟอร์มจอง, เลื่อน ←7วัน→, หลายคนใช้ PIN เดียว แยกด้วยชื่อผู้บันทึก
-- **หน้าแรก:** มี stub ป้าย "คืนนี้ว่าง/เต็ม" ทุกการ์ดเฮือน — เปิดใช้โดยวาง URL /exec
-  ในตัวแปร `BOOKING_API` (script ท้าย index.html)
-- **ข้อควรระวังวันเปิดใช้:** ต้องคีย์การจองล่วงหน้าจากระบบเก่า (แอปปฏิทินที่ทีมใช้อยู่)
-  เข้าระบบใหม่ก่อน ไม่งั้นจองซ้อน
+## 6. ระบบจอง (สถาปัตยกรรมใหม่ 19 ส.ค. 2026: Cloudflare D1 — เลิกแผน Google Sheets)
+เหตุผล: ตัด dependency บัญชี Google ของคน (โอนเจ้าของแล้ว API พัง) — ทุกอย่างอยู่ใน
+บัญชี Cloudflare เดียวกับเว็บ: โดเมน + เว็บ + ฐานข้อมูล โอนก้อนเดียวจบ
+- **worker.js (อยู่ root repo):** API ที่ /api?action=... contract เดิมเป๊ะ:
+  availability (สาธารณะ ไม่มีชื่อลูกค้า days≤120) / rooms, bookings, add, cancel (PIN)
+  PIN = const ในไฟล์ (ตอนนี้ 2569 — เปลี่ยนแล้ว push ใหม่) / ตาราง rooms+bookings
+  auto-create + seed 10 ห้องครั้งแรกเอง ไม่ต้องรัน SQL มือ / กันจองซ้อนด้วย
+  INSERT..WHERE NOT EXISTS (atomic) / ยกเลิก = เปลี่ยนสถานะ ไม่ลบแถว / เวลา UTC+7
+- **.assetsignore (สำคัญ):** กัน worker.js, wrangler.jsonc, SPEC.md, README.md, tools,
+  node_modules ไม่ให้เสิร์ฟสาธารณะ (เดิม directory "./" เสิร์ฟทั้ง repo!) — ไฟล์ลับ/โค้ด
+  ใหม่ทุกไฟล์ต้องเช็คว่าควรเข้า .assetsignore ไหม
+- **/admin:** default API URL = /api (แก้แล้ว รองรับ relative path), PIN เดียวกับ worker
+- **หน้าแรก:** BOOKING_API = '/api' แล้ว — fetch fail เงียบๆ จนกว่า worker จะ deploy
+  (ปฏิทิน+ป้ายจะติดเองทันทีที่เปิดสวิตช์)
+- **⏳ เปิดสวิตช์ (ขั้นเดียวที่เหลือ):** Pist เข้า Cloudflare dashboard → Storage & Databases
+  → D1 → Create database ชื่อ `thongwai-booking` → ส่ง **Database ID** (UUID บนหน้า DB)
+  มาให้ Claude → Claude แก้ wrangler.jsonc (เพิ่ม main:worker.js + assets binding
+  ASSETS + run_worker_first:["/api"] + d1_databases binding DB) → push → ระบบติดทั้งเว็บ
+- **ข้อควรระวังวันเปิดใช้:** คีย์การจองล่วงหน้าจากปฏิทินทีมเข้า /admin ก่อน กันจองซ้อน
+- ทดสอบแล้ว (node:sqlite shim): overlap/back-to-back/cancel/PIN/validation ผ่าน 10 เคส
 
 ## 7. งานค้าง (เรียงตาม EV)
 1. ★ Pist ติดตั้ง Apps Script 5 ขั้น + ส่ง URL /exec → ต่อปฏิทินหน้าเว็บ + เปิดป้ายคืนนี้ว่าง + ทดสอบ /admin ครบวงจร

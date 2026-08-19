@@ -1,0 +1,11 @@
+# ไฟล์ที่ห้ามเสิร์ฟเป็นไฟล์สาธารณะบนเว็บ
+worker.js
+wrangler.jsonc
+SPEC.md
+README.md
+tools
+.assetsignore
+node_modules
+package.json
+package-lock.json
+wrangler.test.jsonc
