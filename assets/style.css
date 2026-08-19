@@ -208,8 +208,10 @@ footer a{color:var(--glow)}
 .hero3 .en{font-size:.78rem;letter-spacing:.24em;opacity:.9;margin-top:8px;text-shadow:0 1px 8px rgba(0,0,0,.6)}
 .hero3 p.tag{max-width:580px;margin-top:14px;font-size:1.06rem;text-shadow:0 1px 12px rgba(0,0,0,.7)}
 @media(max-width:860px){
-  .hero3{min-height:70vh}
-  .hero3 img.bg{object-position:60% 35%}
-  .hero3-inner{padding-top:90px;padding-bottom:34px}
+  .hero3{min-height:58vh}
+  .hero3 img.bg{object-position:58% 72%}
+  .hero3-inner{padding-top:56px;padding-bottom:30px}
+  .hero3 h1{font-size:2.05rem}
+  .hero3 p.tag{font-size:.98rem}
   .hero3 .cta-row .btn{width:100%;text-align:center}
 }
