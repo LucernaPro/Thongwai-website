@@ -44,6 +44,8 @@ const SEED_ROOMS = [
   ['T4', 'เต็นท์ 4',              2,   600, 13],
   ['T5', 'เต็นท์ 5',              2,   600, 14],
   ['T6', 'เต็นท์ 6',              2,   600, 15],
+  ['T7', 'เต็นท์ 7',              2,   600, 16],
+  ['T8', 'เต็นท์ 8',              2,   600, 17],
 ];
 
 /* ── เวลา สปป.ลาว (UTC+7 ไม่มี DST) ── */
@@ -91,6 +93,14 @@ async function init(db) {
       await db.batch(SEED_ROOMS.filter(r => /^T[2-6]$/.test(r[0])).map(r =>
         db.prepare('INSERT OR IGNORE INTO rooms (id,name,capacity,price,sort) VALUES (?,?,?,?,?)').bind(...r)));
     }
+  }
+  // migration 19 ส.ค. 2026 (2): เต็นท์มี 8 หลัง — เพิ่ม T7-T8 + ย้ายรายการนำเข้าที่เคยติดป้าย X:
+  const t7 = await db.prepare("SELECT id FROM rooms WHERE id = 'T7'").first();
+  if (!t7) {
+    await db.batch(SEED_ROOMS.filter(r => /^T[78]$/.test(r[0])).map(r =>
+      db.prepare('INSERT OR IGNORE INTO rooms (id,name,capacity,price,sort) VALUES (?,?,?,?,?)').bind(...r)));
+    await db.prepare("UPDATE bookings SET room = 'T7' WHERE room = 'X:เต้นท์หลังเล็ก7'").run();
+    await db.prepare("UPDATE bookings SET room = 'T8' WHERE room = 'X:เต้นท์หลังเล็ก8'").run();
   }
   const { u } = await db.prepare('SELECT COUNT(*) AS u FROM users').first();
   if (u === 0) {

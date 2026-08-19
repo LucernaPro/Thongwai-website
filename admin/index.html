@@ -370,7 +370,9 @@ function openDetail(id){
 }
 $('dClose').onclick = closeSheets;
 $('dCancel').onclick = async () => {
-  if(!confirm('ยืนยันยกเลิกการจองนี้?')) return;
+  const b = bookings.find(x=>x.id===currentId);
+  const who = b ? `ของ "${b.name}" (${thDate(b.checkin)} → ${thDate(b.checkout)})` : 'นี้';
+  if(!confirm('⚠️ ยืนยันยกเลิกการจอง' + who + '?\nยกเลิกแล้วห้องจะกลับเป็นว่างทันที')) return;
   const m=$('dMsg'); m.className='msg ok'; m.textContent='กำลังยกเลิก…';
   try{
     const r = await api({action:'cancel', id:currentId});
