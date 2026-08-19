@@ -177,3 +177,22 @@ footer a{color:var(--glow)}
 .high .hpic{width:100%;height:150px;overflow:hidden;margin-bottom:16px}
 .high .hpic img{width:100%;height:100%;object-fit:cover}
 .high h3,.high p{padding:0 24px}
+
+/* ---- hero v2: split layout, no text-over-image ---- */
+.hero2{display:grid;grid-template-columns:1fr 1.1fr;min-height:74vh;background:var(--pine)}
+.hero2-text{display:flex;align-items:center;color:var(--white)}
+.hero2-text .inner{padding:56px 48px 56px max(48px, calc((100vw - var(--maxw))/2 + 20px));max-width:640px}
+.hero2 .lao{font-family:'Noto Sans Lao Looped','Mitr',sans-serif;color:var(--glow);font-size:1rem;letter-spacing:.05em;margin-bottom:10px}
+.hero2 h1{font-size:clamp(2.2rem,4.2vw,3.4rem);line-height:1.25}
+.hero2 .en{font-size:.78rem;letter-spacing:.24em;color:rgba(245,239,227,.75);margin-top:10px}
+.hero2 p.tag{margin-top:18px;font-size:1.05rem;color:rgba(245,239,227,.92);line-height:1.8}
+.hero2-media{position:relative;min-height:340px}
+.hero2-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(max-width:860px){
+  .hero2{display:flex;flex-direction:column;min-height:0}
+  .hero2-media{order:-1;min-height:0;position:static}
+  .hero2-media img{position:static;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;display:block}
+  .hero2-text .inner{padding:30px 20px 38px;max-width:none}
+  .hero2 h1{font-size:2rem}
+  .hero2 .cta-row .btn{width:100%;text-align:center}
+}
