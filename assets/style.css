@@ -225,3 +225,17 @@ footer a{color:var(--glow)}
 .gal-grid img{width:100%;height:auto;aspect-ratio:auto;object-fit:unset;display:block;margin:0 0 14px;border-radius:10px;break-inside:avoid}
 .gal-grid .tall{grid-row:auto;height:auto}
 @media(max-width:720px){.gal-grid{columns:2;column-gap:10px}.gal-grid img{margin-bottom:10px}}
+
+/* ===== Lightbox แกลเลอรี ===== */
+.gal-grid img{cursor:zoom-in}
+.lb{position:fixed;inset:0;background:rgba(19,28,32,.94);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+.lb.open{display:flex}
+.lb>img{max-width:min(1600px,94vw);max-height:80vh;width:auto;height:auto;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.lb-cap{color:var(--cream,#f5efe3);opacity:.85;font-size:.9rem;margin-top:14px;text-align:center;max-width:90vw}
+.lb-count{color:var(--glow,#f6c877);font-size:.8rem;margin-top:4px;letter-spacing:.08em}
+.lb button{position:absolute;background:rgba(245,239,227,.08);border:1px solid rgba(245,239,227,.25);color:#f5efe3;width:44px;height:44px;border-radius:50%;font-size:24px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;padding:0}
+.lb button:hover{background:rgba(232,150,62,.4)}
+.lb-close{top:16px;right:16px;font-size:18px}
+.lb-prev{left:14px;top:50%;transform:translateY(-50%)}
+.lb-next{right:14px;top:50%;transform:translateY(-50%)}
+@media(max-width:720px){.lb{padding:10px}.lb-prev{left:6px}.lb-next{right:6px}.lb>img{max-height:72vh}}
