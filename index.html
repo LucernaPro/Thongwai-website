@@ -24,7 +24,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=lb1">
+<link rel="stylesheet" href="/assets/style.css?v=rd1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -53,6 +53,7 @@ if (location.hostname.endsWith('workers.dev')) {
     <a class="brand" href="/" style="display:flex;align-items:center;gap:9px"><img src="/images/logo-emblem.png" alt="" style="height:34px;width:auto"><span>ทุ่งหวายโฮมสเตย์<small>Thongwai Homestay · Paksong</small></span></a>
     <nav class="main">
       <a href="#rooms">ห้องพัก</a>
+      <a href="#reviews">รีวิว</a>
       <a href="#availability">เช็คห้องว่าง</a>
       <a href="#gallery">แกลเลอรี</a>
       <a href="#visit">การเดินทาง</a>
@@ -149,23 +150,25 @@ if (location.hostname.endsWith('workers.dev')) {
         </div>
       </article>
       <article class="room" data-room="R3">
-        <div class="imgbox"><img src="/images/room-jaosua1.webp" alt="เฮือนเจ้าสัว 1 ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800"></div>
+        <div class="imgbox"><a href="/rooms/jaosua1/"><img src="/images/room-jaosua1.webp" alt="เฮือนเจ้าสัว 1 ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800"></a></div>
         <div class="body">
           <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R3"></span></div>
-          <h3>เฮือนเจ้าสัว 1</h3>
+          <h3><a href="/rooms/jaosua1/" style="text-decoration:none">เฮือนเจ้าสัว 1</a></h3>
           <p class="spec">1 ห้องนอน · 1 ห้องน้ำ · ระเบียงหลังบ้าน · พักได้ 4 ท่าน</p>
           <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>1,800฿</b> <small>(1,170,000 กีบ)</small></div>
           <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,200฿</b> <small>(1,430,000 กีบ)</small></div>
+          <a class="more" href="/rooms/jaosua1/">ชมบ้านหลังนี้ →</a>
         </div>
       </article>
       <article class="room" data-room="R4">
-        <div class="imgbox"><img src="/images/room-jaosua2.webp" alt="เฮือนเจ้าสัว 2 ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800"></div>
+        <div class="imgbox"><a href="/rooms/jaosua2/"><img src="/images/room-jaosua2.webp" alt="เฮือนเจ้าสัว 2 ทุ่งหวายโฮมสเตย์" loading="lazy" width="1200" height="800"></a></div>
         <div class="body">
           <div class="row-top"><span class="badge">บ้านพัก</span><span class="avail" data-avail="R4"></span></div>
-          <h3>เฮือนเจ้าสัว 2</h3>
+          <h3><a href="/rooms/jaosua2/" style="text-decoration:none">เฮือนเจ้าสัว 2</a></h3>
           <p class="spec">1 ห้องนอน · 1 ห้องน้ำ · ระเบียงหลังบ้าน · พักได้ 4 ท่าน</p>
           <div class="price"><span class="pl">ไม่รวมอาหารเช้า</span> <b>1,800฿</b> <small>(1,170,000 กีบ)</small></div>
           <div class="price"><span class="pl">รวมอาหารเช้า</span> <b>2,200฿</b> <small>(1,430,000 กีบ)</small></div>
+          <a class="more" href="/rooms/jaosua2/">ชมบ้านหลังนี้ →</a>
         </div>
       </article>
       <article class="room" data-room="R5">
@@ -229,6 +232,23 @@ if (location.hostname.endsWith('workers.dev')) {
       </article>
     </div>
     <p class="footnote">เตียงเสริม 200฿ (130,000 กีบ) ไม่รวมอาหารเช้า · 320฿ (200,000 กีบ) รวมอาหารเช้า</p>
+  </div>
+</section>
+
+<section id="reviews">
+  <div class="wrap">
+    <div class="eyebrow">เสียงจากผู้เข้าพัก</div>
+    <h2>รีวิวจริงจากคนที่มานอนจริง</h2>
+    <p class="lead">คลิปรีวิวจากผู้เข้าพักและเพจท่องเที่ยว — แตะเพื่อเปิดเสียง</p>
+    <div class="reel-row">
+      <div class="reel-card">
+        <div class="reel-frame">
+          <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1776247666851495&show_text=false&t=0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" title="คลิปรีวิวเฮือนมหาเศรษฐี ทุ่งหวายโฮมสเตย์"></iframe>
+        </div>
+        <div class="cap"><b>เฮือนมหาเศรษฐี</b><span>คลิปรีวิวจากผู้เข้าพัก</span></div>
+      </div>
+      <!-- REVIEW: เพิ่มคลิปรีวิวใหม่ = ก๊อป .reel-card ด้านบนทั้งก้อน แล้วเปลี่ยน href (URL-encode) + ชื่อเฮือน -->
+    </div>
   </div>
 </section>
 
@@ -339,55 +359,6 @@ const BOOKING_API = '';   // ★ วาง URL /exec ตรงนี้เมื
   } catch (e) {}
 })();
 </script>
-<script>
-// Lightbox แกลเลอรี — คลิกรูปเพื่อขยาย เลื่อนซ้าย-ขวาภายในชุดเดียวกัน (ชุด SepSook แยกจากชุดของเรา)
-(() => {
-  const grids = [...document.querySelectorAll('.gal-grid')];
-  if (!grids.length) return;
-  const lb = document.createElement('div');
-  lb.className = 'lb';
-  lb.innerHTML = '<button class="lb-close" aria-label="ปิด">✕</button>' +
-    '<button class="lb-prev" aria-label="ภาพก่อนหน้า">‹</button>' +
-    '<img alt="">' +
-    '<button class="lb-next" aria-label="ภาพถัดไป">›</button>' +
-    '<div class="lb-cap"></div><div class="lb-count"></div>';
-  document.body.appendChild(lb);
-  const im = lb.querySelector('img'), cap = lb.querySelector('.lb-cap'), cnt = lb.querySelector('.lb-count');
-  let list = [], idx = 0, credit = '';
-  const show = i => {
-    idx = (i + list.length) % list.length;
-    im.src = list[idx].src; im.alt = list[idx].alt;
-    cap.textContent = list[idx].alt + credit;
-    cnt.textContent = (idx + 1) + ' / ' + list.length;
-  };
-  const close = () => { lb.classList.remove('open'); document.body.style.overflow = ''; im.removeAttribute('src'); };
-  grids.forEach(g => g.addEventListener('click', e => {
-    if (e.target.tagName !== 'IMG') return;
-    list = [...g.querySelectorAll('img')];
-    const label = g.previousElementSibling;
-    credit = (label && /SepSook/i.test(label.textContent)) ? ' — 📷 เพจ SepSook' : '';
-    show(list.indexOf(e.target));
-    lb.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }));
-  lb.querySelector('.lb-close').onclick = close;
-  lb.querySelector('.lb-prev').onclick = () => show(idx - 1);
-  lb.querySelector('.lb-next').onclick = () => show(idx + 1);
-  lb.addEventListener('click', e => { if (e.target === lb) close(); });
-  document.addEventListener('keydown', e => {
-    if (!lb.classList.contains('open')) return;
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowLeft') show(idx - 1);
-    else if (e.key === 'ArrowRight') show(idx + 1);
-  });
-  let tx = null;
-  lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-  lb.addEventListener('touchend', e => {
-    if (tx === null) return;
-    const dx = e.changedTouches[0].clientX - tx; tx = null;
-    if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
-  }, { passive: true });
-})();
-</script>
+<script src="/assets/lightbox.js" defer></script>
 </body>
 </html>

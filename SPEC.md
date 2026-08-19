@@ -43,7 +43,10 @@
 ## 4. โครงไฟล์เว็บ
 ```
 /index.html            หน้าแรก (ไทย) — หน้าเดียว ครบทุก section
+/rooms/jaosua1/index.html  หน้า detail เฮือนเจ้าสัว 1 (template สำหรับหน้า detail เฮือนอื่นๆ ต่อไป)
+/rooms/jaosua2/index.html  หน้า detail เฮือนเจ้าสัว 2 (twin ของ jaosua1)
 /assets/style.css      สไตล์รวม (โทน "ค่ำที่ทุ่งหวาย": เขียวสน/ฟ้าค่ำ/ส้มโคมหวาย/ครีม)
+/assets/lightbox.js    lightbox แกลเลอรีใช้ร่วมทุกหน้า (โหลดแบบ defer)
 /admin/index.html      หน้าจัดการจอง (สร้างเสร็จ รอ API) — noindex
 /images/*.webp         รูปทั้งหมด
 /robots.txt            เปิดรับทุกบอท + sitemap
@@ -56,7 +59,19 @@ Signature: เส้นไฟราว SVG คั่น section / แกลเ�
 Lightbox (19 ส.ค. 2026): คลิกรูปใน .gal-grid ขยายเต็มจอ — ลูกศร/swipe เลื่อนได้เฉพาะ
 ภายในชุดเดียวกัน (เคารพกติกาข้อ 6 — ชุด SepSook ไม่ปนกับชุดของเรา และ caption
 ชุด SepSook ติดเครดิตอัตโนมัติ) / ESC หรือคลิกพื้นหลังเพื่อปิด / CSS ท้าย style.css,
-JS ท้าย index.html — แก้ style.css เมื่อไรให้ bump `?v=` ที่ลิงก์ stylesheet (ตอนนี้ v=lb1)
+JS แยกเป็น /assets/lightbox.js — แก้ style.css เมื่อไรให้ bump `?v=` ที่ลิงก์ stylesheet (ตอนนี้ v=rd1)
+หน้า detail ห้องพัก (19 ส.ค. 2026): เริ่มที่เจ้าสัว 1+2 — การ์ดในหน้าแรกลิงก์ด้วยรูป+ชื่อ+
+"ชมบ้านหลังนี้ →" (.more) / โครงหน้า: rd-hero (รูปการ์ดเป็น hero) + rd-grid
+(เนื้อหา 1.6fr : การ์ดราคา sticky 1fr) + แกลเลอรี .gal-grid ใช้ lightbox ร่วม /
+มีบล็อก .rd-video ซ่อนไว้ (display:none) รอวางคลิปแต่ละห้อง — เฮือนอื่นให้ก๊อป
+template จาก /rooms/jaosua1/ / เพิ่มหน้าใหม่ต้องเพิ่มใน sitemap.xml ด้วย
+Section รีวิว #reviews (19 ส.ค. 2026): อยู่ถัดจาก #rooms ทันที (social proof ติด
+จุดตัดสินใจ) — .reel-row รองรับหลายคลิป การ์ดละคลิป aspect 9:16 (Reel แนวตั้ง)
+embed ผ่าน facebook.com/plugins/video.php (href ต้อง URL-encode) — คลิปแรก:
+รีวิวเฮือนมหาเศรษฐี reel/1776247666851495 / เพิ่มคลิปใหม่: ก๊อป .reel-card ตาม
+comment ในโค้ด
+รูปเฮือนเจ้าสัว (19 ส.ค. 2026): jaosua-balcony.webp (ระเบียงหลังบ้าน A-frame),
+jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใช้ในแกลเลอรีหน้า detail ทั้งสองหลัง
 
 ## 5. ข้อมูลธุรกิจ (ยืนยันแล้ว)
 - โทร: +856 20 91 555 288 | Facebook: facebook.com/61563305080991
