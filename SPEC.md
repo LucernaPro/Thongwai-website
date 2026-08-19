@@ -56,6 +56,8 @@
 Design tokens: --dusk #1d2d33, --pine #2e4a38, --lantern #e8963e, --glow #f6c877,
 --cream #f5efe3 / ฟอนต์ Mitr (display) + Sarabun (body) + Noto Sans Lao Looped
 Signature: เส้นไฟราว SVG คั่น section / แกลเลอรี = masonry columns
+Section #dining "ห้องอาหารริมลำธาร" (19 ส.ค. 2026): masonry 8 รูป dining-*.webp
+อยู่ถัดจาก #gallery — 4 รูปหลังเป็นรูปเล็กจากเพจ (414px) ถ้าได้ไฟล์ใหญ่ค่อยสลับ
 Lightbox (19 ส.ค. 2026): คลิกรูปใน .gal-grid ขยายเต็มจอ — ลูกศร/swipe เลื่อนได้เฉพาะ
 ภายในชุดเดียวกัน (เคารพกติกาข้อ 6 — ชุด SepSook ไม่ปนกับชุดของเรา และ caption
 ชุด SepSook ติดเครดิตอัตโนมัติ) / ESC หรือคลิกพื้นหลังเพื่อปิด / CSS ท้าย style.css,
@@ -82,7 +84,12 @@ review-tent.mp4 (รีวิวเต็นท์ ชุดขาว) ทั้
 jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใช้ในแกลเลอรีหน้า detail ทั้งสองหลัง
 
 ## 5. ข้อมูลธุรกิจ (ยืนยันแล้ว)
-- โทร: +856 20 91 555 288 | Facebook: facebook.com/61563305080991
+- ช่องทางจอง (การจองคือโทร/แชท ตามที่ลงเว็บ): โทร +856 20 91 555 288 |
+  LINE https://lin.ee/tvjr6Fx (QR = images/line-qr.webp) |
+  เพจ FB ทางการ https://www.facebook.com/thongwaihomestay/ (URL vanity — เลิกใช้เลข
+  61563305080991 บนเว็บแล้ว) ปุ่มทักเพจใช้ https://m.me/thongwaihomestay
+- แผนที่นำทาง: https://maps.app.goo.gl/7SpH7qq64s1iKQvr7 (ปุ่มใน visit card)
+- กล่องติดตามเพจ (FB page plugin timeline) อยู่ใน #visit คอลัมน์ซ้าย + ลิงก์ fallback
 - เฮือน 9 หลัง + เต็นท์ (room_id ใช้ในระบบจอง):
   | id | ชื่อ (ตามป้าย) | สเปคย่อ | ราคา ไม่รวม/รวมอาหารเช้า (บาท) |
   |----|----|----|----|
@@ -130,9 +137,11 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
    มหาเศรษฐีกลางคืน, เด็คคาเฟ่เก้าอี้โยก, ผังมุมสูงกลางวัน, ชุด SepSook ที่เหลือ
 5. พิกัด Google Maps + geo ใน schema + หน้าการเดินทางละเอียด (มีรูปผังมุมสูงรอ)
 6. หน้า ລາວ (/lo) และ EN (/en) — ปุ่มบน topbar ขึ้น "เร็วๆนี้" อยู่
-7. ราคาเต็นท์ / ลิงก์เพจ SepSook / เปลี่ยนโลโก้บนเพจ FB เป็นชุด Thongwai ใหม่
-8. Google Business Profile ผูกเว็บ + Search Console submit sitemap
-9. อนาคต: Cloudflare Email Routing ถ้าอยากมี email@thongwaihomestay.com
+7. ★ เต็นท์มี 6 หลัง (Pist แจ้ง 19 ส.ค. 2026 — "ตอนแก้รอบหน้าค่อยทำ"): ปรับการ์ดหน้าแรก
+   + ระบบจอง T1 เป็น T1-T6 (แก้ SEED_ROOMS ใน worker.js + migration แถว rooms ใน D1)
+8. ลิงก์เพจ SepSook / เปลี่ยนโลโก้บนเพจ FB เป็นชุด Thongwai ใหม่
+9. Google Business Profile ผูกเว็บ + Search Console submit sitemap
+10. อนาคต: Cloudflare Email Routing ถ้าอยากมี email@thongwaihomestay.com
 
 ## 8. ประวัติย่อ (19 ส.ค. 2026 — วันเดียวจบทั้งหมดนี้)
 จดโดเมน+ผูก Cloudflare+www+SSL / เว็บหน้าแรก v1: hero drone full-bleed (เงาเฉพาะฐาน),

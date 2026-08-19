@@ -335,3 +335,17 @@ footer a{color:var(--glow)}
 .avw-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
 .avw-note{font-size:.8rem;opacity:.6;margin-top:12px}
 @media(max-width:720px){.avw-rooms{grid-template-columns:1fr}}
+
+/* ===== ปุ่ม LINE / แผนที่ / QR / กล่องเพจ FB ===== */
+.btn-lineapp{background:#06C755;color:#fff;box-shadow:0 4px 14px rgba(6,199,85,.35)}
+.btn-maps{border:1.5px solid var(--pine);color:var(--pine)}
+.btn-maps:hover{background:rgba(46,74,56,.08)}
+.line-qr-box{display:flex;align-items:center;gap:14px;margin-top:18px;padding-top:16px;border-top:1px dashed var(--cream-2)}
+.line-qr-box img{border-radius:8px;border:1px solid var(--cream-2);flex:none}
+.line-qr-box span{font-size:.85rem;color:var(--ink-soft);line-height:1.5}
+@media(max-width:720px){.line-qr-box{display:none}}
+.fb-follow{margin-top:30px}
+.fb-follow h3{font-size:1.05rem;margin-bottom:12px}
+.fb-frame{max-width:340px;border-radius:12px;overflow:hidden;border:1px solid var(--cream-2);background:var(--white);min-height:120px}
+.fb-frame iframe{display:block;max-width:100%}
+.fb-link{display:inline-block;margin-top:10px;font-size:.9rem;font-family:'Mitr',sans-serif;color:var(--pine)}
