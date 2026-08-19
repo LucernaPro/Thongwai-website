@@ -3,3 +3,5 @@ package.json
 package-lock.json
 wrangler.test.jsonc
 .wrangler/
+__pycache__/
+*.pyc
