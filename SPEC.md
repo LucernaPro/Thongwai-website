@@ -184,6 +184,11 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
   ตรวจ → push → Pist กดที่ /admin/import/ (id ใหม่ไม่ชนของเก่า, กดซ้ำไม่ซ้ำแถว)
   / จองซ้อนในอนาคต 2 คู่ให้ทีมยกเลิกเอง:
   R2 29 ส.ค. (พี่จ๋ม/พี่จุ๋ม), R5 23 ส.ค. (ปัอปปี้/แอนนี้)
+- **บทเรียน build ล้มยกแผง (20 ส.ค. 2026):** wrangler สแกน asset เจอ .git/objects/pack
+  ที่โตทะลุลิมิต 25 MiB/ไฟล์ → build ล้มทุกคอมมิตตั้งแต่คืน 19 ส.ค. โดยไม่เกี่ยวกับโค้ด
+  แก้แล้ว: .assetsignore ต้องมี .git เสมอ / อาการ: dashboard ป้ายแดง Latest build
+  failed + Active deployment ค้างที่คอมมิตเก่า / repo นี้มีวิดีโอ+รูปเยอะ pack จะโตต่อ —
+  ห้ามลบบรรทัด .git ออก
 - **Build toolchain ล็อกเวอร์ชัน (20 ส.ค. 2026):** package.json + lockfile อยู่ใน repo
   แล้ว wrangler = 4.124.0 ตายตัว (เดิม npx ดึง latest ทุก build = deploy drift ไป
   เวอร์ชันไม่เคยเทส) — อัปเกรด wrangler = ตั้งใจเปลี่ยน + dry-run ก่อนเสมอ:
