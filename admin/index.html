@@ -187,6 +187,18 @@ table.cal{border-collapse:collapse;min-width:100%}
   <div class="msg" id="fMsg"></div>
 </div>
 
+<!-- bottom sheet: เอกสารการจอง (รูปส่งลูกค้า) -->
+<div class="sheet" id="docSheet">
+  <h2 style="color:var(--glow);margin-bottom:10px">เอกสารการจอง</h2>
+  <div style="text-align:center"><img id="docImg" style="width:100%;max-width:420px;border-radius:12px;border:1px solid rgba(246,200,119,.3)" alt="เอกสารการจอง"></div>
+  <p style="font-size:.82rem;opacity:.7;margin-top:10px">ส่งให้ลูกค้า: กดปุ่มแชร์ หรือกดรูปค้างไว้แล้วบันทึก/แชร์</p>
+  <div class="row" style="margin-top:12px">
+    <button class="btn btn-l" id="docShare">แชร์เอกสาร</button>
+    <button class="btn btn-g" id="docClose">ปิด</button>
+  </div>
+  <div class="msg" id="docMsg"></div>
+</div>
+
 <!-- bottom sheet: จัดการผู้ใช้ (admin เท่านั้น) -->
 <div class="sheet" id="userSheet">
   <h2 style="color:var(--glow);margin-bottom:6px">จัดการผู้ใช้</h2>
@@ -208,6 +220,7 @@ table.cal{border-collapse:collapse;min-width:100%}
   <h2 style="color:var(--glow)" id="dTitle">รายละเอียด</h2>
   <div id="dBody" style="margin:10px 0;font-size:.95rem;line-height:2"></div>
   <div class="row">
+    <button class="btn btn-l" id="dDoc">📄 เอกสารการจอง</button>
     <button class="btn btn-r" id="dCancel">ยกเลิกการจองนี้</button>
     <button class="btn btn-g" id="dClose">ปิด</button>
   </div>
@@ -279,6 +292,98 @@ $('btnSettings').onclick = () => {
   $('whoami').textContent='';
   $('setupCard').style.display='block'; $('cfgUser').value=''; $('cfgPass').value='';
   $('cfgMsg').className='msg';
+};
+
+/* ================= เอกสารการจอง (รูปส่งลูกค้า) ================= */
+let docBlob = null;
+const LOGO = new Image(); LOGO.src = '/images/logo-emblem.png';
+
+function wrapText(ctx, text, x, y, maxW, lh){
+  const words = String(text).split(' ');
+  let line = '', yy = y;
+  for (const w of words){
+    const t = line ? line + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && line){ ctx.fillText(line, x, yy); line = w; yy += lh; }
+    else line = t;
+  }
+  if (line) ctx.fillText(line, x, yy);
+  return yy;
+}
+
+async function drawDoc(b){
+  try { await document.fonts.ready; } catch(e) {}
+  const W = 1000, cv = document.createElement('canvas');
+  const rn = roomName(b.room);
+  const noteParts = (b.note || '').split(' · ').filter(Boolean);
+  const H = 940 + noteParts.length * 44;
+  cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+
+  x.fillStyle = '#f7f2e6'; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#2e4a38'; x.fillRect(0, 0, W, 200);
+  if (LOGO.complete && LOGO.naturalWidth) x.drawImage(LOGO, 60, 40, 120, 120);
+  x.fillStyle = '#f6c877'; x.font = '600 46px Mitr';
+  x.fillText('ทุ่งหวายโฮมสเตย์', 210, 95);
+  x.fillStyle = '#e8e2d2'; x.font = '26px Sarabun';
+  x.fillText('ທົ່ງຫວາຍໂຮມສະເຕ · Thongwai Homestay · Paksong', 210, 138);
+  x.fillStyle = '#e8963e'; x.fillRect(0, 200, W, 8);
+
+  x.fillStyle = '#24312c'; x.font = '600 40px Mitr';
+  x.fillText('เอกสารยืนยันการจอง', 60, 285);
+  x.fillStyle = '#6a7268'; x.font = '24px Sarabun';
+  x.fillText('Booking Confirmation · ' + b.id, 60, 322);
+
+  let y = 400;
+  const row = (k, v, big) => {
+    x.fillStyle = '#8a8f85'; x.font = '24px Sarabun'; x.fillText(k, 60, y);
+    x.fillStyle = '#24312c'; x.font = (big ? '600 34px Mitr' : '28px Sarabun');
+    y = wrapText(x, v, 300, y, W - 360, 38) + 56;
+    x.strokeStyle = 'rgba(46,74,56,.15)'; x.setLineDash([6, 8]);
+    x.beginPath(); x.moveTo(60, y - 38); x.lineTo(W - 60, y - 38); x.stroke(); x.setLineDash([]);
+  };
+  row('ผู้เข้าพัก', b.name, true);
+  if (b.phone) row('เบอร์โทร', b.phone);
+  row('ห้องพัก', rn, true);
+  row('เช็คอิน', thDate(b.checkin) + ' (' + thDow(b.checkin) + ')');
+  row('เช็คเอาท์', thDate(b.checkout) + ' (' + thDow(b.checkout) + ')');
+  row('จำนวนคืน', nightsOf(b) + ' คืน');
+  for (const p of noteParts) row('', p);
+
+  x.fillStyle = '#2e4a38'; x.fillRect(0, H - 170, W, 170);
+  x.fillStyle = '#9fe0b7'; x.font = '600 30px Mitr';
+  x.fillText('✓ ยืนยันการจองแล้ว — ขอบคุณที่เลือกทุ่งหวายโฮมสเตย์', 60, H - 108);
+  x.fillStyle = '#e8e2d2'; x.font = '23px Sarabun';
+  x.fillText('โทร +856 20 91 555 288 · thongwaihomestay.com · บ้านทุ่งหวาย เมืองปากซอง แขวงจำปาสัก', 60, H - 62);
+  x.fillStyle = 'rgba(232,226,210,.55)'; x.font = '19px Sarabun';
+  x.fillText('ออกเอกสาร ' + new Date().toLocaleString('th-TH') + ' โดย ' + store.user, 60, H - 26);
+  return cv;
+}
+
+$('dDoc').onclick = async () => {
+  const b = bookings.find(x=>x.id===currentId) || logBookings.find(x=>x.id===currentId); if(!b) return;
+  const cv = await drawDoc(b);
+  $('docImg').src = cv.toDataURL('image/png');
+  cv.toBlob(bl => { docBlob = bl; }, 'image/png');
+  $('docMsg').className='msg';
+  $('detailSheet').classList.remove('open');
+  $('docSheet').classList.add('open');
+};
+$('docClose').onclick = closeSheets;
+$('docShare').onclick = async () => {
+  const m = $('docMsg');
+  try {
+    const file = new File([docBlob], 'booking-' + currentId + '.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'เอกสารการจอง ทุ่งหวายโฮมสเตย์' });
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(docBlob); a.download = 'booking-' + currentId + '.png';
+    a.click();
+    m.className='msg ok'; m.textContent='บันทึกรูปแล้ว ✓';
+  } catch(e) {
+    if (e.name !== 'AbortError'){ m.className='msg err'; m.textContent='แชร์ไม่สำเร็จ — กดรูปค้างไว้แล้วบันทึกแทนได้'; }
+  }
 };
 
 /* ================= จัดการผู้ใช้ (admin) ================= */
@@ -444,7 +549,7 @@ function openForm(room, date){
 $('fabAdd').onclick = () => openForm();
 $('fClose').onclick = closeSheets;
 $('backdrop').onclick = closeSheets;
-function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').classList.remove('open'); $('detailSheet').classList.remove('open'); $('userSheet').classList.remove('open'); }
+function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').classList.remove('open'); $('detailSheet').classList.remove('open'); $('userSheet').classList.remove('open'); $('docSheet').classList.remove('open'); }
 
 $('fSave').onclick = async () => {
   const m=$('fMsg'); m.className='msg';
