@@ -90,7 +90,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.3</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.4</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <button id="btnUsers" title="จัดการผู้ใช้" style="display:none">👥</button>
@@ -299,7 +299,7 @@ $('btnSettings').onclick = () => {
 
 /* ================= เอกสารการจอง (รูปส่งลูกค้า) ================= */
 let docBlob = null;
-const LOGO = new Image(); LOGO.src = '/images/logo-emblem.png';
+const LOGO = new Image(); LOGO.src = '/images/logo-thongwai-320.png';
 
 function wrapText(ctx, text, x, y, maxW, lh){
   const words = String(text).split(' ');
@@ -324,7 +324,7 @@ async function drawDoc(b){
 
   x.fillStyle = '#f7f2e6'; x.fillRect(0, 0, W, H);
   x.fillStyle = '#2e4a38'; x.fillRect(0, 0, W, 200);
-  if (LOGO.complete && LOGO.naturalWidth) x.drawImage(LOGO, 60, 40, 120, 120);
+  if (LOGO.complete && LOGO.naturalWidth) x.drawImage(LOGO, 52, 30, 170, 140);
   x.fillStyle = '#f6c877'; x.font = '600 46px Mitr';
   x.fillText('ทุ่งหวายโฮมสเตย์', 210, 95);
   x.fillStyle = '#e8e2d2'; x.font = '26px Sarabun';
