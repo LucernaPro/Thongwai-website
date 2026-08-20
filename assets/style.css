@@ -128,7 +128,7 @@ h2{font-size:clamp(1.5rem,3.2vw,2.1rem);margin-bottom:14px}
 .avail-box p{max-width:520px;margin:0 auto 22px;font-size:.95rem;opacity:.85}
 
 /* gallery */
-.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:38px}
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:38px;grid-auto-flow:dense} /* SPEC Rule 13: dense เสมอ — ภาพ tall ห้ามทำให้เกิดรูโหว่ */
 .gal-grid img{border-radius:10px;aspect-ratio:4/3;object-fit:cover;width:100%;transition:transform .25s ease}
 .gal-grid img:hover{transform:scale(1.02)}
 .gal-grid .tall{grid-row:span 2;aspect-ratio:auto;height:100%}
