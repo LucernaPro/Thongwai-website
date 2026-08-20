@@ -223,6 +223,7 @@ footer a{color:var(--glow)}
 .gal-label strong{color:var(--pine)}
 .gal-credit{margin:14px 2px 0;font-size:.85rem;color:var(--ink-soft);text-align:right;opacity:.85}
 .gal-credit strong{color:var(--pine)}
+#resort-gallery{padding-top:0} /* พื้นครีมต่อครีมกับ #gallery — ตัด padding บนทิ้ง ให้เครดิต SepSook เป็นตัวคั่นพอ (20 ส.ค. 2026) */
 
 /* ---- gallery v2: masonry columns (no holes, no crops) ---- */
 .gal-grid{display:block;columns:3 300px;column-gap:14px;margin-top:22px}
@@ -402,10 +403,11 @@ a.tl:hover .nm{color:var(--glow)}
 .avpage section{padding:52px 0 72px}
 .avw-load{margin-top:34px;opacity:.7}
 
-/* ===== บีบระยะหัว section บนมือถือ (19 ส.ค. 2026 — Pist: เว้นหัวเยอะเกิน) ===== */
+/* ===== บีบระยะหัว section บนมือถือ (19 ส.ค. 2026 — Pist: เว้นหัวเยอะเกิน · ปรับซ้ำ 20 ส.ค. 2026: บีบช่องไฟระหว่าง section ทั้งหน้า) ===== */
 @media(max-width:720px){
-  section{padding:38px 0 50px}
-  #gallery[style],#visit[style],section[style*="padding-top"]{padding-top:38px!important}
+  section{padding:32px 0 40px}
+  #gallery[style],#visit[style],section[style*="padding-top"]{padding-top:32px!important}
+  #resort-gallery{padding-top:0!important}
   .lights{height:38px}
   h2{margin-bottom:10px}
   .high-grid,.room-grid,.gal-grid,.reel-row{margin-top:20px}
@@ -413,7 +415,7 @@ a.tl:hover .nm{color:var(--glow)}
   .gal-label{margin-top:24px}
   .hero .wrap{padding-top:84px;padding-bottom:48px}
   .rd-hero .wrap{padding-top:64px;padding-bottom:32px}
-  .gal-grid img{max-height:400px;margin-bottom:10px}
+  .gal-grid img{max-height:400px}
   .visit-grid{margin-top:20px;gap:24px}
   .rd-grid{margin-top:20px;gap:22px}
   .fb-follow{margin-top:22px}
