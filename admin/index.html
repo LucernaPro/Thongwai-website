@@ -90,7 +90,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.2</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.3</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <button id="btnUsers" title="จัดการผู้ใช้" style="display:none">👥</button>
@@ -192,8 +192,11 @@ table.cal{border-collapse:collapse;min-width:100%}
   <h2 style="color:var(--glow);margin-bottom:10px">เอกสารการจอง</h2>
   <div style="text-align:center"><img id="docImg" style="width:100%;max-width:420px;border-radius:12px;border:1px solid rgba(246,200,119,.3)" alt="เอกสารการจอง"></div>
   <p style="font-size:.82rem;opacity:.7;margin-top:10px">ส่งให้ลูกค้า: กดปุ่มแชร์ หรือกดรูปค้างไว้แล้วบันทึก/แชร์</p>
-  <div class="row" style="margin-top:12px">
+  <div class="row" style="margin-top:12px;flex-wrap:wrap">
     <button class="btn btn-l" id="docShare">แชร์เอกสาร</button>
+    <button class="btn btn-g" id="docSaveImg">บันทึกรูป</button>
+    <button class="btn btn-g" id="docSavePdf">บันทึก PDF</button>
+    <button class="btn btn-g" id="docPrint">พิมพ์</button>
     <button class="btn btn-g" id="docClose">ปิด</button>
   </div>
   <div class="msg" id="docMsg"></div>
@@ -359,9 +362,11 @@ async function drawDoc(b){
   return cv;
 }
 
+let docCv = null;
 $('dDoc').onclick = async () => {
   const b = bookings.find(x=>x.id===currentId) || logBookings.find(x=>x.id===currentId); if(!b) return;
   const cv = await drawDoc(b);
+  docCv = cv;
   $('docImg').src = cv.toDataURL('image/png');
   cv.toBlob(bl => { docBlob = bl; }, 'image/png');
   $('docMsg').className='msg';
@@ -384,6 +389,61 @@ $('docShare').onclick = async () => {
   } catch(e) {
     if (e.name !== 'AbortError'){ m.className='msg err'; m.textContent='แชร์ไม่สำเร็จ — กดรูปค้างไว้แล้วบันทึกแทนได้'; }
   }
+};
+
+// ── สร้าง PDF เองโดยฝังรูป JPEG (ไม่พึ่งไลบรารี — ฟอนต์ชัวร์เพราะเป็นภาพ) ──
+function jpegToPdf(jpegDataUrl, pxW, pxH){
+  const jpeg = Uint8Array.from(atob(jpegDataUrl.split(',')[1]), c => c.charCodeAt(0));
+  const W = 595.28, H = W * pxH / pxW;                       // กว้าง A4 (พอยต์)
+  const enc = new TextEncoder();
+  const head = `%PDF-1.4\n`;
+  const objs = [];
+  objs.push(`1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n`);
+  objs.push(`2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n`);
+  objs.push(`3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W.toFixed(2)} ${H.toFixed(2)} ] /Resources << /XObject << /Im1 4 0 R >> >> /Contents 5 0 R >> endobj\n`);
+  const imgHead = `4 0 obj << /Type /XObject /Subtype /Image /Width ${pxW} /Height ${pxH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >> stream\n`;
+  const imgTail = `\nendstream endobj\n`;
+  const content = `q ${W.toFixed(2)} 0 0 ${H.toFixed(2)} 0 0 cm /Im1 Do Q`;
+  const obj5 = `5 0 obj << /Length ${content.length} >> stream\n${content}\nendstream endobj\n`;
+
+  const parts = [enc.encode(head)];
+  const offsets = [0];
+  let pos = head.length;
+  const pushText = t => { parts.push(enc.encode(t)); pos += t.length; };
+  offsets.push(pos); pushText(objs[0]);
+  offsets.push(pos); pushText(objs[1]);
+  offsets.push(pos); pushText(objs[2]);
+  offsets.push(pos); pushText(imgHead); parts.push(jpeg); pos += jpeg.length; pushText(imgTail);
+  offsets.push(pos); pushText(obj5);
+  const xrefPos = pos;
+  let xref = `xref\n0 6\n0000000000 65535 f \n`;
+  for (let i = 1; i <= 5; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+  xref += `trailer << /Size 6 /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+  pushText(xref);
+  return new Blob(parts, { type: 'application/pdf' });
+}
+function dl(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+}
+$('docSaveImg').onclick = () => {
+  if (!docBlob) return;
+  dl(docBlob, 'booking-' + currentId + '.png');
+  const m = $('docMsg'); m.className='msg ok'; m.textContent='บันทึกรูปแล้ว ✓';
+};
+$('docSavePdf').onclick = () => {
+  if (!docCv) return;
+  const pdf = jpegToPdf(docCv.toDataURL('image/jpeg', 0.92), docCv.width, docCv.height);
+  dl(pdf, 'booking-' + currentId + '.pdf');
+  const m = $('docMsg'); m.className='msg ok'; m.textContent='บันทึก PDF แล้ว ✓';
+};
+$('docPrint').onclick = () => {
+  if (!docCv) return;
+  const w = window.open('', '_blank');
+  if (!w) { const m=$('docMsg'); m.className='msg err'; m.textContent='เบราว์เซอร์บล็อกหน้าต่างพิมพ์ — อนุญาต popup แล้วลองใหม่'; return; }
+  w.document.write('<html><head><title>เอกสารการจอง</title><style>@page{margin:0}body{margin:0}img{width:100%;display:block}</style></head><body><img src="' + docCv.toDataURL('image/png') + '" onload="setTimeout(function(){window.print()},150)"></body></html>');
+  w.document.close();
 };
 
 /* ================= จัดการผู้ใช้ (admin) ================= */
