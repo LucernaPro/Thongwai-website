@@ -14,7 +14,7 @@
   let list = [], idx = 0, credit = '';
   const show = i => {
     idx = (i + list.length) % list.length;
-    im.src = list[idx].src; im.alt = list[idx].alt;
+    im.src = list[idx].dataset.full || list[idx].src; im.alt = list[idx].alt;
     cap.textContent = list[idx].alt + credit;
     cnt.textContent = (idx + 1) + ' / ' + list.length;
   };
