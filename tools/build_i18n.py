@@ -21,7 +21,7 @@ CANON = {  # canonical path ต่อภาษา
 EN = {
  # meta/title
  'ทุ่งหวายโฮมสเตย์ ທົ່ງຫວາຍໂຮມສະເຕ | Thongwai Homestay ปากซอง จำปาสัก สปป.ลาว — เว็บไซต์ทางการ': 'Thongwai Homestay | Riverside Stay in Paksong, Champasak, Laos — Official Website',
- 'เว็บไซต์ทางการของทุ่งหวายโฮมสเตย์ (ທົ່ງຫວາຍໂຮມສະເຕ / Thongwai Homestay) ที่พักริมลำธารบนที่ราบสูงโบโลเวน เมืองปากซอง แขวงจำปาสัก สปป.ลาว ห้องพักหลายแบบและลานกางเต็นท์ พร้อมอาหารและเครื่องดื่ม โทร +856 20 91 555 288': 'Official website of Thongwai Homestay — a riverside retreat on the Bolaven Plateau in Paksong, Champasak, Laos. Wooden houses and tents, restaurant and Lao coffee. Call +856 20 91 555 288',
+ 'เว็บไซต์ทางการของทุ่งหวายโฮมสเตย์ (ທົ່ງຫວາຍໂຮມສະເຕ / Thongwai Homestay) ที่พักริมลำธารบนที่ราบสูงโบโลเวน เมืองปากซอง แขวงจำปาสัก สปป.ลาว ห้องพักหลายแบบและลานกางเต็นท์ พร้อมอาหารและเครื่องดื่ม โทร +856 20 91 555 288': 'Official website of Thongwai Homestay — a one-of-a-kind riverside retreat on the Bolaven Plateau and a must-visit in Paksong, Champasak, Laos. Wooden houses and tents, restaurant and Lao coffee. Call +856 20 91 555 288',
  'ทุ่งหวายโฮมสเตย์ ທົ່ງຫວາຍໂຮມສະເຕ | Thongwai Homestay ปากซอง จำปาสัก สปป.ลาว': 'Thongwai Homestay | Paksong, Champasak, Laos',
  'เว็บไซต์ทางการ — ที่พักริมลำธารบนที่ราบสูงโบโลเวน เมืองปากซอง ห้องพักหลายแบบและลานกางเต็นท์ พร้อมอาหารและเครื่องดื่ม โทร +856 20 91 555 288': 'Official website — riverside stay on the Bolaven Plateau, Paksong. Wooden houses, tents, restaurant and Lao coffee. Call +856 20 91 555 288',
  'ที่พักริมลำธารบนที่ราบสูงโบโลเวน เมืองปากซอง แขวงจำปาสัก สปป.ลาว ห้องพักหลายแบบและลานกางเต็นท์ พร้อมบริการอาหารและเครื่องดื่ม': 'A riverside retreat on the Bolaven Plateau, Paksong, Champasak, Laos — wooden houses, tents, restaurant and drinks',
@@ -46,7 +46,7 @@ EN = {
  'โทรจอง +856 20 91 555 288': 'Call to book +856 20 91 555 288',
  # hero
  'มุมสูงทุ่งหวายโฮมสเตย์ยามโพล้เพล้ สวนดอกไม้ ไฟราว บ้านไม้ และภูเขาโบโลเวน': 'Aerial view of Thongwai Homestay at dusk — flower gardens, string lights, wooden houses and the Bolaven mountains',
- 'ที่พักริมลำธารบนที่ราบสูงโบโลเวน อากาศเย็นสบายตลอดปี พักผ่อนท่ามกลางเสียงลำธาร พร้อมกาแฟลาวแท้จากแหล่งปลูก': 'A riverside retreat on the Bolaven Plateau — cool weather all year round, the sound of the stream, and true Lao coffee from the source',
+ 'ที่พักริมลำธารบนที่ราบสูงโบโลเวน อากาศเย็นสบายตลอดปี พักผ่อนท่ามกลางเสียงลำธาร พร้อมกาแฟลาวแท้จากแหล่งปลูก': 'A one-of-a-kind riverside retreat on the Bolaven Plateau — cool all year round, the sound of the stream, and true Lao coffee from the source. Not to be missed.',
  'เมืองปากซอง': 'Paksong', 'แขวงจำปาสัก': 'Champasak',
  'เว็บไซต์ทางการเพียงแห่งเดียวของ': 'The only official website of',
  'ทุ่งหวายโฮมสเตย์ ທົ່ງຫວາຍໂຮມສະເຕ': 'Thongwai Homestay',
