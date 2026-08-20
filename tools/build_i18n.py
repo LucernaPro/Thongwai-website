@@ -9,10 +9,12 @@ PAGES = {  # th path → (en path, lo path)
     'availability/index.html': ('en/availability/index.html', 'lo/availability/index.html'),
     'rooms/jaosua1/index.html': ('en/rooms/jaosua1/index.html', 'lo/rooms/jaosua1/index.html'),
     'rooms/jaosua2/index.html': ('en/rooms/jaosua2/index.html', 'lo/rooms/jaosua2/index.html'),
+    'rooms/tent/index.html': ('en/rooms/tent/index.html', 'lo/rooms/tent/index.html'),
 }
 CANON = {  # canonical path ต่อภาษา
     'index.html': '/', 'availability/index.html': '/availability/',
     'rooms/jaosua1/index.html': '/rooms/jaosua1/', 'rooms/jaosua2/index.html': '/rooms/jaosua2/',
+    'rooms/tent/index.html': '/rooms/tent/',
 }
 
 # ═══════════ ENGLISH ═══════════
@@ -176,6 +178,24 @@ EN = {
  'ราคาต่อคืน': 'Rates per night', 'เตียงเสริม': 'Extra bed', '/ 320฿ รวมอาหารเช้า': '/ 320฿ with breakfast',
  'พักได้ 4 ท่าน · ตรวจสอบห้องว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'Sleeps 4 · check availability or ask us anything on any channel',
  'ส่งข้อความ Messenger': 'Message on Messenger', 'ดูปฏิทินห้องว่าง': 'View availability calendar',
+ # tent page
+ 'เต็นท์กลางสนาม — ลานกางเต็นท์วิวภูเขา 8 หลัง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Lawn Tents — 8 Mountain-View Tents | Thongwai Homestay, Paksong',
+ 'เต็นท์กลางสนามที่ทุ่งหวายโฮมสเตย์ ปากซอง — เต็นท์พร้อมฟลายชีท 8 หลัง บนแท่นไม้ยกพื้น กลางสนามหญ้าวิวภูเขา ใกล้วงกองไฟ พักได้หลังละ 2 ท่าน เริ่ม 600 บาท/คืน โทร +856 20 91 555 288': 'Lawn tents at Thongwai Homestay, Paksong — 8 tents with flysheets on raised wooden platforms, set on an open lawn with mountain views near the campfire circle. 2 guests per tent, from 600 THB/night. Call +856 20 91 555 288',
+ 'เต็นท์กลางสนาม | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Lawn Tents | Thongwai Homestay, Paksong',
+ 'เต็นท์พร้อมฟลายชีท 8 หลัง กลางสนามหญ้าวิวภูเขา ใกล้วงกองไฟ พักได้หลังละ 2 ท่าน เริ่ม 600 บาท/คืน': '8 tents with flysheets on a mountain-view lawn near the campfire circle. 2 guests per tent, from 600 THB/night.',
+ 'เต็นท์พร้อมฟลายชีท 8 หลัง กลางสนามหญ้าวิวภูเขา ใกล้วงกองไฟ พักได้หลังละ 2 ท่าน': '8 tents with flysheets on a mountain-view lawn near the campfire circle · 2 guests per tent',
+ 'เต็นท์กลางสนาม ทุ่งหวายโฮมสเตย์ พร้อมฟลายชีทและชุดโต๊ะเก้าอี้ไม้': 'Lawn tent at Thongwai Homestay with flysheet and wooden table set',
+ 'ลานกางเต็นท์': 'Tent field',
+ '⛺ มี 8 หลัง': '⛺ 8 tents', '👥 หลังละ 2 ท่าน': '👥 2 per tent', '🔥 วงกองไฟกลางลาน': '🔥 Campfire circle',
+ '🏔 วิวภูเขา': '🏔 Mountain views', '💡 ไฟราวทั่วบริเวณ': '💡 String lights',
+ 'ตื่นมาพร้อมวิวภูเขา กลางสนามหญ้า': 'Wake up to mountains, right on the lawn',
+ 'เต็นท์ทรงบ้านพร้อมฟลายชีทกันฝนและน้ำค้าง ตั้งบนแท่นไม้ยกพื้นทั้ง 8 หลัง กระจายบนสนามหญ้าเปิดโล่งที่มองเห็นแนวเขาโบโลเวนโดยรอบ หน้าเต็นท์มีชุดโต๊ะและเก้าอี้ไม้สำหรับนั่งพักผ่อน': 'House-style tents with rain-and-dew flysheets, each set on a raised wooden platform — all 8 spread across an open lawn with the Bolaven hills all around. Every tent has its own wooden table and chairs out front.',
+ 'กลางลานมีวงกองไฟพร้อมม้านั่งไม้ล้อมวงสำหรับค่ำคืนบนที่ราบสูง และศาลามุงหญ้าสำหรับนั่งพักผ่อนร่วมกัน แสงไฟราวประดับทั่วบริเวณยามค่ำ': 'At the centre of the field sits a campfire circle ringed with log benches for cool plateau evenings, plus a thatched pavilion for lounging together. String lights glow across the whole field after dark.',
+ 'แถวเต็นท์กลางสนามใต้ไฟราว วิวภูเขาโบโลเวน': 'Row of lawn tents under string lights with Bolaven mountain views',
+ 'วงกองไฟพร้อมม้านั่งไม้ล้อมวง กลางลานเต็นท์ และศาลามุงหญ้า': 'Campfire circle with log benches in the tent field, thatched pavilion behind',
+ 'ลานเต็นท์ยามเย็น ไฟราวและแนวเขาโดยรอบ': 'The tent field at dusk with string lights and hills around',
+ 'ราคาต่อคืน (ต่อหลัง)': 'Rates per night (per tent)',
+ 'พักได้หลังละ 2 ท่าน · มีทั้งหมด 8 หลัง · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': '2 guests per tent · 8 tents in total · check availability or ask us anything on any channel',
  'ไทย': 'ไทย',
 }
 
@@ -325,6 +345,24 @@ LO = {
  'ราคาต่อคืน': 'ລາຄາຕໍ່ຄືນ', 'เตียงเสริม': 'ຕຽງເສີມ', '/ 320฿ รวมอาหารเช้า': '/ 320฿ ລວມອາຫານເຊົ້າ',
  'พักได้ 4 ท่าน · ตรวจสอบห้องว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ 4 ທ່ານ · ກວດຫ້ອງວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
  'ส่งข้อความ Messenger': 'ສົ່ງຂໍ້ຄວາມ Messenger', 'ดูปฏิทินห้องว่าง': 'ເບິ່ງປະຕິທິນຫ້ອງວ່າງ',
+ # tent page
+ 'เต็นท์กลางสนาม — ลานกางเต็นท์วิวภูเขา 8 หลัง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຕັນກາງເດີ່ນ — ລານກາງເຕັນວິວພູ 8 ຫຼັງ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เต็นท์กลางสนามที่ทุ่งหวายโฮมสเตย์ ปากซอง — เต็นท์พร้อมฟลายชีท 8 หลัง บนแท่นไม้ยกพื้น กลางสนามหญ้าวิวภูเขา ใกล้วงกองไฟ พักได้หลังละ 2 ท่าน เริ่ม 600 บาท/คืน โทร +856 20 91 555 288': 'ເຕັນກາງເດີ່ນທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຕັນພ້ອມຜ້າຄຸມ 8 ຫຼັງ ເທິງແທ່ນໄມ້ຍົກພື້ນ ກາງເດີ່ນຫຍ້າວິວພູ ໃກ້ບ່ອນກໍ່ໄຟ ພັກໄດ້ຫຼັງລະ 2 ທ່ານ ເລີ່ມ 600 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
+ 'เต็นท์กลางสนาม | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຕັນກາງເດີ່ນ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เต็นท์พร้อมฟลายชีท 8 หลัง กลางสนามหญ้าวิวภูเขา ใกล้วงกองไฟ พักได้หลังละ 2 ท่าน เริ่ม 600 บาท/คืน': 'ເຕັນພ້ອມຜ້າຄຸມ 8 ຫຼັງ ກາງເດີ່ນຫຍ້າວິວພູ ໃກ້ບ່ອນກໍ່ໄຟ ພັກໄດ້ຫຼັງລະ 2 ທ່ານ ເລີ່ມ 600 ບາດ/ຄືນ',
+ 'เต็นท์พร้อมฟลายชีท 8 หลัง กลางสนามหญ้าวิวภูเขา ใกล้วงกองไฟ พักได้หลังละ 2 ท่าน': 'ເຕັນພ້ອມຜ້າຄຸມ 8 ຫຼັງ ກາງເດີ່ນຫຍ້າວິວພູ ໃກ້ບ່ອນກໍ່ໄຟ ພັກໄດ້ຫຼັງລະ 2 ທ່ານ',
+ 'เต็นท์กลางสนาม ทุ่งหวายโฮมสเตย์ พร้อมฟลายชีทและชุดโต๊ะเก้าอี้ไม้': 'ເຕັນກາງເດີ່ນ ທົ່ງຫວາຍໂຮມສະເຕ ພ້ອມຜ້າຄຸມ ແລະ ຊຸດໂຕະຕັ່ງໄມ້',
+ 'ลานกางเต็นท์': 'ລານກາງເຕັນ',
+ '⛺ มี 8 หลัง': '⛺ ມີ 8 ຫຼັງ', '👥 หลังละ 2 ท่าน': '👥 ຫຼັງລະ 2 ທ່ານ', '🔥 วงกองไฟกลางลาน': '🔥 ບ່ອນກໍ່ໄຟກາງລານ',
+ '🏔 วิวภูเขา': '🏔 ວິວພູ', '💡 ไฟราวทั่วบริเวณ': '💡 ໄຟປະດັບທົ່ວບໍລິເວນ',
+ 'ตื่นมาพร้อมวิวภูเขา กลางสนามหญ้า': 'ຕື່ນມາພ້ອມວິວພູ ກາງເດີ່ນຫຍ້າ',
+ 'เต็นท์ทรงบ้านพร้อมฟลายชีทกันฝนและน้ำค้าง ตั้งบนแท่นไม้ยกพื้นทั้ง 8 หลัง กระจายบนสนามหญ้าเปิดโล่งที่มองเห็นแนวเขาโบโลเวนโดยรอบ หน้าเต็นท์มีชุดโต๊ะและเก้าอี้ไม้สำหรับนั่งพักผ่อน': 'ເຕັນຊົງເຮືອນພ້ອມຜ້າຄຸມກັນຝົນ ແລະ ນ້ຳໝອກ ຕັ້ງເທິງແທ່ນໄມ້ຍົກພື້ນທັງ 8 ຫຼັງ ກະຈາຍເທິງເດີ່ນຫຍ້າເປີດໂລ່ງທີ່ເຫັນແນວພູບໍລະເວນອ້ອມຮອບ ໜ້າເຕັນມີຊຸດໂຕະ ແລະ ຕັ່ງໄມ້ສຳລັບນັ່ງພັກຜ່ອນ',
+ 'กลางลานมีวงกองไฟพร้อมม้านั่งไม้ล้อมวงสำหรับค่ำคืนบนที่ราบสูง และศาลามุงหญ้าสำหรับนั่งพักผ่อนร่วมกัน แสงไฟราวประดับทั่วบริเวณยามค่ำ': 'ກາງລານມີບ່ອນກໍ່ໄຟພ້ອມມ້ານັ່ງໄມ້ອ້ອມວົງສຳລັບຄໍ່າຄືນເທິງພູພຽງ ແລະ ສາລາມຸງຫຍ້າສຳລັບນັ່ງພັກຜ່ອນຮ່ວມກັນ ແສງໄຟປະດັບທົ່ວບໍລິເວນຕອນຄໍ່າ',
+ 'แถวเต็นท์กลางสนามใต้ไฟราว วิวภูเขาโบโลเวน': 'ແຖວເຕັນກາງເດີ່ນໃຕ້ໄຟປະດັບ ວິວພູບໍລະເວນ',
+ 'วงกองไฟพร้อมม้านั่งไม้ล้อมวง กลางลานเต็นท์ และศาลามุงหญ้า': 'ບ່ອນກໍ່ໄຟພ້ອມມ້ານັ່ງໄມ້ອ້ອມວົງ ກາງລານເຕັນ ແລະ ສາລາມຸງຫຍ້າ',
+ 'ลานเต็นท์ยามเย็น ไฟราวและแนวเขาโดยรอบ': 'ລານເຕັນຕອນແລງ ໄຟປະດັບ ແລະ ແນວພູອ້ອມຮອບ',
+ 'ราคาต่อคืน (ต่อหลัง)': 'ລາຄາຕໍ່ຄືນ (ຕໍ່ຫຼັງ)',
+ 'พักได้หลังละ 2 ท่าน · มีทั้งหมด 8 หลัง · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ຫຼັງລະ 2 ທ່ານ · ມີທັງໝົດ 8 ຫຼັງ · ກວດວັນວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
  'ไทย': 'ไทย',
 }
 
@@ -386,7 +424,7 @@ def build(th_path, lang, D):
     # ลิงก์ภายในก่อน แล้วค่อยฝังปุ่มภาษา (กันปุ่มไทยโดน rewrite ทับ)
     h = rewrite_links(h, lang)
     # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
-    for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'"):
+    for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'"):
         h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
