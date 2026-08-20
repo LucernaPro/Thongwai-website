@@ -274,7 +274,12 @@ footer a{color:var(--glow)}
 .rd-video{margin-top:26px}
 /* ===== section รีวิวจากผู้เข้าพัก (Reel แนวตั้ง) ===== */
 #reviews{background:var(--cream)}
-.reel-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:38px}
+.reel-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:22px}
+.feat-video{margin-top:38px;background:var(--white);border:1px solid var(--cream-2);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 18px rgba(36,49,44,.06)}
+.feat-video video{width:100%;height:auto;display:block;aspect-ratio:16/9;background:var(--dusk-deep)}
+.feat-video .cap{padding:14px 16px;font-size:.9rem}
+.feat-video .cap b{font-family:'Mitr',sans-serif;color:var(--pine);display:block}
+.feat-video .cap span{color:var(--ink-soft);font-size:.84rem}
 .reel-card{width:min(300px,100%);background:var(--white);border:1px solid var(--cream-2);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 18px rgba(36,49,44,.06)}
 .reel-frame{background:var(--dusk-deep)}
 .reel-frame video{width:100%;height:auto;display:block;aspect-ratio:9/16;object-fit:cover;background:var(--dusk-deep)}
@@ -415,7 +420,9 @@ a.tl:hover .nm{color:var(--glow)}
   #reviews,#visit{padding-top:20px}
   .lights{height:38px}
   h2{margin-bottom:10px}
-  .high-grid,.room-grid,.gal-grid,.reel-row{margin-top:20px}
+  .high-grid,.room-grid,.gal-grid{margin-top:20px}
+  .feat-video{margin-top:20px}
+  .reel-row{margin-top:18px}
   .avcta{margin-top:22px}
   .gal-label{margin-top:24px}
   .hero .wrap{padding-top:84px;padding-bottom:48px}
