@@ -3,6 +3,7 @@
   "name": "thongwai-website",
   "compatibility_date": "2026-08-19",
   "main": "worker.js",
+  "vars": { "GH_LOG_REPO": "LucernaPro/Thongwai-booking-log" },
   "assets": {
     "directory": "./",
     "binding": "ASSETS",

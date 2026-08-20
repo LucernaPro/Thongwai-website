@@ -90,9 +90,10 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.5</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.6</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
+  <button id="btnExport" title="ดาวน์โหลดสำรองการจองทั้งหมด (CSV)" style="display:none">⬇</button>
   <button id="btnUsers" title="จัดการผู้ใช้" style="display:none">👥</button>
   <button id="btnSettings" title="ออกจากระบบ / สลับผู้ใช้">⚙︎</button>
 </header>
@@ -269,6 +270,7 @@ function boot(){
   $('fabAdd').style.display='block';
   $('whoami').textContent = store.user + (store.role==='admin' ? ' · เจ้าของ' : '');
   $('btnUsers').style.display = store.role==='admin' ? 'inline' : 'none';
+  $('btnExport').style.display = store.role==='admin' ? 'inline' : 'none';
   load();
   setView(view);
 }
@@ -295,6 +297,23 @@ $('btnSettings').onclick = () => {
   $('whoami').textContent='';
   $('setupCard').style.display='block'; $('cfgUser').value=''; $('cfgPass').value='';
   $('cfgMsg').className='msg';
+};
+
+/* ================= ดาวน์โหลดสำรองทั้งหมด (CSV เปิดใน Excel ได้) ================= */
+$('btnExport').onclick = async () => {
+  try {
+    const u = new URL(API, location.origin);
+    u.searchParams.set('action','export'); u.searchParams.set('user',store.user); u.searchParams.set('pass',store.pass);
+    const r = await fetch(u);
+    if (!r.ok) throw 0;
+    const ct = r.headers.get('content-type') || '';
+    if (ct.includes('json')) { const j = await r.json(); alert(j.error || 'ดาวน์โหลดไม่สำเร็จ'); return; }
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'thongwai-bookings-' + todayStr() + '.csv';
+    a.click();
+  } catch(e) { alert('ดาวน์โหลดไม่สำเร็จ ลองใหม่อีกครั้ง'); }
 };
 
 /* ================= เอกสารการจอง (รูปส่งลูกค้า) ================= */

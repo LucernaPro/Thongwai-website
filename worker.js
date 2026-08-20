@@ -80,6 +80,8 @@ async function init(db) {
     db.prepare(`CREATE INDEX IF NOT EXISTS ix_book ON bookings (room, status, checkin, checkout)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS users (
       username TEXT PRIMARY KEY, pass TEXT NOT NULL, role TEXT NOT NULL, created TEXT)`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS audit (
+      seq INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, actor TEXT, action TEXT, ref TEXT, data TEXT)`),
   ]);
   const { c } = await db.prepare('SELECT COUNT(*) AS c FROM rooms').first();
   if (c === 0) {
@@ -108,6 +110,30 @@ async function init(db) {
       .bind('admin', await makePw('2569'), 'admin', nowStamp()).run();
   }
   ready = true;
+}
+
+/* ── Fail-safe: สมุดบัญชีถาวร + สำเนานอกระบบ (ห้ามทำการจองล้มไม่ว่ากรณีใด) ── */
+async function auditLog(env, ctx, actor, action, ref, data) {
+  try {
+    await env.DB.prepare('INSERT INTO audit (ts,actor,action,ref,data) VALUES (?,?,?,?,?)')
+      .bind(nowStamp(), actor, action, ref, JSON.stringify(data)).run();
+  } catch (e) {}
+  try {
+    if (!env.GH_LOG_TOKEN || !env.GH_LOG_REPO) return;
+    const ts = nowStamp();
+    const lines = [`[${action}] ${ts} โดย ${actor}`, `รหัส: ${ref}`];
+    for (const [k, v] of Object.entries(data)) if (v) lines.push(`${k}: ${v}`);
+    const text = lines.join('\n') + '\n';
+    const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(text)));
+    const path = `log/${ts.slice(0, 7)}/${ts.replace(/[: ]/g, '-')}_${action}_${ref}.txt`;
+    const p = fetch(`https://api.github.com/repos/${env.GH_LOG_REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + env.GH_LOG_TOKEN, 'User-Agent': 'thongwai-worker',
+                 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ message: `${action} ${ref}`, content: b64 }),
+    }).catch(() => {});
+    if (ctx && ctx.waitUntil) ctx.waitUntil(p);
+  } catch (e) {}
 }
 
 /* ── ตรวจตัวตนต่อคำขอ: คืน {username, role} หรือ null ── */
@@ -216,7 +242,7 @@ async function cancelBooking(db, p) {
 
 /* ── router ── */
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname !== '/api') return env.ASSETS.fetch(request);
 
@@ -244,8 +270,36 @@ export default {
              WHERE created LIKE ? ORDER BY created, id`).bind(dt + '%').all()).results;
           return json({ ok: true, bookings });
         }
-        case 'add':      return json(await addBooking(env.DB, p, me));
-        case 'cancel':   return json(await cancelBooking(env.DB, p));
+        case 'add': {
+          const r = await addBooking(env.DB, p, me);
+          if (r.ok) await auditLog(env, ctx, me.username, 'จอง', r.id, {
+            ห้อง: p.get('room'), ชื่อ: p.get('name'), เบอร์: p.get('phone') || '',
+            เช็คอิน: p.get('checkin'), เช็คเอาท์: p.get('checkout'), หมายเหตุ: p.get('note') || '' });
+          return json(r);
+        }
+        case 'cancel': {
+          const id = p.get('id');
+          const row = await env.DB.prepare('SELECT room,name,checkin,checkout FROM bookings WHERE id = ?').bind(id).first();
+          const r = await cancelBooking(env.DB, p);
+          if (r.ok) await auditLog(env, ctx, me.username, 'ยกเลิก', id, row || {});
+          return json(r);
+        }
+        case 'export': {
+          if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
+          const rooms = Object.fromEntries(
+            (await env.DB.prepare('SELECT id,name FROM rooms').all()).results.map(r => [r.id, r.name]));
+          const rows = (await env.DB.prepare(
+            'SELECT id,room,checkin,checkout,name,phone,note,status,created,staff FROM bookings ORDER BY created,id').all()).results;
+          const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+          const head = ['รหัส','ห้อง','ชื่อห้อง','เช็คอิน','เช็คเอาท์','ชื่อลูกค้า','เบอร์โทร','หมายเหตุ','สถานะ','วันที่จอง','ผู้รับจอง'];
+          const csv = '\uFEFF' + head.join(',') + '\n' + rows.map(b =>
+            [b.id, b.room, rooms[b.room] || b.room, b.checkin, b.checkout, b.name, b.phone, b.note, b.status, b.created, b.staff]
+              .map(esc).join(',')).join('\n');
+          return new Response(csv, { headers: {
+            'content-type': 'text/csv; charset=utf-8',
+            'content-disposition': 'attachment; filename="thongwai-bookings.csv"',
+            'access-control-allow-origin': '*' } });
+        }
         // ── นำเข้าสมุดจองเดิม (admin, ทำซ้ำได้ ไม่ซ้ำแถว) ──
         case 'import': {
           // ถาวร (Pist 20 ส.ค. 2026): เดินทีละหน้า ไม่ผูกกับชุดข้อมูล — เปลี่ยน

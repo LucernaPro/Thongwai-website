@@ -159,6 +159,13 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
   🏠 ห้องว่าง (ผังตาม**วันเข้าพัก** เดิม + เข้าพักคืนนี้ + การจองข้างหน้า) /
   รายละเอียดการจอง = ตารางกางครบทุกช่องเหมือน Excel แยกบรรทัด ไม่ตัดทอน,
   ปุ่มยกเลิกซ่อนเมื่อยกเลิกแล้ว
+- **Fail-safe 3 ชั้น (20 ส.ค. 2026 — Pist: ห้ามข้อมูลจองหายไม่ว่ากรณีใด):**
+  (1) ตาราง audit append-only ใน D1 — ทุก จอง/ยกเลิก เขียนสำเนา ts/actor/action/snapshot
+  (2) ปุ่ม ⬇ ใน /admin (admin เท่านั้น) = action=export → CSV ทั้งหมด UTF-8 BOM เปิด Excel ได้
+  (3) สำเนา txt เข้า GitHub repo ส่วนตัวอัตโนมัติทุกการจอง/ยกเลิก — GH_LOG_REPO ใน
+  wrangler.jsonc = LucernaPro/Thongwai-booking-log, token = secret ชื่อ GH_LOG_TOKEN
+  (Cloudflare dashboard → Settings → Variables and Secrets) / fire-and-forget: ล้มเงียบ
+  ห้าม block การจอง / path: log/YYYY-MM/ts_action_id.txt
 - **เอกสารการจอง (20 ส.ค. 2026, แนวคิดจาก Lucerna Docs):** ปุ่ม 📄 ในรายละเอียด
   การจอง → วาดรูปเอกสารยืนยัน (canvas PNG 1000px, หัวเขียว pine + โลโก้ + Booking
   Confirmation + ตารางครบ + มัดจำจาก note + ท้าย ✓ยืนยันแล้ว/ติดต่อ/ออกโดยใคร) →
