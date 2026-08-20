@@ -184,6 +184,12 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
   ตรวจ → push → Pist กดที่ /admin/import/ (id ใหม่ไม่ชนของเก่า, กดซ้ำไม่ซ้ำแถว)
   / จองซ้อนในอนาคต 2 คู่ให้ทีมยกเลิกเอง:
   R2 29 ส.ค. (พี่จ๋ม/พี่จุ๋ม), R5 23 ส.ค. (ปัอปปี้/แอนนี้)
+- **Build toolchain ล็อกเวอร์ชัน (20 ส.ค. 2026):** package.json + lockfile อยู่ใน repo
+  แล้ว wrangler = 4.124.0 ตายตัว (เดิม npx ดึง latest ทุก build = deploy drift ไป
+  เวอร์ชันไม่เคยเทส) — อัปเกรด wrangler = ตั้งใจเปลี่ยน + dry-run ก่อนเสมอ:
+  npx wrangler deploy --dry-run --outdir /tmp/wbuild
+  / วินิจฉัย deploy ค้าง: /admin มีเลขเวอร์ชัน v4.x บนหัว (bump ทุกครั้งที่แก้) แยกแคช
+  เก่า vs บั๊กจริง, build log ดูที่ Cloudflare dashboard → Workers & Pages → Builds
 - **⏳ เปิดสวิตช์ (ขั้นเดียวที่เหลือ):** Pist เข้า Cloudflare dashboard → Storage & Databases
   → D1 → Create database ชื่อ `thongwai-booking` → ส่ง **Database ID** (UUID บนหน้า DB)
   มาให้ Claude → Claude แก้ wrangler.jsonc (เพิ่ม main:worker.js + assets binding
