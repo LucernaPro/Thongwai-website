@@ -1,6 +1,4 @@
 node_modules/
-package.json
-package-lock.json
 wrangler.test.jsonc
 .wrangler/
 __pycache__/
