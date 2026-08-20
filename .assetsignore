@@ -9,3 +9,5 @@ node_modules
 package.json
 package-lock.json
 wrangler.test.jsonc
+.git
+.gitignore
