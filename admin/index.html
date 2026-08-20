@@ -90,7 +90,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.4</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.5</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <button id="btnUsers" title="จัดการผู้ใช้" style="display:none">👥</button>
@@ -191,7 +191,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <div class="sheet" id="docSheet">
   <h2 style="color:var(--glow);margin-bottom:10px">เอกสารการจอง</h2>
   <div style="text-align:center"><img id="docImg" style="width:100%;max-width:420px;border-radius:12px;border:1px solid rgba(246,200,119,.3)" alt="เอกสารการจอง"></div>
-  <p style="font-size:.82rem;opacity:.7;margin-top:10px">ส่งให้ลูกค้า: กดปุ่มแชร์ หรือกดรูปค้างไว้แล้วบันทึก/แชร์</p>
+  <p style="font-size:.82rem;opacity:.7;margin-top:10px">ส่งลูกค้า = แชร์เอกสาร · เก็บลงคลังรูป = บันทึกรูป แล้วเลือก "บันทึกรูปภาพ" (หรือกดรูปค้างไว้ก็ได้)</p>
   <div class="row" style="margin-top:12px;flex-wrap:wrap">
     <button class="btn btn-l" id="docShare">แชร์เอกสาร</button>
     <button class="btn btn-g" id="docSaveImg">บันทึกรูป</button>
@@ -427,10 +427,19 @@ function dl(blob, name){
   a.href = URL.createObjectURL(blob); a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 30000);
 }
-$('docSaveImg').onclick = () => {
+$('docSaveImg').onclick = async () => {
   if (!docBlob) return;
+  const m = $('docMsg');
+  const file = new File([docBlob], 'booking-' + currentId + '.png', { type: 'image/png' });
+  // มือถือ: เว็บเขียนลงคลังรูปตรงๆ ไม่ได้ — ใช้ share sheet แล้วให้กด "บันทึกรูปภาพ"
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    m.className='msg ok'; m.textContent='ในเมนูที่เด้งขึ้น เลือก "บันทึกรูปภาพ / Save Image" เพื่อเก็บลงคลังรูปของเครื่อง';
+    try { await navigator.share({ files: [file] }); }
+    catch(e){ if (e.name !== 'AbortError'){ m.className='msg err'; m.textContent='ไม่สำเร็จ — กดรูปตัวอย่างค้างไว้แล้วเลือก "บันทึกรูปภาพ" แทนได้'; } }
+    return;
+  }
   dl(docBlob, 'booking-' + currentId + '.png');
-  const m = $('docMsg'); m.className='msg ok'; m.textContent='บันทึกรูปแล้ว ✓';
+  m.className='msg ok'; m.textContent='บันทึกรูปแล้ว ✓';
 };
 $('docSavePdf').onclick = () => {
   if (!docCv) return;
