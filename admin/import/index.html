@@ -22,8 +22,8 @@ a{color:#f6c877}
 </head>
 <body>
 <div class="card">
-  <h1>นำเข้าสมุดจองเดิม (3,545 รายการ)</h1>
-  <p>ระบบจะดึงรายการจองทั้งหมดจากสมุดจองเดิมเข้าฐานข้อมูลเว็บ กดซ้ำได้ ไม่มีรายการซ้ำ ใช้สิทธิ์ admin ที่ล็อกอินไว้ในหน้า <a href="/admin/">/admin</a></p>
+  <h1>นำเข้าข้อมูลการจองจากไฟล์</h1>
+  <p>นำเข้าชุดข้อมูลที่เตรียมไว้ในระบบเข้าฐานข้อมูลจอง กดซ้ำได้ ไม่มีรายการซ้ำ (เครื่องมือถาวร — นำเข้ารอบใหม่: ส่งไฟล์ Excel ให้ Claude แปลงเป็นชุดข้อมูลแล้ว deploy ก่อน) ใช้สิทธิ์ admin ที่ล็อกอินไว้ในหน้า <a href="/admin/">/admin</a></p>
   <button id="go">เริ่มนำเข้า</button>
   <div class="bar" id="bar"><i id="fill"></i></div>
   <div class="st" id="st"></div>
@@ -41,10 +41,11 @@ $('go').onclick = async () => {
   $('bar').style.display = 'block';
   const st = $('st'); st.className = 'st';
   try {
-    let done = false, guard = 0;
-    while (!done && guard++ < 40) {
+    let done = false, page = 0;
+    while (!done && page < 200) {
       const u = new URL('/api', location.origin);
       u.searchParams.set('action', 'import');
+      u.searchParams.set('page', page++);
       u.searchParams.set('user', user); u.searchParams.set('pass', pass);
       const r = await (await fetch(u)).json();
       if (!r.ok) { st.className = 'st err'; st.textContent = r.error; $('go').disabled = false; return; }
@@ -53,7 +54,7 @@ $('go').onclick = async () => {
       done = r.done;
     }
     st.className = 'st ok';
-    st.textContent = '✓ นำเข้าครบทุกรายการ — เปิดหน้า /admin หรือปฏิทินหน้าเว็บเพื่อตรวจสอบ แล้วแจ้ง Claude เพื่อถอดหน้านี้ออก';
+    st.textContent = '✓ นำเข้าครบทุกรายการ — เปิดหน้า /admin หรือปฏิทินหน้าเว็บเพื่อตรวจสอบ';
   } catch (e) {
     st.className = 'st err'; st.textContent = 'การเชื่อมต่อสะดุด กดเริ่มนำเข้าอีกครั้งได้ (ไม่มีรายการซ้ำ)';
     $('go').disabled = false;

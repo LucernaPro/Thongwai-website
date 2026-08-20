@@ -248,18 +248,21 @@ export default {
         case 'cancel':   return json(await cancelBooking(env.DB, p));
         // ── นำเข้าสมุดจองเดิม (admin, ทำซ้ำได้ ไม่ซ้ำแถว) ──
         case 'import': {
+          // ถาวร (Pist 20 ส.ค. 2026): เดินทีละหน้า ไม่ผูกกับชุดข้อมูล — เปลี่ยน
+          // tools/import-data.json เป็นชุดใหม่แล้ว deploy ก็นำเข้าซ้ำได้ (INSERT OR IGNORE)
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
-          const { c } = await env.DB.prepare("SELECT COUNT(*) AS c FROM bookings WHERE id LIKE 'X%'").first();
           const CHUNK = 300;
-          const batch = IMPORT_DATA.slice(c, c + CHUNK);
+          const page = Math.max(0, Number(p.get('page') || 0));
+          const batch = IMPORT_DATA.slice(page * CHUNK, (page + 1) * CHUNK);
           if (batch.length) {
             await env.DB.batch(batch.map(r => env.DB.prepare(
               `INSERT OR IGNORE INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff)
                VALUES (?,?,?,?,?,?,?,?,?,?)`)
               .bind(r[0], r[1], r[2], r[3], r[4], r[5], r[6], 'จอง', r[7], r[8])));
           }
-          const done = c + batch.length >= IMPORT_DATA.length;
-          return json({ ok: true, total: IMPORT_DATA.length, imported: c + batch.length, done });
+          const done = (page + 1) * CHUNK >= IMPORT_DATA.length;
+          return json({ ok: true, total: IMPORT_DATA.length,
+                        imported: Math.min((page + 1) * CHUNK, IMPORT_DATA.length), done, page });
         }
         // ── เฉพาะ admin ──
         case 'users': case 'user_add': case 'user_del': case 'user_setpw': {
