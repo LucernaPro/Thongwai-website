@@ -221,6 +221,8 @@ footer a{color:var(--glow)}
 /* ---- gallery group label ---- */
 .gal-label{margin:34px 2px 4px;font-size:.9rem;color:var(--ink-soft)}
 .gal-label strong{color:var(--pine)}
+.gal-credit{margin:14px 2px 0;font-size:.85rem;color:var(--ink-soft);text-align:right;opacity:.85}
+.gal-credit strong{color:var(--pine)}
 
 /* ---- gallery v2: masonry columns (no holes, no crops) ---- */
 .gal-grid{display:block;columns:3 300px;column-gap:14px;margin-top:22px}
