@@ -90,7 +90,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.6</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.7</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <button id="btnExport" title="ดาวน์โหลดสำรองการจองทั้งหมด (CSV)" style="display:none">⬇</button>
@@ -165,6 +165,9 @@ table.cal{border-collapse:collapse;min-width:100%}
 <div class="backdrop" id="backdrop"></div>
 <div class="sheet" id="formSheet">
   <h2 style="color:var(--glow);margin-bottom:6px">บันทึกการจอง</h2>
+  <label>✨ วางข้อความจากไลน์ — กรอกให้อัตโนมัติ</label>
+  <textarea id="fPaste" rows="3" placeholder="ก๊อปข้อความลูกค้าจากไลน์มาวางตรงนี้ทั้งก้อนได้เลย (ชื่อ เบอร์ ห้อง วันที่ มัดจำ) ระบบจะแยกลงช่องให้เอง"></textarea>
+  <div class="msg" id="fPasteMsg" style="margin:4px 0 8px"></div>
   <label>ชื่อลูกค้า *</label><input id="fName">
   <label>เบอร์โทร</label><input id="fPhone" inputmode="tel">
   <label>ห้อง *</label><select id="fRoom"></select>
@@ -625,12 +628,131 @@ $('nextBtn').onclick = () => { viewStart = addDays(viewStart, 7); load(); };
 $('todayBtn').onclick = () => { viewStart = todayStr(); load(); };
 
 /* ================= form ================= */
+
+/* ── ตัวช่วยกรอกจากไลน์ (v4.7) ─ วางทั้งก้อน → แยกลงช่อง ช่องไหนไม่เจอเว้นไว้ให้แก้เอง ── */
+const TH_MONTHS = {'ม.ค':1,'มค':1,'มกราคม':1,'ก.พ':2,'กพ':2,'กุมภาพันธ์':2,'มี.ค':3,'มีค':3,'มีนาคม':3,'เม.ย':4,'เมย':4,'เมษายน':4,'พ.ค':5,'พค':5,'พฤษภาคม':5,'มิ.ย':6,'มิย':6,'มิถุนายน':6,'ก.ค':7,'กค':7,'กรกฎาคม':7,'ส.ค':8,'สค':8,'สิงหาคม':8,'ก.ย':9,'กย':9,'กันยายน':9,'ต.ค':10,'ตค':10,'ตุลาคม':10,'พ.ย':11,'พย':11,'พฤศจิกายน':11,'ธ.ค':12,'ธค':12,'ธันวาคม':12};
+function ceYear(y){ // 69→2026, 2569→2026, 26/2026 คงเดิม
+  y = Number(y);
+  if (y > 2400) return y - 543;
+  if (y >= 100) return y;
+  return y >= 60 ? y + 2500 - 543 : y + 2000;
+}
+function fmtUTC(ms){ const d = new Date(ms); return d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0'); }
+function laoTodayMs(){ const n = new Date(Date.now() + 7*3600e3); return Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()); }
+function resolveDate(d, m, y){ // ไม่มีปี → ปีที่ทำให้วันไม่อยู่ในอดีต (เผื่อย้อนหลังได้ 1 วัน)
+  if (y) { const ms = Date.UTC(ceYear(y), m-1, d); return isNaN(ms) ? null : ms; }
+  const now = new Date(Date.now() + 7*3600e3);
+  let ms = Date.UTC(now.getUTCFullYear(), m-1, d);
+  if (ms < laoTodayMs() - 86400e3) ms = Date.UTC(now.getUTCFullYear()+1, m-1, d);
+  return isNaN(ms) ? null : ms;
+}
+function findDates(text){
+  const found = []; // {ms, idx}
+  const push = (ms, idx) => { if (ms !== null) found.push({ms, idx}); };
+  let m;
+  // ช่วงวัน 22-23/8 หรือ 22–23 ส.ค.
+  const reRange = /(\d{1,2})\s*[-–ถึง]{1,3}\s*(\d{1,2})\s*[\/.]?\s*(\d{1,2}|[ก-ฮ.]{2,12})(?:[\/.](\d{2,4}))?/g;
+  while ((m = reRange.exec(text))) {
+    const mon = /\d/.test(m[3]) ? Number(m[3]) : TH_MONTHS[m[3].replace(/\.$/,'')];
+    if (!mon || mon < 1 || mon > 12) continue;
+    push(resolveDate(Number(m[1]), mon, m[4]), m.index);
+    push(resolveDate(Number(m[2]), mon, m[4]), m.index + 1);
+  }
+  // เดี่ยว 22/8, 22/08/69, 22 ส.ค. 69
+  const reOne = /(\d{1,2})\s*(?:[\/.]\s*(\d{1,2})|\s?([ก-ฮ.]{2,12}))(?:\s*[\/.]?\s*(\d{2,4}))?/g;
+  while ((m = reOne.exec(text))) {
+    const mon = m[2] ? Number(m[2]) : TH_MONTHS[(m[3]||'').replace(/\.$/,'')];
+    if (!mon || mon < 1 || mon > 12) continue;
+    const d = Number(m[1]); if (d < 1 || d > 31) continue;
+    if (found.some(f => Math.abs(f.idx - m.index) < 3)) continue; // ซ้ำกับ range
+    push(resolveDate(d, mon, m[4]), m.index);
+  }
+  found.sort((a,b) => a.idx - b.idx);
+  return found;
+}
+function parsePaste(raw){
+  const filled = [], miss = [];
+  let text = raw.replace(/^\d{1,2}:\d{2}\s*/gm, ''); // เวลาไลน์หัวบรรทัด
+  // ชื่อพนักงานที่ซ้ำหัวบรรทัด ≥2 ครั้ง → ตัดทิ้ง
+  const heads = text.split('\n').map(l => l.trim().split(/\s+/).slice(0,2).join(' ')).filter(Boolean);
+  heads.forEach(h => { if (h.length > 3 && heads.filter(x => x === h).length >= 2) text = text.split('\n').map(l => l.trim().startsWith(h) ? l.trim().slice(h.length).trim() : l).join('\n'); });
+
+  // เบอร์โทร (ไทย 10 หลัก / ลาว 856-20)
+  let phone = '';
+  const pm = text.match(/(\+?85[26][\s-]?20[\s\d-]{6,12}|0\d[\s-]?\d{4}[\s-]?\d{4}|0\d{2}[\s-]?\d{3}[\s-]?\d{4})/);
+  if (pm) { phone = pm[0].replace(/[\s-]/g,''); text = text.replace(pm[0], ' '); }
+  if (phone) { $('fPhone').value = phone; filled.push('เบอร์'); } else miss.push('เบอร์');
+
+  const norm = s => s.replace(/\s+/g,'').replace(/เต้นท์|เต๊นท์|เต็นๆ/g,'เต็นท์');
+  const ntext = norm(text);
+
+  // ห้อง — เทียบชื่อจริงก่อน (ยาวก่อน) แล้วค่อย keyword
+  let roomId = '';
+  [...rooms].sort((a,b) => b.name.length - a.name.length).forEach(r => { if (!roomId && ntext.includes(norm(r.name))) roomId = r.id; });
+  if (!roomId) {
+    const kw = {'มหาเศรษฐี':'R1','โชคลาภ':'R2','เจ้าสัว1':'R3','เจ้าสัว2':'R4','มั่งมีเงินทอง':'R5','มั่งมี':'R5','ล้ำลวย':'R6','อุดมสุข':'R7','มั่งคั่ง':'R8','มหาเฮง':'R9'};
+    for (const k in kw) if (ntext.includes(k)) { roomId = kw[k]; break; }
+    if (!roomId) { const tm = ntext.match(/เต็นท์(\d)/); if (tm && rooms.some(r => r.id === 'T'+tm[1])) roomId = 'T'+tm[1]; }
+  }
+  if (roomId) { $('fRoom').value = roomId; filled.push('ห้อง'); } else miss.push('ห้อง');
+
+  // วันที่ — ยึด label ก่อน ไม่มีก็เรียงตามลำดับที่เจอ
+  const inSeg = text.match(/(?:เช็คอิน|เข้าพัก|วันเข้า|check\s*in)[^\n]{0,25}/i);
+  const outSeg = text.match(/(?:เช็คเอาท์|เช็คเอ้าท์|วันออก|ออก|check\s*out)[^\n]{0,25}/i);
+  let inMs = null, outMs = null;
+  if (inSeg) { const f = findDates(inSeg[0]); if (f.length) inMs = f[0].ms; }
+  if (outSeg) { const f = findDates(outSeg[0]); if (f.length) outMs = f[0].ms; }
+  if (inMs === null || outMs === null) {
+    const all = findDates(text).map(f => f.ms);
+    if (inMs === null && all.length) inMs = all[0];
+    if (outMs === null && all.length > 1) outMs = all.find(ms => ms > inMs) ?? all[1];
+  }
+  if (inMs !== null) {
+    if (outMs === null || outMs <= inMs) outMs = inMs + 86400e3;
+    $('fIn').value = fmtUTC(inMs); $('fOut').value = fmtUTC(outMs); filled.push('วันที่');
+  } else miss.push('วันที่');
+
+  // อาหารเช้า / เตียงเสริม
+  if (/ไม่(?:รวม|เอา)อาหารเช้า/.test(ntext)) { $('fBf').value = ''; filled.push('อาหารเช้า(ไม่รวม)'); }
+  else if (/(?:รวม|พร้อม|\+)อาหารเช้า/.test(ntext)) { $('fBf').value = '1'; filled.push('อาหารเช้า'); }
+  if (/เตียงเสริม/.test(ntext) && !/ไม่(?:มี|เอา|ใช้)เตียงเสริม/.test(ntext)) { $('fXbed').value = '1'; filled.push('เตียงเสริม'); }
+
+  // มัดจำ
+  const depB = text.match(/(?:มัดจำ|โอน(?:แล้ว)?|จ่ายแล้ว)\s*([\d,]+)\s*(?:บาท|฿|b)?(?!\s*กีบ)/i);
+  const depK = text.match(/([\d,]+)\s*กีบ/);
+  if (depB) { $('fDepB').value = depB[1].replace(/,/g,''); filled.push('มัดจำ฿'); }
+  if (depK) { $('fDepK').value = depK[1].replace(/,/g,''); filled.push('มัดจำกีบ'); }
+
+  // ชื่อ — ตัดบรรทัดตรงคีย์เวิร์ดห้อง/วันที่ เอาเฉพาะส่วนหน้า แล้วเช็คว่าเป็นชื่อคนได้
+  const skip = /บ้านเลขที่|หมู่|ตำบล|ต\.|อำเภอ|อ\.|จังหวัด|จ\.|ซอย|ถนน|รหัส|เช็ค|อาหาร|เตียง|มัดจำ|โอน|คืน|ห้อง|ราคา|บาท|กีบ/;
+  const cutAt = /เฮือน|เต็นท์|เจ้าสัว|มหาเศรษฐี|โชคลาภ|มั่งมี|ล้ำลวย|อุดมสุข|มั่งคั่ง|มหาเฮง|\d{1,2}\s*[\/.–-]\s*\d{1,2}/;
+  let name = '';
+  for (let l of text.split('\n').map(s => s.trim())) {
+    const cm = cutAt.exec(l);
+    if (cm) l = l.slice(0, cm.index).trim();
+    if (l.length >= 3 && l.length <= 40 && /[ก-๙a-zA-Z]{2}/.test(l) && !/\d{3,}/.test(l) && !skip.test(norm(l))) { name = l.replace(/\s{2,}/g,' '); break; }
+  }
+  if (name) { $('fName').value = name; filled.push('ชื่อ'); } else miss.push('ชื่อ');
+
+  // จำนวนคน → หมายเหตุ
+  const gm = text.match(/(\d{1,2})\s*(?:คน|ท่าน)/);
+  if (gm) { $('fNote').value = ($('fNote').value ? $('fNote').value + ' · ' : '') + 'มา ' + gm[1] + ' คน'; filled.push('จำนวนคน'); }
+
+  const pmsg = $('fPasteMsg');
+  pmsg.className = 'msg ' + (miss.length ? 'err' : 'ok');
+  pmsg.textContent = (filled.length ? 'กรอกให้แล้ว: ' + filled.join(' · ') : 'อ่านข้อมูลไม่ออก ลองวางใหม่')
+    + (miss.length ? '  |  ยังขาด: ' + miss.join(' · ') + ' — กรอกเองด้านล่าง' : '  ✓ เช็คความถูกต้องก่อนบันทึก');
+}
+$('fPaste').addEventListener('paste', () => setTimeout(() => { if ($('fPaste').value.trim()) parsePaste($('fPaste').value); }, 50));
+$('fPaste').addEventListener('input', () => { if (!$('fPaste').value.trim()) { $('fPasteMsg').className='msg'; $('fPasteMsg').textContent=''; } });
+
 function openForm(room, date){
   $('fRoom').innerHTML = rooms.map(r => `<option value="${r.id}" ${r.id===room?'selected':''}>${r.name} (${r.capacity} คน · ${r.price}฿)</option>`).join('');
   $('fIn').value = date || todayStr();
   $('fOut').value = addDays(date || todayStr(), 1);
   $('fName').value=''; $('fPhone').value=''; $('fNote').value='';
   $('fBf').value=''; $('fXbed').value=''; $('fDepB').value=''; $('fDepK').value='';
+  $('fPaste').value=''; $('fPasteMsg').className='msg'; $('fPasteMsg').textContent='';
   $('fMsg').className='msg';
   $('backdrop').classList.add('show'); $('formSheet').classList.add('open');
 }
