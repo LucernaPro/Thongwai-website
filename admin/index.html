@@ -90,7 +90,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.8</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.9</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <button id="btnExport" title="ดาวน์โหลดสำรองการจองทั้งหมด (CSV)" style="display:none">⬇</button>
@@ -124,9 +124,9 @@ table.cal{border-collapse:collapse;min-width:100%}
         <button class="btn btn-g" id="logPrev">← วันก่อน</button>
         <button class="btn btn-g" id="logToday">วันนี้</button>
         <button class="btn btn-g" id="logNext">วันถัดไป →</button>
-        <button class="btn btn-g" style="position:relative">📅 ไปวันที่
-          <input type="date" id="logJump" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer">
-        </button>
+        <label class="btn btn-g" style="position:relative;display:inline-flex;align-items:center;cursor:pointer">📅 ไปวันที่
+          <input type="date" id="logJump" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;-webkit-appearance:none">
+        </label>
       </div>
       <div class="card">
         <h2 id="logHead">รับจองวันนี้</h2>
@@ -140,9 +140,9 @@ table.cal{border-collapse:collapse;min-width:100%}
         <button class="btn btn-g" id="prevBtn">← ก่อน</button>
         <button class="btn btn-g" id="todayBtn">วันนี้</button>
         <button class="btn btn-g" id="nextBtn">ถัดไป →</button>
-        <button class="btn btn-g" style="position:relative">📅 ไปวันที่
-          <input type="date" id="calJump" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer">
-        </button>
+        <label class="btn btn-g" style="position:relative;display:inline-flex;align-items:center;cursor:pointer">📅 ไปวันที่
+          <input type="date" id="calJump" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;-webkit-appearance:none">
+        </label>
       </div>
       <h2 id="rangeLabel" style="font-size:.95rem;color:var(--glow)"></h2>
     </div>
