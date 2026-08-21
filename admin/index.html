@@ -90,7 +90,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.7</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.8</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <button id="btnExport" title="ดาวน์โหลดสำรองการจองทั้งหมด (CSV)" style="display:none">⬇</button>
@@ -124,6 +124,9 @@ table.cal{border-collapse:collapse;min-width:100%}
         <button class="btn btn-g" id="logPrev">← วันก่อน</button>
         <button class="btn btn-g" id="logToday">วันนี้</button>
         <button class="btn btn-g" id="logNext">วันถัดไป →</button>
+        <button class="btn btn-g" style="position:relative">📅 ไปวันที่
+          <input type="date" id="logJump" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer">
+        </button>
       </div>
       <div class="card">
         <h2 id="logHead">รับจองวันนี้</h2>
@@ -137,6 +140,9 @@ table.cal{border-collapse:collapse;min-width:100%}
         <button class="btn btn-g" id="prevBtn">← ก่อน</button>
         <button class="btn btn-g" id="todayBtn">วันนี้</button>
         <button class="btn btn-g" id="nextBtn">ถัดไป →</button>
+        <button class="btn btn-g" style="position:relative">📅 ไปวันที่
+          <input type="date" id="calJump" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer">
+        </button>
       </div>
       <h2 id="rangeLabel" style="font-size:.95rem;color:var(--glow)"></h2>
     </div>
@@ -590,6 +596,8 @@ function setView(v){
 $('tabLog').onclick = () => setView('log');
 $('tabCal').onclick = () => setView('cal');
 $('logPrev').onclick  = () => { logDate = addDays(logDate, -1); loadLog(); };
+$('logJump').onchange = () => { if ($('logJump').value) { logDate = $('logJump').value; loadLog(); } };
+$('calJump').onchange = () => { if ($('calJump').value) { viewStart = $('calJump').value; load(); } };
 $('logNext').onclick  = () => { logDate = addDays(logDate, +1); loadLog(); };
 $('logToday').onclick = () => { logDate = todayStr(); loadLog(); };
 
@@ -601,6 +609,7 @@ async function loadLog(){
     if(!r.ok) throw 0;
     logBookings = r.bookings;
     const act = logBookings.filter(b=>b.status==='จอง');
+    $('logJump').value = logDate;
     $('logHead').textContent = `รับจองวัน${thDow(logDate)}ที่ ${thDate(logDate)} — ${act.length} รายการ` + (logBookings.length>act.length ? ` (+ยกเลิก ${logBookings.length-act.length})` : '');
     $('logList').innerHTML = logBookings.length ? logBookings.map(b => `
       <div class="bk log" onclick="openDetail('${b.id}')">
@@ -634,6 +643,7 @@ async function load(){
 function render(){
   const days = Array.from({length:DAYS}, (_,i)=>addDays(viewStart,i));
   $('rangeLabel').textContent = thDate(days[0]) + ' – ' + thDate(days[days.length-1]);
+  $('calJump').value = viewStart;
   let h = '<tr><th class="roomname">ห้อง</th>';
   for(const d of days) h += `<th class="${d===todayStr()?'today':''}">${thDow(d)}<br>${thDate(d)}</th>`;
   h += '</tr>';
