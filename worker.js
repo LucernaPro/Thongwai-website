@@ -212,7 +212,7 @@ async function addBooking(db, p, me) {
   const r = await db.prepare('SELECT id FROM rooms WHERE id = ?').bind(room).first();
   if (!r) return { ok: false, error: 'ไม่พบห้อง ' + room };
 
-  const id = 'B' + Date.now();
+  const id = 'B' + Date.now() + Math.random().toString(36).slice(2, 5);
   // INSERT แบบมีเงื่อนไขในคำสั่งเดียว = atomic กันจองซ้อนแม้กดพร้อมกันสองเครื่อง
   const res = await db.prepare(
     `INSERT INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff)
@@ -283,6 +283,45 @@ export default {
           const r = await cancelBooking(env.DB, p);
           if (r.ok) await auditLog(env, ctx, me.username, 'ยกเลิก', id, row || {});
           return json(r);
+        }
+        case 'move': {
+          const id = p.get('id'), room = p.get('room'),
+                checkin = p.get('checkin'), checkout = p.get('checkout');
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(checkin || '') || !/^\d{4}-\d{2}-\d{2}$/.test(checkout || ''))
+            return json({ ok: false, error: 'รูปแบบวันที่ต้องเป็น yyyy-mm-dd' });
+          if (checkout <= checkin) return json({ ok: false, error: 'วันเช็คเอาท์ต้องหลังวันเช็คอิน' });
+          const b = await env.DB.prepare('SELECT * FROM bookings WHERE id = ?').bind(id).first();
+          if (!b) return json({ ok: false, error: 'ไม่พบรายการจอง' });
+          if (b.status !== 'จอง') return json({ ok: false, error: 'รายการนี้ถูกยกเลิกไปแล้ว' });
+          const target = room || b.room;
+          if (!(await env.DB.prepare('SELECT id FROM rooms WHERE id = ?').bind(target).first()))
+            return json({ ok: false, error: 'ไม่พบห้อง ' + target });
+          // UPDATE แบบมีเงื่อนไขคำสั่งเดียว = atomic (ไม่นับตัวเองเป็นคู่ชน)
+          const res = await env.DB.prepare(
+            `UPDATE bookings SET room = ?, checkin = ?, checkout = ?
+             WHERE id = ? AND status = 'จอง' AND NOT EXISTS (
+               SELECT 1 FROM bookings
+               WHERE room = ? AND status = 'จอง' AND id != ?
+                 AND checkin < ? AND ? < checkout)`)
+            .bind(target, checkin, checkout, id, target, id, checkout, checkin).run();
+          if (res.meta.changes === 0) {
+            // ชน — หาว่าห้องไหนว่างช่วงนั้นเสนอ admin
+            const free = (await env.DB.prepare(
+              `SELECT id, name FROM rooms WHERE id NOT IN (
+                 SELECT room FROM bookings
+                 WHERE status = 'จอง' AND id != ? AND checkin < ? AND ? < checkout)
+               ORDER BY sort`).bind(id, checkout, checkin).all()).results;
+            const clash = await env.DB.prepare(
+              `SELECT name, checkin, checkout FROM bookings
+               WHERE room = ? AND status = 'จอง' AND id != ? AND checkin < ? AND ? < checkout LIMIT 1`)
+              .bind(target, id, checkout, checkin).first();
+            return json({ ok: false, clash: true, free,
+              error: `ห้องนี้ไม่ว่างช่วงที่เลือก — ชนกับ "${clash ? clash.name : ''}" (${clash ? clash.checkin : ''} → ${clash ? clash.checkout : ''})` });
+          }
+          await auditLog(env, ctx, me.username, 'เลื่อน', id, {
+            ชื่อ: b.name, จาก: `${b.room} ${b.checkin} → ${b.checkout}`,
+            เป็น: `${target} ${checkin} → ${checkout}` });
+          return json({ ok: true });
         }
         case 'export': {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
