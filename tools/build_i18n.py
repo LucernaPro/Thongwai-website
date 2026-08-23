@@ -16,6 +16,7 @@ PAGES = {  # th path → (en path, lo path)
     'rooms/mahasetthi/index.html': ('en/rooms/mahasetthi/index.html', 'lo/rooms/mahasetthi/index.html'),
     'rooms/mahaheng/index.html': ('en/rooms/mahaheng/index.html', 'lo/rooms/mahaheng/index.html'),
     'rooms/lamluay/index.html': ('en/rooms/lamluay/index.html', 'lo/rooms/lamluay/index.html'),
+    'rooms/mangmee/index.html': ('en/rooms/mangmee/index.html', 'lo/rooms/mangmee/index.html'),
 }
 CANON = {  # canonical path ต่อภาษา
     'index.html': '/', 'availability/index.html': '/availability/',
@@ -25,6 +26,7 @@ CANON = {  # canonical path ต่อภาษา
     'rooms/mahasetthi/index.html': '/rooms/mahasetthi/',
     'rooms/mahaheng/index.html': '/rooms/mahaheng/',
     'rooms/lamluay/index.html': '/rooms/lamluay/',
+    'rooms/mangmee/index.html': '/rooms/mangmee/',
 }
 
 # ═══════════ ENGLISH ═══════════
@@ -335,6 +337,20 @@ EN = {
  'ระเบียงหน้าเฮือนล้ำลวย ทุ่งหวายโฮมสเตย์ เก้าอี้หวายและโคมหวายแขวน': 'The front terrace of Lam Luay House at Thongwai Homestay — rattan chairs and a hanging rattan lantern',
  'ห้องนอนเฮือนล้ำลวย เตียงใหญ่ ผนังไม้ไผ่สานโทนเข้ม และภาพเมล็ดกาแฟใส่กรอบ': 'Lam Luay House bedroom — large bed, dark woven-bamboo walls and a framed picture of coffee cherries',
  'หน้าบ้านเป็นระเบียงไม้ มีเก้าอี้หวายพร้อมโต๊ะกลม และโคมหวายแขวนเหนือหัว มองออกไปเห็นลานหน้ารีสอร์ทและแนวต้นไม้': 'The front of the house is a timber terrace with rattan chairs, a round table and a rattan lantern overhead, looking out to the resort forecourt and the trees.',
+ # ── เฮือนมั่งมีเงินทอง (R5) ──
+ 'เฮือนมั่งมีเงินทอง — บ้านพักโซนวิวแคมป์ปิ้ง 2 ท่าน | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Mang Mee Ngoen Thong House — Camping-View House for 2 | Thongwai Homestay, Paksong',
+ 'เฮือนมั่งมีเงินทองที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพักหลังเล็ก พักได้ 2 ท่าน (เสริมเตียงได้) ระเบียงหน้าบ้าน โซนวิวแคมป์ปิ้ง เริ่ม 800 บาท/คืน โทร +856 20 91 555 288': 'Mang Mee Ngoen Thong House at Thongwai Homestay, Paksong — a small house sleeping 2 (extra bed available), with a front terrace in the camping-view zone. From 800 THB/night. Call +856 20 91 555 288',
+ 'เฮือนมั่งมีเงินทอง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Mang Mee Ngoen Thong House | Thongwai Homestay, Paksong',
+ 'บ้านพักหลังเล็ก พักได้ 2 ท่าน (เสริมเตียงได้) โซนวิวแคมป์ปิ้ง เริ่ม 800 บาท/คืน': 'A small house sleeping 2 (extra bed available), camping-view zone. From 800 THB/night.',
+ 'บ้านพักหลังเล็ก พักได้ 2 ท่าน (เสริมเตียงได้) โซนวิวแคมป์ปิ้ง': 'A small house sleeping 2 (extra bed available), camping-view zone',
+ 'ห้องนอนเฮือนมั่งมีเงินทอง ทุ่งหวายโฮมสเตย์ ผนังไม้ไผ่สาน ประตูกระจกเปิดสู่สนามหญ้า': 'Mang Mee Ngoen Thong House bedroom at Thongwai Homestay — woven-bamboo walls, glass doors opening onto the lawn',
+ 'บ้านพักหลังเล็ก': 'A small house',
+ 'หลังเล็กเป็นส่วนตัว โซนวิวแคมป์ปิ้ง': 'A small house to yourselves, in the camping-view zone',
+ 'เฮือนมั่งมีเงินทองเป็นบ้านพักหลังเล็ก <strong>พักได้ 2 ท่าน (เสริมเตียงได้)</strong> อยู่ในโซนวิวแคมป์ปิ้งของรีสอร์ท มีระเบียงหน้าบ้าน': 'Mang Mee Ngoen Thong House is a small house <strong>sleeping 2 (extra bed available)</strong>, set in the camping-view zone, with a terrace out front.',
+ 'ห้องนอนกรุผนังและเพดานด้วยไม้ไผ่สาน ปูพื้นไม้ มีเตียงสองหลังวางเคียงกัน พร้อมเครื่องนอนครบและหมอนอิง โคมไฟตั้งโต๊ะข้างเตียง กระจกบานใหญ่ และภาพน้ำตกใส่กรอบแขวนผนัง': 'The bedroom has woven-bamboo walls and ceiling over a wooden floor, with two beds side by side, full bedding and cushions, a table lamp at the bedside, a large mirror and a framed waterfall picture on the wall.',
+ 'ประตูกระจกบานเลื่อนเปิดออกสู่ระเบียงและสนามหญ้า แสงเข้าเต็มห้องในตอนกลางวัน': 'Sliding glass doors open onto the terrace and the lawn, filling the room with daylight.',
+ 'ห้องนอนเฮือนมั่งมีเงินทอง อีกมุมหนึ่ง ผนังไม้ไผ่สานและหน้าต่างบานไม้': 'Mang Mee Ngoen Thong bedroom from another angle — woven-bamboo walls and timber-framed windows',
+ 'เฮือนมั่งมีเงินทอง': 'Mang Mee Ngoen Thong House',
 }
 
 # ═══════════ ລາວ ═══════════
@@ -630,6 +646,20 @@ LO = {
  'ระเบียงหน้าเฮือนล้ำลวย ทุ่งหวายโฮมสเตย์ เก้าอี้หวายและโคมหวายแขวน': 'ລະບຽງໜ້າເຮືອນລ້ຳລວຍ ທົ່ງຫວາຍໂຮມສະເຕ ຕັ່ງຫວາຍ ແລະ ໂຄມຫວາຍແຂວນ',
  'ห้องนอนเฮือนล้ำลวย เตียงใหญ่ ผนังไม้ไผ่สานโทนเข้ม และภาพเมล็ดกาแฟใส่กรอบ': 'ຫ້ອງນອນເຮືອນລ້ຳລວຍ ຕຽງໃຫຍ່ ຝາໄມ້ໄຜ່ສານໂທນເຂັ້ມ ແລະ ຮູບແກ່ນກາເຟໃສ່ກອບ',
  'หน้าบ้านเป็นระเบียงไม้ มีเก้าอี้หวายพร้อมโต๊ะกลม และโคมหวายแขวนเหนือหัว มองออกไปเห็นลานหน้ารีสอร์ทและแนวต้นไม้': 'ໜ້າເຮືອນເປັນລະບຽງໄມ້ ມີຕັ່ງຫວາຍພ້ອມໂຕະມົນ ແລະ ໂຄມຫວາຍແຂວນເໜືອຫົວ ເບິ່ງອອກໄປເຫັນເດີ່ນໜ້າທີ່ພັກ ແລະ ແນວຕົ້ນໄມ້',
+ # ── เฮือนมั่งมีเงินทอง (R5) ──
+ 'เฮือนมั่งมีเงินทอง — บ้านพักโซนวิวแคมป์ปิ้ง 2 ท่าน | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນມັ່ງມີເງິນທອງ — ເຮືອນພັກໂຊນວິວແຄມປິ້ງ 2 ທ່ານ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เฮือนมั่งมีเงินทองที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพักหลังเล็ก พักได้ 2 ท่าน (เสริมเตียงได้) ระเบียงหน้าบ้าน โซนวิวแคมป์ปิ้ง เริ่ม 800 บาท/คืน โทร +856 20 91 555 288': 'ເຮືອນມັ່ງມີເງິນທອງທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຮືອນພັກຫຼັງນ້ອຍ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້) ລະບຽງໜ້າເຮືອນ ໂຊນວິວແຄມປິ້ງ ເລີ່ມ 800 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
+ 'เฮือนมั่งมีเงินทอง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນມັ່ງມີເງິນທອງ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'บ้านพักหลังเล็ก พักได้ 2 ท่าน (เสริมเตียงได้) โซนวิวแคมป์ปิ้ง เริ่ม 800 บาท/คืน': 'ເຮືອນພັກຫຼັງນ້ອຍ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້) ໂຊນວິວແຄມປິ້ງ ເລີ່ມ 800 ບາດ/ຄືນ',
+ 'บ้านพักหลังเล็ก พักได้ 2 ท่าน (เสริมเตียงได้) โซนวิวแคมป์ปิ้ง': 'ເຮືອນພັກຫຼັງນ້ອຍ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້) ໂຊນວິວແຄມປິ້ງ',
+ 'ห้องนอนเฮือนมั่งมีเงินทอง ทุ่งหวายโฮมสเตย์ ผนังไม้ไผ่สาน ประตูกระจกเปิดสู่สนามหญ้า': 'ຫ້ອງນອນເຮືອນມັ່ງມີເງິນທອງ ທົ່ງຫວາຍໂຮມສະເຕ ຝາໄມ້ໄຜ່ສານ ປະຕູແກ້ວເປີດສູ່ສະໜາມຫຍ້າ',
+ 'บ้านพักหลังเล็ก': 'ເຮືອນພັກຫຼັງນ້ອຍ',
+ 'หลังเล็กเป็นส่วนตัว โซนวิวแคมป์ปิ้ง': 'ຫຼັງນ້ອຍເປັນສ່ວນຕົວ ໂຊນວິວແຄມປິ້ງ',
+ 'เฮือนมั่งมีเงินทองเป็นบ้านพักหลังเล็ก <strong>พักได้ 2 ท่าน (เสริมเตียงได้)</strong> อยู่ในโซนวิวแคมป์ปิ้งของรีสอร์ท มีระเบียงหน้าบ้าน': 'ເຮືອນມັ່ງມີເງິນທອງເປັນເຮືອນພັກຫຼັງນ້ອຍ <strong>ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້)</strong> ຢູ່ໃນໂຊນວິວແຄມປິ້ງຂອງທີ່ພັກ ມີລະບຽງໜ້າເຮືອນ',
+ 'ห้องนอนกรุผนังและเพดานด้วยไม้ไผ่สาน ปูพื้นไม้ มีเตียงสองหลังวางเคียงกัน พร้อมเครื่องนอนครบและหมอนอิง โคมไฟตั้งโต๊ะข้างเตียง กระจกบานใหญ่ และภาพน้ำตกใส่กรอบแขวนผนัง': 'ຫ້ອງນອນກຸຝາ ແລະ ເພດານດ້ວຍໄມ້ໄຜ່ສານ ປູພື້ນໄມ້ ມີຕຽງສອງຫຼັງວາງຄຽງກັນ ພ້ອມເຄື່ອງນອນຄົບ ແລະ ໝອນອີງ ໂຄມໄຟຕັ້ງໂຕະຂ້າງຕຽງ ແວ່ນບານໃຫຍ່ ແລະ ຮູບນ້ຳຕົກໃສ່ກອບແຂວນຝາ',
+ 'ประตูกระจกบานเลื่อนเปิดออกสู่ระเบียงและสนามหญ้า แสงเข้าเต็มห้องในตอนกลางวัน': 'ປະຕູແກ້ວບານເລື່ອນເປີດອອກສູ່ລະບຽງ ແລະ ສະໜາມຫຍ້າ ແສງເຂົ້າເຕັມຫ້ອງໃນຕອນກາງເວັນ',
+ 'ห้องนอนเฮือนมั่งมีเงินทอง อีกมุมหนึ่ง ผนังไม้ไผ่สานและหน้าต่างบานไม้': 'ຫ້ອງນອນເຮືອນມັ່ງມີເງິນທອງ ອີກມຸມໜຶ່ງ ຝາໄມ້ໄຜ່ສານ ແລະ ປ່ອງຢ້ຽມບານໄມ້',
+ 'เฮือนมั่งมีเงินทอง': 'ເຮືອນມັ່ງມີເງິນທອງ',
 }
 
 # ═══════════ house rules — เงื่อนไขการจอง/กฎที่พัก (markup: tools/house-rules.html) ═══════════
@@ -721,7 +751,7 @@ def build(th_path, lang, D):
     # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
     for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'",
                     "'/rooms/udomsuk/'", "'/rooms/mangkhang/'", "'/rooms/choklap/'",
-                    "'/rooms/mahasetthi/'", "'/rooms/mahaheng/'", "'/rooms/lamluay/'"):
+                    "'/rooms/mahasetthi/'", "'/rooms/mahaheng/'", "'/rooms/lamluay/'", "'/rooms/mangmee/'"):
         h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
