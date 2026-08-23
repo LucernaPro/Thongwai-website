@@ -12,15 +12,34 @@ PAGES = {  # th path → (en path, lo path)
     'rooms/tent/index.html': ('en/rooms/tent/index.html', 'lo/rooms/tent/index.html'),
     'rooms/mangkhang/index.html': ('en/rooms/mangkhang/index.html', 'lo/rooms/mangkhang/index.html'),
     'rooms/udomsuk/index.html': ('en/rooms/udomsuk/index.html', 'lo/rooms/udomsuk/index.html'),
+    'rooms/choklap/index.html': ('en/rooms/choklap/index.html', 'lo/rooms/choklap/index.html'),
 }
 CANON = {  # canonical path ต่อภาษา
     'index.html': '/', 'availability/index.html': '/availability/',
     'rooms/jaosua1/index.html': '/rooms/jaosua1/', 'rooms/jaosua2/index.html': '/rooms/jaosua2/',
     'rooms/tent/index.html': '/rooms/tent/', 'rooms/mangkhang/index.html': '/rooms/mangkhang/', 'rooms/udomsuk/index.html': '/rooms/udomsuk/',
+    'rooms/choklap/index.html': '/rooms/choklap/',
 }
 
 # ═══════════ ENGLISH ═══════════
 EN = {
+ # ── เฮือนโชคลาภเงินทอง (R2) ──
+ 'เฮือนโชคลาภเงินทอง — บ้านพัก 2 ห้องนอน โซนริมน้ำ | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Chok Lap Ngoen Thong House — 2-Bedroom House in the Riverside Zone | Thongwai Homestay, Paksong',
+ 'เฮือนโชคลาภเงินทองที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 2 ห้องนอน 2 ห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้) โซนวิวริมน้ำ ติดระเบียงริมน้ำ เริ่ม 1,600 บาท/คืน โทร +856 20 91 555 288': 'Chok Lap Ngoen Thong House at Thongwai Homestay, Paksong — 2 bedrooms, 2 bathrooms, sleeps 4 (extra bed available). Riverside zone, beside the waterside terrace. From 1,600 THB/night. Call +856 20 91 555 288',
+ 'เฮือนโชคลาภเงินทอง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Chok Lap Ngoen Thong House | Thongwai Homestay, Paksong',
+ 'บ้านพัก 2 ห้องนอน 2 ห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้) โซนวิวริมน้ำ เริ่ม 1,600 บาท/คืน': '2 bedrooms, 2 bathrooms, sleeps 4 (extra bed available). Riverside zone. From 1,600 THB/night.',
+ 'บ้านพัก 2 ห้องนอน 2 ห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้) โซนวิวริมน้ำ ติดระเบียงริมน้ำ': '2 bedrooms, 2 bathrooms, sleeps 4 (extra bed available) — riverside zone with waterside terrace',
+ 'พื้นที่ส่วนกลางในเฮือนโชคลาภเงินทอง โต๊ะไม้พร้อมเก้าอี้และผนังไม้': 'Shared living area in Chok Lap Ngoen Thong House — wooden table with chairs and timber walls',
+ '🌊 โซนวิวริมน้ำ': '🌊 Riverside zone', '🪑 พื้นที่ส่วนกลางในบ้าน': '🪑 Shared living area',
+ 'บ้านพักสองห้องนอน โซนริมน้ำ': 'Two-bedroom house, riverside zone',
+ 'สองห้องนอน สองห้องน้ำ พร้อมพื้นที่ส่วนกลางในบ้าน': 'Two bedrooms, two bathrooms and a shared living area',
+ 'เฮือนโชคลาภเงินทองเป็นบ้านพัก<strong>สองห้องนอน สองห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้)</strong> อยู่ในโซนวิวริมน้ำ ติดระเบียงริมน้ำของรีสอร์ท': 'Chok Lap Ngoen Thong House is a <strong>two-bedroom, two-bathroom house that sleeps 4 (extra bed available)</strong>, set in the riverside zone beside the waterside terrace.',
+ 'ห้องนอนตกแต่งด้วยผนังไม้ไผ่สานลายขัดและพื้นไม้ เตียงพร้อมเครื่องนอนครบ ผ้าคาดลายพื้นเมืองและหมอนอิง มีตู้ข้างเตียงและผ้าม่านผ้าฝ้ายทุกบาน': 'The bedrooms are finished with woven-bamboo walls and wooden floors — beds with full bedding, a traditional-pattern runner and cushions, plus a bedside cabinet and cotton curtains at every window.',
+ 'กลางบ้านเป็นพื้นที่ส่วนกลาง มีโต๊ะไม้พร้อมเก้าอี้ 4 ตัว เคาน์เตอร์อ่างล้างและกาต้มน้ำ สำหรับนั่งพักผ่อนร่วมกันภายในบ้าน': 'At the centre of the house is a shared living area with a wooden table and four chairs, a counter with a sink and a kettle, for relaxing together indoors.',
+ 'ห้องนอนเฮือนโชคลาภเงินทอง เตียงพร้อมเครื่องนอนครบ ผนังไม้ไผ่สาน': 'Chok Lap Ngoen Thong bedroom — bed with full bedding, woven-bamboo walls',
+ 'มุมเตียงในห้องนอนเฮือนโชคลาภเงินทอง ผ้าคาดลายพื้นเมืองและหมอนอิง': 'Bedside corner in Chok Lap Ngoen Thong House — traditional-pattern runner and cushions',
+ 'ห้องนอนอีกห้องของเฮือนโชคลาภเงินทอง เตียงและตู้ข้างเตียงไม้': 'The second bedroom of Chok Lap Ngoen Thong House — bed and wooden bedside cabinet',
+ 'พักได้ 4 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'Sleeps 4 (extra bed available) · Check availability or ask us through any channel',
  'เฮือนอุดมสุข — บ้านพัก 2 ห้องนอน ห้องโถงกลาง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Udom Suk House — 2-Bedroom House with Central Hall | Thongwai Homestay, Paksong',
  'เฮือนอุดมสุขที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 2 ห้องนอน 2 ห้องน้ำ ห้องโถงตรงกลาง พักห้องละ 2 ท่าน (เสริมเตียงได้) หน้าบ้านเปิดสู่สนามหญ้าโซนวิวแคมป์ปิ้ง เริ่ม 1,600 บาท/คืน โทร +856 20 91 555 288': 'Udom Suk House at Thongwai Homestay, Paksong — 2 bedrooms, 2 bathrooms and a central hall. Each bedroom sleeps 2 (extra bed available). The front opens onto the camping-view lawn. From 1,600 THB/night. Call +856 20 91 555 288',
  'เฮือนอุดมสุข | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Udom Suk House | Thongwai Homestay, Paksong',
@@ -259,6 +278,23 @@ EN = {
 
 # ═══════════ ລາວ ═══════════
 LO = {
+ # ── เฮือนโชคลาภเงินทอง (R2) ──
+ 'เฮือนโชคลาภเงินทอง — บ้านพัก 2 ห้องนอน โซนริมน้ำ | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນໂຊກລາບເງິນທອງ — ເຮືອນພັກ 2 ຫ້ອງນອນ ໂຊນແຄມນ້ຳ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เฮือนโชคลาภเงินทองที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 2 ห้องนอน 2 ห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้) โซนวิวริมน้ำ ติดระเบียงริมน้ำ เริ่ม 1,600 บาท/คืน โทร +856 20 91 555 288': 'ເຮືອນໂຊກລາບເງິນທອງທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຮືອນພັກ 2 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ພັກໄດ້ 4 ທ່ານ (ເສີມຕຽງໄດ້) ໂຊນວິວແຄມນ້ຳ ຕິດລະບຽງແຄມນ້ຳ ເລີ່ມ 1,600 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
+ 'เฮือนโชคลาภเงินทอง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນໂຊກລາບເງິນທອງ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'บ้านพัก 2 ห้องนอน 2 ห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้) โซนวิวริมน้ำ เริ่ม 1,600 บาท/คืน': 'ເຮືອນພັກ 2 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ພັກໄດ້ 4 ທ່ານ (ເສີມຕຽງໄດ້) ໂຊນວິວແຄມນ້ຳ ເລີ່ມ 1,600 ບາດ/ຄືນ',
+ 'บ้านพัก 2 ห้องนอน 2 ห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้) โซนวิวริมน้ำ ติดระเบียงริมน้ำ': 'ເຮືອນພັກ 2 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ພັກໄດ້ 4 ທ່ານ (ເສີມຕຽງໄດ້) ໂຊນວິວແຄມນ້ຳ ຕິດລະບຽງແຄມນ້ຳ',
+ 'พื้นที่ส่วนกลางในเฮือนโชคลาภเงินทอง โต๊ะไม้พร้อมเก้าอี้และผนังไม้': 'ພື້ນທີ່ສ່ວນກາງໃນເຮືອນໂຊກລາບເງິນທອງ ໂຕະໄມ້ພ້ອມຕັ່ງ ແລະ ຝາໄມ້',
+ '🌊 โซนวิวริมน้ำ': '🌊 ໂຊນວິວແຄມນ້ຳ', '🪑 พื้นที่ส่วนกลางในบ้าน': '🪑 ພື້ນທີ່ສ່ວນກາງໃນເຮືອນ',
+ 'บ้านพักสองห้องนอน โซนริมน้ำ': 'ເຮືອນພັກສອງຫ້ອງນອນ ໂຊນແຄມນ້ຳ',
+ 'สองห้องนอน สองห้องน้ำ พร้อมพื้นที่ส่วนกลางในบ้าน': 'ສອງຫ້ອງນອນ ສອງຫ້ອງນ້ຳ ພ້ອມພື້ນທີ່ສ່ວນກາງໃນເຮືອນ',
+ 'เฮือนโชคลาภเงินทองเป็นบ้านพัก<strong>สองห้องนอน สองห้องน้ำ พักได้ 4 ท่าน (เสริมเตียงได้)</strong> อยู่ในโซนวิวริมน้ำ ติดระเบียงริมน้ำของรีสอร์ท': 'ເຮືອນໂຊກລາບເງິນທອງເປັນເຮືອນພັກ<strong>ສອງຫ້ອງນອນ ສອງຫ້ອງນ້ຳ ພັກໄດ້ 4 ທ່ານ (ເສີມຕຽງໄດ້)</strong> ຢູ່ໃນໂຊນວິວແຄມນ້ຳ ຕິດລະບຽງແຄມນ້ຳຂອງທີ່ພັກ',
+ 'ห้องนอนตกแต่งด้วยผนังไม้ไผ่สานลายขัดและพื้นไม้ เตียงพร้อมเครื่องนอนครบ ผ้าคาดลายพื้นเมืองและหมอนอิง มีตู้ข้างเตียงและผ้าม่านผ้าฝ้ายทุกบาน': 'ຫ້ອງນອນຕົກແຕ່ງດ້ວຍຝາໄມ້ໄຜ່ສານ ແລະ ພື້ນໄມ້ ຕຽງພ້ອມເຄື່ອງນອນຄົບ ຜ້າຄາດລາຍພື້ນເມືອງ ແລະ ໝອນອີງ ມີຕູ້ຂ້າງຕຽງ ແລະ ຜ້າມ່ານຝ້າຍທຸກປ່ອງ',
+ 'กลางบ้านเป็นพื้นที่ส่วนกลาง มีโต๊ะไม้พร้อมเก้าอี้ 4 ตัว เคาน์เตอร์อ่างล้างและกาต้มน้ำ สำหรับนั่งพักผ่อนร่วมกันภายในบ้าน': 'ກາງເຮືອນເປັນພື້ນທີ່ສ່ວນກາງ ມີໂຕະໄມ້ພ້ອມຕັ່ງ 4 ໂຕ ເຄົາເຕີອ່າງລ້າງ ແລະ ໝໍ້ຕົ້ມນ້ຳ ສຳລັບນັ່ງພັກຜ່ອນຮ່ວມກັນພາຍໃນເຮືອນ',
+ 'ห้องนอนเฮือนโชคลาภเงินทอง เตียงพร้อมเครื่องนอนครบ ผนังไม้ไผ่สาน': 'ຫ້ອງນອນເຮືອນໂຊກລາບເງິນທອງ ຕຽງພ້ອມເຄື່ອງນອນຄົບ ຝາໄມ້ໄຜ່ສານ',
+ 'มุมเตียงในห้องนอนเฮือนโชคลาภเงินทอง ผ้าคาดลายพื้นเมืองและหมอนอิง': 'ມຸມຕຽງໃນຫ້ອງນອນເຮືອນໂຊກລາບເງິນທອງ ຜ້າຄາດລາຍພື້ນເມືອງ ແລະ ໝອນອີງ',
+ 'ห้องนอนอีกห้องของเฮือนโชคลาภเงินทอง เตียงและตู้ข้างเตียงไม้': 'ຫ້ອງນອນອີກຫ້ອງຂອງເຮືອນໂຊກລາບເງິນທອງ ຕຽງ ແລະ ຕູ້ຂ້າງຕຽງໄມ້',
+ 'พักได้ 4 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ 4 ທ່ານ (ເສີມຕຽງໄດ້) · ກວດສອບວັນວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
  'เฮือนอุดมสุข — บ้านพัก 2 ห้องนอน ห้องโถงกลาง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນອຸດົມສຸກ — ເຮືອນພັກ 2 ຫ້ອງນອນ ຫ້ອງໂຖງກາງ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
  'เฮือนอุดมสุขที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 2 ห้องนอน 2 ห้องน้ำ ห้องโถงตรงกลาง พักห้องละ 2 ท่าน (เสริมเตียงได้) หน้าบ้านเปิดสู่สนามหญ้าโซนวิวแคมป์ปิ้ง เริ่ม 1,600 บาท/คืน โทร +856 20 91 555 288': 'ເຮືອນອຸດົມສຸກທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຮືອນພັກ 2 ຫ້ອງນອນ 2 ຫ້ອງນໍ້າ ຫ້ອງໂຖງຕົງກາງ ພັກຫ້ອງລະ 2 ທ່ານ (ເສີມຕຽງໄດ້) ໜ້າເຮືອນເປີດສູ່ສະໜາມຫຍ້າໂຊນວິວແຄມປິ້ງ ເລີ່ມ 1,600 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
  'เฮือนอุดมสุข | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນອຸດົມສຸກ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
@@ -538,7 +574,8 @@ def build(th_path, lang, D):
     # ลิงก์ภายในก่อน แล้วค่อยฝังปุ่มภาษา (กันปุ่มไทยโดน rewrite ทับ)
     h = rewrite_links(h, lang)
     # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
-    for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'"):
+    for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'",
+                    "'/rooms/udomsuk/'", "'/rooms/mangkhang/'", "'/rooms/choklap/'"):
         h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
