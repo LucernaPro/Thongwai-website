@@ -13,6 +13,10 @@
 // ═══ นำเข้าสมุดจองเดิม (ชั่วคราว — ลบทิ้งหลังนำเข้าเสร็จ) ═══
 import IMPORT_DATA from './tools/import-data.json' with { type: 'json' };
 
+function addDaysStr(s, n) {
+  const d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
 const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 async function hashPw(password, salt) {
   const data = new TextEncoder().encode(salt + ':' + password);
@@ -322,6 +326,63 @@ export default {
             ชื่อ: b.name, จาก: `${b.room} ${b.checkin} → ${b.checkout}`,
             เป็น: `${target} ${checkin} → ${checkout}` });
           return json({ ok: true });
+        }
+        case 'stats': {
+          if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะเจ้าของเท่านั้น' });
+          const rooms = (await env.DB.prepare('SELECT id,name,sort FROM rooms ORDER BY sort').all()).results;
+          const bs = (await env.DB.prepare(
+            "SELECT room,checkin,checkout,created,phone,name FROM bookings WHERE status = 'จอง'").all()).results;
+          const today = todayStr();
+          const d365 = addDaysStr(today, -365);
+          const N = s => new Date(s + 'T00:00:00Z');
+          const months = {}, dow = [0,0,0,0,0,0,0], perRoom = {}, lead = [0,0,0,0,0,0],
+                stay = [0,0,0,0], repeat = {};
+          let totalNights = 0, futureBookings = 0, nights30 = 0;
+          const d30 = addDaysStr(today, -30);
+          for (const b of bs) {
+            const nights = Math.max(1, Math.round((N(b.checkout) - N(b.checkin)) / 864e5));
+            totalNights += nights;
+            if (b.checkin >= today) futureBookings++;
+            stay[Math.min(nights, 4) - 1]++;
+            const cd = (b.created || '').slice(0, 10);
+            if (/^\d{4}-\d{2}-\d{2}$/.test(cd)) {
+              const ld = Math.max(0, Math.round((N(b.checkin) - N(cd)) / 864e5));
+              lead[ld === 0 ? 0 : ld <= 3 ? 1 : ld <= 7 ? 2 : ld <= 14 ? 3 : ld <= 30 ? 4 : 5]++;
+            }
+            const ph = (b.phone || '').replace(/\D/g, '');
+            if (ph.length >= 5) {
+              repeat[ph] = repeat[ph] || { n: 0, name: b.name, last: b.checkin };
+              repeat[ph].n++;
+              if (b.checkin > repeat[ph].last) { repeat[ph].last = b.checkin; repeat[ph].name = b.name; }
+            }
+            // ไล่รายคืน
+            let d = b.checkin;
+            while (d < b.checkout) {
+              const ym = d.slice(0, 7);
+              months[ym] = (months[ym] || 0) + 1;
+              if (d >= d365 && d < today) dow[N(d).getUTCDay()]++;
+              if (d >= d365) perRoom[b.room] = (perRoom[b.room] || 0) + 1;
+              if (d >= d30 && d < today) nights30++;
+              d = addDaysStr(d, 1);
+            }
+          }
+          // 15 เดือนล่าสุด + ความจุ (เทียบ 17 หลังปัจจุบัน)
+          const ymList = Object.keys(months).sort().slice(-15);
+          const monthRows = ymList.map(ym => {
+            const [y, m] = ym.split('-').map(Number);
+            const cap = new Date(Date.UTC(y, m, 0)).getUTCDate() * rooms.length;
+            return { ym, nights: months[ym], cap, pct: Math.round(months[ym] / cap * 100) };
+          });
+          const roomRows = rooms.map(r => ({ id: r.id, name: r.name, nights: perRoom[r.id] || 0 }));
+          const repeatRows = Object.entries(repeat).filter(([, v]) => v.n >= 2)
+            .sort((a, b) => b[1].n - a[1].n).slice(0, 12)
+            .map(([ph, v]) => ({ phone: ph, n: v.n, name: v.name, last: v.last }));
+          const curYm = today.slice(0, 7);
+          const cur = monthRows.find(x => x.ym === curYm);
+          return json({ ok: true, months: monthRows, dow, rooms: roomRows, lead, stay,
+            repeat: repeatRows, summary: {
+              bookings: bs.length, totalNights, nights30, futureBookings,
+              curPct: cur ? cur.pct : 0, units: rooms.length } });
         }
         case 'export': {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });

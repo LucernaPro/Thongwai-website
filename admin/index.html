@@ -90,9 +90,10 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v4.9</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400">v5.0</small></h1>
   <span class="pill" id="whoami"></span>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
+  <a id="btnStats" href="/analyze/" title="วิเคราะห์ (เจ้าของ)" style="display:none;text-decoration:none">📊</a>
   <button id="btnExport" title="ดาวน์โหลดสำรองการจองทั้งหมด (CSV)" style="display:none">⬇</button>
   <button id="btnUsers" title="จัดการผู้ใช้" style="display:none">👥</button>
   <button id="btnSettings" title="ออกจากระบบ / สลับผู้ใช้">⚙︎</button>
@@ -301,6 +302,7 @@ function boot(){
   $('whoami').textContent = store.user + (store.role==='admin' ? ' · เจ้าของ' : '');
   $('btnUsers').style.display = store.role==='admin' ? 'inline' : 'none';
   $('btnExport').style.display = store.role==='admin' ? 'inline' : 'none';
+  $('btnStats').style.display = store.role==='admin' ? 'inline' : 'none';
   load();
   setView(view);
 }

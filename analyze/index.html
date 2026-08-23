@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ทุ่งหวาย · วิเคราะห์ (เจ้าของ)</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--dusk:#152227;--pine:#2e4a38;--cream:#f5efe3;--glow:#f6c877;--lantern:#e8963e;--ok:#9fe0b7}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Sarabun',sans-serif;background:var(--dusk);color:var(--cream);padding-bottom:60px}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header{background:var(--pine);padding:14px 0;margin-bottom:18px}
+header .wrap{display:flex;align-items:center;justify-content:space-between}
+h1{font-family:'Mitr';color:var(--glow);font-size:1.1rem}
+h2{font-family:'Mitr';color:var(--glow);font-size:1rem;margin:26px 0 4px}
+.sub{font-size:.8rem;opacity:.65;margin-bottom:12px}
+.card{background:rgba(245,239,227,.05);border:1px solid rgba(246,200,119,.18);border-radius:14px;padding:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi b{font-family:'Mitr';font-size:1.5rem;color:var(--glow);display:block}
+.kpi span{font-size:.8rem;opacity:.75}
+.bars{display:flex;align-items:flex-end;gap:4px;height:150px;margin-top:10px}
+.bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
+.bars .b i{display:block;background:var(--lantern);border-radius:4px 4px 0 0;min-height:2px}
+.bars .b.now i{background:var(--ok)}
+.bars .b small{font-size:.62rem;opacity:.7;margin-top:4px;white-space:nowrap}
+.bars .b em{font-style:normal;font-size:.66rem;color:var(--glow)}
+.hrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.85rem}
+.hrow .nm{flex:0 0 150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow .tr{flex:1;background:rgba(245,239,227,.08);border-radius:99px;height:14px;overflow:hidden}
+.hrow .tr i{display:block;height:100%;background:var(--lantern);border-radius:99px}
+.hrow .v{flex:0 0 46px;text-align:right;font-size:.8rem;color:var(--glow)}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:8px}
+td,th{padding:7px 4px;border-bottom:1px dashed rgba(246,200,119,.15);text-align:left}
+th{font-size:.78rem;opacity:.7;font-weight:500}
+#login{max-width:360px;margin:80px auto}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(246,200,119,.3);background:rgba(245,239,227,.06);color:var(--cream);font-family:'Sarabun';font-size:1rem;margin:6px 0}
+button{font-family:'Mitr';background:var(--lantern);color:var(--dusk);border:none;border-radius:999px;padding:12px 24px;font-size:1rem;cursor:pointer;width:100%;margin-top:8px}
+.err{color:#f0a898;font-size:.85rem;min-height:1.2em;margin-top:8px}
+a{color:var(--glow)}
+.note{font-size:.78rem;opacity:.6;margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>📊 ทุ่งหวาย · วิเคราะห์</h1>
+  <a href="/admin/" style="font-size:.85rem">← กลับหน้าจัดการ</a>
+</div></header>
+
+<div id="login" class="wrap" style="display:none">
+  <div class="card">
+    <h2 style="margin-top:0">เฉพาะเจ้าของ</h2>
+    <input id="lu" placeholder="ผู้ใช้" autocomplete="username">
+    <input id="lp" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+    <button id="lbtn">เข้าสู่ระบบ</button>
+    <div class="err" id="lerr"></div>
+  </div>
+</div>
+
+<div id="app" class="wrap" style="display:none">
+  <div class="cards" id="kpis"></div>
+
+  <h2>อัตราการเข้าพักรายเดือน</h2>
+  <div class="sub">คืนขายเทียบความจุ (จำนวนหลังปัจจุบัน × วันในเดือน) — เดือนปัจจุบันสีเขียว รวมจองล่วงหน้าแล้ว</div>
+  <div class="card"><div class="bars" id="chMonths"></div></div>
+
+  <h2>รายวันในสัปดาห์</h2>
+  <div class="sub">คืนขายรวม 12 เดือนล่าสุด แยกตามคืนวัน — ไว้ตัดสินใจโปรวันธรรมดา</div>
+  <div class="card"><div class="bars" style="height:110px" id="chDow"></div></div>
+
+  <h2>ผลงานรายห้อง (12 เดือนล่าสุด)</h2>
+  <div class="sub">คืนขายต่อหลัง — หลังท้ายตารางคือโอกาส: รูปไม่สวย? ยังไม่มีหน้าเว็บ? ราคา?</div>
+  <div class="card" id="chRooms"></div>
+
+  <h2>ลูกค้าจองล่วงหน้ากี่วัน</h2>
+  <div class="sub">ระยะจากวันจองถึงวันเข้าพัก — ไว้กำหนดจังหวะโพสต์/ยิงโฆษณา</div>
+  <div class="card" id="chLead"></div>
+
+  <h2>พักกี่คืนต่อครั้ง</h2>
+  <div class="card" id="chStay"></div>
+
+  <h2>ลูกค้าประจำ (จองซ้ำจากเบอร์เดิม)</h2>
+  <div class="sub">ลิสต์ VIP — ทักก่อนไฮซีซั่น ดูแลพิเศษ</div>
+  <div class="card"><table id="chRepeat"></table></div>
+
+  <p class="note">หมายเหตุความแม่น: ตัวชี้วัดทั้งหมดนับจาก "คืนขาย" ซึ่งแม่น 100% จากสมุดจอง ·
+  เดือนเก่าเทียบกับความจุปัจจุบัน · วันที่เต็มไม่ได้แปลว่า demand หยุดแค่นั้น (คนโทรมาแล้วเต็มไม่ถูกบันทึก) ·
+  ยังไม่แสดงรายได้เพราะสมุดเก่าบันทึกมัดจำไม่ใช่ราคาจ่ายจริง — เก็บราคาจริงไปสักพักแล้วค่อยเปิดหมวดรายได้</p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const API = '/api';
+const store = { user: localStorage.getItem('tw_user'), pass: localStorage.getItem('tw_pass') };
+const TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const ymTh = ym => TH_M[Number(ym.slice(5)) - 1] + ' ' + (Number(ym.slice(0,4)) + 543).toString().slice(-2);
+
+async function api(params){
+  const u = new URL(API, location.origin);
+  for (const [k,v] of Object.entries(params)) u.searchParams.set(k, v);
+  u.searchParams.set('user', store.user); u.searchParams.set('pass', store.pass);
+  return (await fetch(u)).json();
+}
+
+async function boot(){
+  if (!store.user || !store.pass) return showLogin();
+  const r = await api({ action: 'stats' });
+  if (!r.ok) return showLogin(r.error);
+  render(r);
+  $('login').style.display = 'none';
+  $('app').style.display = 'block';
+}
+function showLogin(msg){
+  $('login').style.display = 'block'; $('app').style.display = 'none';
+  if (msg) $('lerr').textContent = msg;
+}
+$('lbtn').onclick = async () => {
+  store.user = $('lu').value.trim(); store.pass = $('lp').value;
+  const r = await api({ action: 'login' });
+  if (!r.ok || r.role !== 'admin') { $('lerr').textContent = r.error || 'เฉพาะเจ้าของเท่านั้น'; return; }
+  localStorage.setItem('tw_user', store.user); localStorage.setItem('tw_pass', store.pass);
+  localStorage.setItem('tw_role', r.role);
+  boot();
+};
+
+function render(d){
+  const s = d.summary;
+  $('kpis').innerHTML = [
+    ['การจองทั้งหมด', s.bookings.toLocaleString() + ' รายการ'],
+    ['คืนขายสะสม', s.totalNights.toLocaleString() + ' คืน'],
+    ['30 วันล่าสุด', s.nights30.toLocaleString() + ' คืน'],
+    ['เดือนนี้เข้าพัก', s.curPct + '%'],
+    ['จองล่วงหน้าค้างอยู่', s.futureBookings + ' รายการ'],
+  ].map(([k,v]) => `<div class="card kpi"><b>${v}</b><span>${k}</span></div>`).join('');
+
+  const maxP = Math.max(...d.months.map(m => m.pct), 1);
+  $('chMonths').innerHTML = d.months.map(m => `
+    <div class="b ${m.ym === new Date(Date.now()+7*3600e3).toISOString().slice(0,7) ? 'now' : ''}">
+      <em>${m.pct}%</em><i style="height:${Math.round(m.pct / maxP * 100)}%"></i><small>${ymTh(m.ym)}</small>
+    </div>`).join('');
+
+  const DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const maxD = Math.max(...d.dow, 1);
+  $('chDow').innerHTML = d.dow.map((v, i) => `
+    <div class="b ${i===5||i===6||i===0 ? 'now' : ''}"><em>${v}</em><i style="height:${Math.round(v / maxD * 100)}%"></i><small>${DOW[i]}</small></div>`).join('');
+
+  const maxR = Math.max(...d.rooms.map(r => r.nights), 1);
+  $('chRooms').innerHTML = d.rooms.slice().sort((a,b) => b.nights - a.nights).map(r => `
+    <div class="hrow"><span class="nm">${r.name}</span>
+      <span class="tr"><i style="width:${Math.round(r.nights / maxR * 100)}%"></i></span>
+      <span class="v">${r.nights}</span></div>`).join('');
+
+  const LEAD = ['วันเดียวกัน','1-3 วัน','4-7 วัน','8-14 วัน','15-30 วัน','เกิน 30 วัน'];
+  const sumL = d.lead.reduce((a,b) => a+b, 0) || 1;
+  $('chLead').innerHTML = d.lead.map((v, i) => `
+    <div class="hrow"><span class="nm">${LEAD[i]}</span>
+      <span class="tr"><i style="width:${Math.round(v / sumL * 100)}%"></i></span>
+      <span class="v">${Math.round(v / sumL * 100)}%</span></div>`).join('');
+
+  const STAY = ['1 คืน','2 คืน','3 คืน','4 คืนขึ้นไป'];
+  const sumS = d.stay.reduce((a,b) => a+b, 0) || 1;
+  $('chStay').innerHTML = d.stay.map((v, i) => `
+    <div class="hrow"><span class="nm">${STAY[i]}</span>
+      <span class="tr"><i style="width:${Math.round(v / sumS * 100)}%"></i></span>
+      <span class="v">${Math.round(v / sumS * 100)}%</span></div>`).join('');
+
+  $('chRepeat').innerHTML = '<tr><th>ลูกค้า</th><th>เบอร์</th><th>จอง</th><th>ล่าสุด</th></tr>' +
+    (d.repeat.length ? d.repeat.map(r => `
+      <tr><td>${r.name}</td><td><a href="tel:${r.phone}">${r.phone}</a></td>
+      <td>${r.n} ครั้ง</td><td>${r.last}</td></tr>`).join('')
+    : '<tr><td colspan="4" style="opacity:.6">ยังไม่พบลูกค้าจองซ้ำ (เบอร์ตรงกัน ≥ 2 ครั้ง)</td></tr>');
+}
+boot();
+</script>
+</body>
+</html>
