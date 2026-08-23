@@ -14,6 +14,7 @@ PAGES = {  # th path → (en path, lo path)
     'rooms/udomsuk/index.html': ('en/rooms/udomsuk/index.html', 'lo/rooms/udomsuk/index.html'),
     'rooms/choklap/index.html': ('en/rooms/choklap/index.html', 'lo/rooms/choklap/index.html'),
     'rooms/mahasetthi/index.html': ('en/rooms/mahasetthi/index.html', 'lo/rooms/mahasetthi/index.html'),
+    'rooms/mahaheng/index.html': ('en/rooms/mahaheng/index.html', 'lo/rooms/mahaheng/index.html'),
 }
 CANON = {  # canonical path ต่อภาษา
     'index.html': '/', 'availability/index.html': '/availability/',
@@ -21,6 +22,7 @@ CANON = {  # canonical path ต่อภาษา
     'rooms/tent/index.html': '/rooms/tent/', 'rooms/mangkhang/index.html': '/rooms/mangkhang/', 'rooms/udomsuk/index.html': '/rooms/udomsuk/',
     'rooms/choklap/index.html': '/rooms/choklap/',
     'rooms/mahasetthi/index.html': '/rooms/mahasetthi/',
+    'rooms/mahaheng/index.html': '/rooms/mahaheng/',
 }
 
 # ═══════════ ENGLISH ═══════════
@@ -294,6 +296,22 @@ EN = {
  'ห้องนอนอีกห้องของเฮือนมหาเศรษฐี ผนังไม้ไผ่สาน เตียงใหญ่และตู้ข้างเตียง': 'The other bedroom of Maha Setthi House — woven-bamboo walls, large bed and bedside cabinet',
  'สนามหญ้า แปลงไฮเดรนเยีย และทางเดินหินในสวนของทุ่งหวายโฮมสเตย์': 'Lawn, hydrangea beds and the stone path through the garden at Thongwai Homestay',
  'เฮือนมหาเศรษฐี': 'Maha Setthi House',
+ # ── เฮือนมหาเฮง (R9) ──
+ 'เฮือนมหาเฮง — บ้านพักหมู่คณะ 2 ห้องนอน 10 ท่าน | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Maha Heng House — Group House, 2 Bedrooms, Sleeps 10 | Thongwai Homestay, Paksong',
+ 'เฮือนมหาเฮงที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพักหมู่คณะ 2 ห้องนอน 2 ห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้) ระเบียงหน้าบ้าน โซนวิวแคมป์ปิ้ง เริ่ม 3,000 บาท/คืน โทร +856 20 91 555 288': 'Maha Heng House at Thongwai Homestay, Paksong — a group house with 2 bedrooms and 2 bathrooms, sleeping 10 (extra bed available). Front terrace, camping-view zone. From 3,000 THB/night. Call +856 20 91 555 288',
+ 'เฮือนมหาเฮง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Maha Heng House | Thongwai Homestay, Paksong',
+ 'บ้านพักหมู่คณะ 2 ห้องนอน 2 ห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้) เริ่ม 3,000 บาท/คืน': 'A group house with 2 bedrooms and 2 bathrooms, sleeping 10 (extra bed available). From 3,000 THB/night.',
+ 'บ้านพักหมู่คณะ 2 ห้องนอน 2 ห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้)': 'A group house with 2 bedrooms and 2 bathrooms, sleeping 10 (extra bed available)',
+ 'ห้องนอนเฮือนมหาเฮง ทุ่งหวายโฮมสเตย์ ที่นอนเรียงบนยกพื้นไม้พร้อมเครื่องนอนครบ': 'Maha Heng House bedroom at Thongwai Homestay — mattresses in a row on a raised timber platform with full bedding',
+ '🌿 ระเบียงหน้าบ้าน': '🌿 Front terrace',
+ 'สองห้องนอน สองห้องน้ำ พักได้ 10 ท่าน': 'Two bedrooms, two bathrooms, sleeps 10',
+ 'เฮือนมหาเฮงเป็นบ้านพักสำหรับหมู่คณะและครอบครัวใหญ่ <strong>สองห้องนอน สองห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้)</strong> อยู่ในโซนวิวแคมป์ปิ้งของรีสอร์ท มีระเบียงหน้าบ้านสำหรับนั่งพักผ่อน': 'Maha Heng House is built for groups and large families — <strong>two bedrooms, two bathrooms, sleeping 10 (extra bed available)</strong> — set in the camping-view zone, with a front terrace for relaxing.',
+ 'ห้องนอนใหญ่จัดที่นอนเรียงต่อกันบนยกพื้นไม้ พร้อมหมอนและเครื่องนอนครบทุกที่ ผ้าคาดลายพื้นเมืองและผ้าขนหนูจัดไว้เป็นชุดรายบุคคล ผนังกรุไม้ เพดานไม้ไผ่สาน และมีตู้เสื้อผ้าไม้บานเลื่อนอยู่ท้ายห้อง': 'The large bedroom has mattresses laid in a row on a raised timber platform, each with a pillow and full bedding, and a traditional-pattern runner and towels set out per person. The walls are timber-panelled, the ceiling is woven bamboo, and a wooden sliding wardrobe stands at the end of the room.',
+ 'ห้องน้ำสองห้องแยกเป็นส่วนต่อของบ้าน กรุผนังด้วยไม้ไผ่ลำและผนังหินก่อ ปูกระเบื้อง มีเครื่องทำน้ำอุ่น อ่างล้างหน้า และสบู่-แชมพูติดผนังทุกห้อง': 'The two bathrooms sit in an adjoining section of the house, walled in bamboo poles and dry-stone masonry with tiled floors. Each has a water heater, a washbasin, and wall-mounted soap and shampoo.',
+ 'ห้องน้ำเฮือนมหาเฮง สองห้องแยก กรุผนังไม้ไผ่ลำและผนังหินก่อ': 'Maha Heng bathrooms — two separate rooms walled in bamboo poles and dry-stone masonry',
+ 'ภายในห้องน้ำเฮือนมหาเฮง เครื่องทำน้ำอุ่น อ่างล้างหน้า และผนังหินก่อ': 'Inside a Maha Heng bathroom — water heater, washbasin and dry-stone wall',
+ 'พักได้ 10 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'Sleeps 10 (extra bed available) · Check availability or ask us through any channel',
+ 'เฮือนมหาเฮง': 'Maha Heng House',
 }
 
 # ═══════════ ລາວ ═══════════
@@ -552,6 +570,22 @@ LO = {
  'ห้องนอนอีกห้องของเฮือนมหาเศรษฐี ผนังไม้ไผ่สาน เตียงใหญ่และตู้ข้างเตียง': 'ຫ້ອງນອນອີກຫ້ອງຂອງເຮືອນມະຫາເສດຖີ ຝາໄມ້ໄຜ່ສານ ຕຽງໃຫຍ່ ແລະ ຕູ້ຂ້າງຕຽງ',
  'สนามหญ้า แปลงไฮเดรนเยีย และทางเดินหินในสวนของทุ่งหวายโฮมสเตย์': 'ສະໜາມຫຍ້າ ແປງດອກໄຮເດຣນເຈຍ ແລະ ທາງຍ່າງຫີນໃນສວນຂອງທົ່ງຫວາຍໂຮມສະເຕ',
  'เฮือนมหาเศรษฐี': 'ເຮືອນມະຫາເສດຖີ',
+ # ── เฮือนมหาเฮง (R9) ──
+ 'เฮือนมหาเฮง — บ้านพักหมู่คณะ 2 ห้องนอน 10 ท่าน | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນມະຫາເຮງ — ເຮືອນພັກໝູ່ຄະນະ 2 ຫ້ອງນອນ 10 ທ່ານ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เฮือนมหาเฮงที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพักหมู่คณะ 2 ห้องนอน 2 ห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้) ระเบียงหน้าบ้าน โซนวิวแคมป์ปิ้ง เริ่ม 3,000 บาท/คืน โทร +856 20 91 555 288': 'ເຮືອນມະຫາເຮງທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຮືອນພັກໝູ່ຄະນະ 2 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ພັກໄດ້ 10 ທ່ານ (ເສີມຕຽງໄດ້) ລະບຽງໜ້າເຮືອນ ໂຊນວິວແຄມປິ້ງ ເລີ່ມ 3,000 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
+ 'เฮือนมหาเฮง | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນມະຫາເຮງ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'บ้านพักหมู่คณะ 2 ห้องนอน 2 ห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้) เริ่ม 3,000 บาท/คืน': 'ເຮືອນພັກໝູ່ຄະນະ 2 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ພັກໄດ້ 10 ທ່ານ (ເສີມຕຽງໄດ້) ເລີ່ມ 3,000 ບາດ/ຄືນ',
+ 'บ้านพักหมู่คณะ 2 ห้องนอน 2 ห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้)': 'ເຮືອນພັກໝູ່ຄະນະ 2 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ພັກໄດ້ 10 ທ່ານ (ເສີມຕຽງໄດ້)',
+ 'ห้องนอนเฮือนมหาเฮง ทุ่งหวายโฮมสเตย์ ที่นอนเรียงบนยกพื้นไม้พร้อมเครื่องนอนครบ': 'ຫ້ອງນອນເຮືອນມະຫາເຮງ ທົ່ງຫວາຍໂຮມສະເຕ ບ່ອນນອນລຽງເທິງພື້ນໄມ້ຍົກສູງ ພ້ອມເຄື່ອງນອນຄົບ',
+ '🌿 ระเบียงหน้าบ้าน': '🌿 ລະບຽງໜ້າເຮືອນ',
+ 'สองห้องนอน สองห้องน้ำ พักได้ 10 ท่าน': 'ສອງຫ້ອງນອນ ສອງຫ້ອງນ້ຳ ພັກໄດ້ 10 ທ່ານ',
+ 'เฮือนมหาเฮงเป็นบ้านพักสำหรับหมู่คณะและครอบครัวใหญ่ <strong>สองห้องนอน สองห้องน้ำ พักได้ 10 ท่าน (เสริมเตียงได้)</strong> อยู่ในโซนวิวแคมป์ปิ้งของรีสอร์ท มีระเบียงหน้าบ้านสำหรับนั่งพักผ่อน': 'ເຮືອນມະຫາເຮງເປັນເຮືອນພັກສຳລັບໝູ່ຄະນະ ແລະ ຄອບຄົວໃຫຍ່ <strong>ສອງຫ້ອງນອນ ສອງຫ້ອງນ້ຳ ພັກໄດ້ 10 ທ່ານ (ເສີມຕຽງໄດ້)</strong> ຢູ່ໃນໂຊນວິວແຄມປິ້ງຂອງທີ່ພັກ ມີລະບຽງໜ້າເຮືອນສຳລັບນັ່ງພັກຜ່ອນ',
+ 'ห้องนอนใหญ่จัดที่นอนเรียงต่อกันบนยกพื้นไม้ พร้อมหมอนและเครื่องนอนครบทุกที่ ผ้าคาดลายพื้นเมืองและผ้าขนหนูจัดไว้เป็นชุดรายบุคคล ผนังกรุไม้ เพดานไม้ไผ่สาน และมีตู้เสื้อผ้าไม้บานเลื่อนอยู่ท้ายห้อง': 'ຫ້ອງນອນໃຫຍ່ຈັດບ່ອນນອນລຽງຕິດກັນເທິງພື້ນໄມ້ຍົກສູງ ພ້ອມໝອນ ແລະ ເຄື່ອງນອນຄົບທຸກບ່ອນ ຜ້າຄາດລາຍພື້ນເມືອງ ແລະ ຜ້າເຊັດໂຕຈັດໄວ້ເປັນຊຸດລາຍບຸກຄົນ ຝາກຸໄມ້ ເພດານໄມ້ໄຜ່ສານ ແລະ ມີຕູ້ເສື້ອຜ້າໄມ້ບານເລື່ອນຢູ່ທ້າຍຫ້ອງ',
+ 'ห้องน้ำสองห้องแยกเป็นส่วนต่อของบ้าน กรุผนังด้วยไม้ไผ่ลำและผนังหินก่อ ปูกระเบื้อง มีเครื่องทำน้ำอุ่น อ่างล้างหน้า และสบู่-แชมพูติดผนังทุกห้อง': 'ຫ້ອງນ້ຳສອງຫ້ອງແຍກເປັນສ່ວນຕໍ່ຂອງເຮືອນ ກຸຝາດ້ວຍລຳໄມ້ໄຜ່ ແລະ ຝາຫີນກໍ່ ປູກະເບື້ອງ ມີເຄື່ອງເຮັດນ້ຳອຸ່ນ ອ່າງລ້າງໜ້າ ແລະ ສະບູ-ແຊມພູຕິດຝາທຸກຫ້ອງ',
+ 'ห้องน้ำเฮือนมหาเฮง สองห้องแยก กรุผนังไม้ไผ่ลำและผนังหินก่อ': 'ຫ້ອງນ້ຳເຮືອນມະຫາເຮງ ສອງຫ້ອງແຍກ ກຸຝາລຳໄມ້ໄຜ່ ແລະ ຝາຫີນກໍ່',
+ 'ภายในห้องน้ำเฮือนมหาเฮง เครื่องทำน้ำอุ่น อ่างล้างหน้า และผนังหินก่อ': 'ພາຍໃນຫ້ອງນ້ຳເຮືອນມະຫາເຮງ ເຄື່ອງເຮັດນ້ຳອຸ່ນ ອ່າງລ້າງໜ້າ ແລະ ຝາຫີນກໍ່',
+ 'พักได้ 10 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ 10 ທ່ານ (ເສີມຕຽງໄດ້) · ກວດສອບວັນວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
+ 'เฮือนมหาเฮง': 'ເຮືອນມະຫາເຮງ',
 }
 
 # ═══════════ house rules — เงื่อนไขการจอง/กฎที่พัก (markup: tools/house-rules.html) ═══════════
@@ -643,7 +677,7 @@ def build(th_path, lang, D):
     # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
     for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'",
                     "'/rooms/udomsuk/'", "'/rooms/mangkhang/'", "'/rooms/choklap/'",
-                    "'/rooms/mahasetthi/'"):
+                    "'/rooms/mahasetthi/'", "'/rooms/mahaheng/'"):
         h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
