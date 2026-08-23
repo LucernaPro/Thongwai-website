@@ -127,9 +127,10 @@ Section รีวิว #reviews (19 ส.ค. 2026): อยู่ถัดจา
 (ห้าม poster จอดำ) — คลิปปัจจุบัน: review-resort-tour.mp4 (พาชมรีสอร์ท+เฮือน),
 review-tent.mp4 (รีวิวเต็นท์ ชุดขาว) ทั้งคู่รีวิวจากผู้เข้าพัก / เพิ่มคลิปใหม่:
 ก๊อป .reel-card ตาม comment ในโค้ด
-หน้า detail เฮือนโชคลาภเงินทอง R2 (23 ส.ค. 2026): slug `choklap` — hero = พื้นที่ส่วนกลาง
-ในบ้าน (choklap-hero.webp 1920x1080 q80) / แกลเลอรี 4 รูป = ภาพนอกบ้านของการ์ด +
-choklap-bed-1..3 (1600x900 q88 + -t 720w q82) / ยังไม่มีคลิปพาชม — เว้น comment ไว้ในโค้ด
+หน้า detail เฮือนโชคลาภเงินทอง R2 (23 ส.ค. 2026): slug `choklap` — hero = ภาพนอกบ้าน
+(choklap-hero.webp 1200x800 q80 จากรูปการ์ด R2 แพทเทิร์นเดียวกับ jaosua hero) / แกลเลอรี
+4 รูป = choklap-living (ภาพบรรยากาศภายในบ้าน) + choklap-bed-1..3 ทั้งหมด 1600x900 q88
++ -t 720w q82 / ยังไม่มีคลิปพาชม — เว้น comment ไว้ในโค้ด
 ตำแหน่งบล็อก .rd-video / การ์ด R2 หน้าแรกลิงก์เข้าหน้านี้แล้ว + ROOM_URL ใน /availability
 **บั๊ก i18n ที่แก้พร้อมกัน:** `js_path` ใน build_i18n.py เดิมมีแค่ jaosua1/2/tent ทำให้ลิงก์
 ROOM_URL ของ udomsuk/mangkhang ในหน้า /en, /lo เด้งกลับหน้าไทย — เพิ่มครบ 3 slug แล้ว
