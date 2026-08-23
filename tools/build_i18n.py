@@ -13,12 +13,14 @@ PAGES = {  # th path → (en path, lo path)
     'rooms/mangkhang/index.html': ('en/rooms/mangkhang/index.html', 'lo/rooms/mangkhang/index.html'),
     'rooms/udomsuk/index.html': ('en/rooms/udomsuk/index.html', 'lo/rooms/udomsuk/index.html'),
     'rooms/choklap/index.html': ('en/rooms/choklap/index.html', 'lo/rooms/choklap/index.html'),
+    'rooms/mahasetthi/index.html': ('en/rooms/mahasetthi/index.html', 'lo/rooms/mahasetthi/index.html'),
 }
 CANON = {  # canonical path ต่อภาษา
     'index.html': '/', 'availability/index.html': '/availability/',
     'rooms/jaosua1/index.html': '/rooms/jaosua1/', 'rooms/jaosua2/index.html': '/rooms/jaosua2/',
     'rooms/tent/index.html': '/rooms/tent/', 'rooms/mangkhang/index.html': '/rooms/mangkhang/', 'rooms/udomsuk/index.html': '/rooms/udomsuk/',
     'rooms/choklap/index.html': '/rooms/choklap/',
+    'rooms/mahasetthi/index.html': '/rooms/mahasetthi/',
 }
 
 # ═══════════ ENGLISH ═══════════
@@ -274,6 +276,24 @@ EN = {
  'ห้องนอน': 'Bedroom', 'ห้องน้ำ': 'Bathroom',
  'พักได้หลังละ 2 ท่าน · มีทั้งหมด 8 หลัง · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': '2 guests per tent · 8 tents in total · check availability or ask us anything on any channel',
  'ไทย': 'ไทย',
+ # ── เฮือนมหาเศรษฐี (R1) ──
+ 'เฮือนมหาเศรษฐี — บ้านพัก 3 ห้องนอน ระเบียงหน้า-หลังบ้าน | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Maha Setthi House — 3-Bedroom House with Front and Back Terraces | Thongwai Homestay, Paksong',
+ 'เฮือนมหาเศรษฐีที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 3 ห้องนอน 2 ห้องน้ำ ระเบียงหน้า-หลังบ้าน พักห้องละ 2 ท่าน (เสริมเตียงได้) เริ่ม 2,300 บาท/คืน โทร +856 20 91 555 288': 'Maha Setthi House at Thongwai Homestay, Paksong — 3 bedrooms, 2 bathrooms, terraces front and back. Each bedroom sleeps 2 (extra bed available). From 2,300 THB/night. Call +856 20 91 555 288',
+ 'เฮือนมหาเศรษฐี | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Maha Setthi House | Thongwai Homestay, Paksong',
+ 'บ้านพัก 3 ห้องนอน 2 ห้องน้ำ ระเบียงหน้า-หลังบ้าน พักห้องละ 2 ท่าน (เสริมเตียงได้) เริ่ม 2,300 บาท/คืน': '3 bedrooms, 2 bathrooms, terraces front and back. Each bedroom sleeps 2 (extra bed available). From 2,300 THB/night.',
+ 'บ้านพัก 3 ห้องนอน 2 ห้องน้ำ ระเบียงหน้า-หลังบ้าน พักห้องละ 2 ท่าน (เสริมเตียงได้)': '3 bedrooms, 2 bathrooms and terraces front and back — each bedroom sleeps 2 (extra bed available)',
+ 'ระเบียงเฮือนมหาเศรษฐี ทุ่งหวายโฮมสเตย์ เพดานไม้ไผ่สานและเก้าอี้โยกหวาย': 'Terrace of Maha Setthi House at Thongwai Homestay — woven-bamboo ceiling and rattan rocking chairs',
+ '🛏 3 ห้องนอน': '🛏 3 bedrooms', '🌿 ระเบียงหน้า-หลังบ้าน': '🌿 Terraces front and back',
+ 'บ้านพักสามห้องนอน': 'Three-bedroom house',
+ 'สามห้องนอน สองห้องน้ำ ระเบียงทั้งหน้าและหลังบ้าน': 'Three bedrooms, two bathrooms and terraces front and back',
+ 'เฮือนมหาเศรษฐีเป็นบ้านพัก<strong>สามห้องนอน สองห้องน้ำ พักห้องละ 2 ท่าน (เสริมเตียงได้)</strong> มีระเบียงทั้งด้านหน้าและด้านหลังบ้าน': 'Maha Setthi House is a <strong>three-bedroom, two-bathroom house where each bedroom sleeps 2 (extra bed available)</strong>, with terraces at both the front and the back.',
+ 'ระเบียงเป็นพื้นไม้ เพดานไม้ไผ่สาน แขวนโคมหวาย มีเก้าอี้โยกพร้อมเบาะ โต๊ะไม้ยาวและม้านั่ง สำหรับนั่งรับอากาศเย็นของโบโลเวน': 'The terrace has a wooden floor, a woven-bamboo ceiling and hanging rattan lanterns, with cushioned rocking chairs and a long wooden table and bench for sitting out in the cool Bolaven air.',
+ 'ห้องนอนปูพื้นไม้ เตียงใหญ่พร้อมเครื่องนอนครบและผ้าคาดลายพื้นเมือง แต่ละห้องมีหน้าต่างสองด้านพร้อมผ้าม่าน ห้องหนึ่งกรุผนังไม้ทั้งห้องพร้อมโต๊ะเครื่องแป้ง อีกห้องกรุผนังไม้ไผ่สานช่วงบน มีตู้ข้างเตียงและตู้เสื้อผ้า': 'The bedrooms have wooden floors and large beds with full bedding and a traditional-pattern runner, with curtained windows on two sides. One is panelled in timber throughout and has a dressing table; another has woven-bamboo upper walls, a bedside cabinet and a wardrobe.',
+ 'จากระเบียงมองออกไปเห็นสนามหญ้า แปลงไฮเดรนเยีย และทางเดินหินที่ทอดผ่านสวนไปยังลำธารซึ่งไหลผ่านที่พัก': 'From the terrace you look out over the lawn, the hydrangea beds and the stone path that runs through the garden down to the stream that flows through the property.',
+ 'ห้องนอนเฮือนมหาเศรษฐี ผนังไม้ทั้งห้อง เตียงใหญ่และโต๊ะเครื่องแป้ง': 'Maha Setthi bedroom — timber-panelled walls, large bed and dressing table',
+ 'ห้องนอนอีกห้องของเฮือนมหาเศรษฐี ผนังไม้ไผ่สาน เตียงใหญ่และตู้ข้างเตียง': 'The other bedroom of Maha Setthi House — woven-bamboo walls, large bed and bedside cabinet',
+ 'สนามหญ้า แปลงไฮเดรนเยีย และทางเดินหินในสวนของทุ่งหวายโฮมสเตย์': 'Lawn, hydrangea beds and the stone path through the garden at Thongwai Homestay',
+ 'เฮือนมหาเศรษฐี': 'Maha Setthi House',
 }
 
 # ═══════════ ລາວ ═══════════
@@ -514,6 +534,24 @@ LO = {
  'ห้องนอน': 'ຫ້ອງນອນ', 'ห้องน้ำ': 'ຫ້ອງນ້ຳ',
  'พักได้หลังละ 2 ท่าน · มีทั้งหมด 8 หลัง · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ຫຼັງລະ 2 ທ່ານ · ມີທັງໝົດ 8 ຫຼັງ · ກວດວັນວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
  'ไทย': 'ไทย',
+ # ── เฮือนมหาเศรษฐี (R1) ──
+ 'เฮือนมหาเศรษฐี — บ้านพัก 3 ห้องนอน ระเบียงหน้า-หลังบ้าน | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນມະຫາເສດຖີ — ເຮືອນພັກ 3 ຫ້ອງນອນ ລະບຽງໜ້າ-ຫຼັງເຮືອນ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เฮือนมหาเศรษฐีที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 3 ห้องนอน 2 ห้องน้ำ ระเบียงหน้า-หลังบ้าน พักห้องละ 2 ท่าน (เสริมเตียงได้) เริ่ม 2,300 บาท/คืน โทร +856 20 91 555 288': 'ເຮືອນມະຫາເສດຖີທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຮືອນພັກ 3 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ລະບຽງໜ້າ-ຫຼັງເຮືອນ ພັກຫ້ອງລະ 2 ທ່ານ (ເສີມຕຽງໄດ້) ເລີ່ມ 2,300 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
+ 'เฮือนมหาเศรษฐี | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນມະຫາເສດຖີ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'บ้านพัก 3 ห้องนอน 2 ห้องน้ำ ระเบียงหน้า-หลังบ้าน พักห้องละ 2 ท่าน (เสริมเตียงได้) เริ่ม 2,300 บาท/คืน': 'ເຮືອນພັກ 3 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ລະບຽງໜ້າ-ຫຼັງເຮືອນ ພັກຫ້ອງລະ 2 ທ່ານ (ເສີມຕຽງໄດ້) ເລີ່ມ 2,300 ບາດ/ຄືນ',
+ 'บ้านพัก 3 ห้องนอน 2 ห้องน้ำ ระเบียงหน้า-หลังบ้าน พักห้องละ 2 ท่าน (เสริมเตียงได้)': 'ເຮືອນພັກ 3 ຫ້ອງນອນ 2 ຫ້ອງນ້ຳ ລະບຽງໜ້າ-ຫຼັງເຮືອນ ພັກຫ້ອງລະ 2 ທ່ານ (ເສີມຕຽງໄດ້)',
+ 'ระเบียงเฮือนมหาเศรษฐี ทุ่งหวายโฮมสเตย์ เพดานไม้ไผ่สานและเก้าอี้โยกหวาย': 'ລະບຽງເຮືອນມະຫາເສດຖີ ທົ່ງຫວາຍໂຮມສະເຕ ເພດານໄມ້ໄຜ່ສານ ແລະ ຕັ່ງໂຍກຫວາຍ',
+ '🛏 3 ห้องนอน': '🛏 3 ຫ້ອງນອນ', '🌿 ระเบียงหน้า-หลังบ้าน': '🌿 ລະບຽງໜ້າ-ຫຼັງເຮືອນ',
+ 'บ้านพักสามห้องนอน': 'ເຮືອນພັກສາມຫ້ອງນອນ',
+ 'สามห้องนอน สองห้องน้ำ ระเบียงทั้งหน้าและหลังบ้าน': 'ສາມຫ້ອງນອນ ສອງຫ້ອງນ້ຳ ລະບຽງທັງໜ້າ ແລະ ຫຼັງເຮືອນ',
+ 'เฮือนมหาเศรษฐีเป็นบ้านพัก<strong>สามห้องนอน สองห้องน้ำ พักห้องละ 2 ท่าน (เสริมเตียงได้)</strong> มีระเบียงทั้งด้านหน้าและด้านหลังบ้าน': 'ເຮືອນມະຫາເສດຖີເປັນເຮືອນພັກ<strong>ສາມຫ້ອງນອນ ສອງຫ້ອງນ້ຳ ພັກຫ້ອງລະ 2 ທ່ານ (ເສີມຕຽງໄດ້)</strong> ມີລະບຽງທັງດ້ານໜ້າ ແລະ ດ້ານຫຼັງເຮືອນ',
+ 'ระเบียงเป็นพื้นไม้ เพดานไม้ไผ่สาน แขวนโคมหวาย มีเก้าอี้โยกพร้อมเบาะ โต๊ะไม้ยาวและม้านั่ง สำหรับนั่งรับอากาศเย็นของโบโลเวน': 'ລະບຽງເປັນພື້ນໄມ້ ເພດານໄມ້ໄຜ່ສານ ແຂວນໂຄມຫວາຍ ມີຕັ່ງໂຍກພ້ອມເບາະ ໂຕະໄມ້ຍາວ ແລະ ຕັ່ງນັ່ງ ສຳລັບນັ່ງຮັບອາກາດເຢັນຂອງໂບລາເວນ',
+ 'ห้องนอนปูพื้นไม้ เตียงใหญ่พร้อมเครื่องนอนครบและผ้าคาดลายพื้นเมือง แต่ละห้องมีหน้าต่างสองด้านพร้อมผ้าม่าน ห้องหนึ่งกรุผนังไม้ทั้งห้องพร้อมโต๊ะเครื่องแป้ง อีกห้องกรุผนังไม้ไผ่สานช่วงบน มีตู้ข้างเตียงและตู้เสื้อผ้า': 'ຫ້ອງນອນປູພື້ນໄມ້ ຕຽງໃຫຍ່ພ້ອມເຄື່ອງນອນຄົບ ແລະ ຜ້າຄາດລາຍພື້ນເມືອງ ແຕ່ລະຫ້ອງມີປ່ອງຢ້ຽມສອງດ້ານພ້ອມຜ້າມ່ານ ຫ້ອງໜຶ່ງກຸຝາໄມ້ທັງຫ້ອງພ້ອມໂຕະແຕ່ງໜ້າ ອີກຫ້ອງກຸຝາໄມ້ໄຜ່ສານຊ່ວງເທິງ ມີຕູ້ຂ້າງຕຽງ ແລະ ຕູ້ເສື້ອຜ້າ',
+ 'จากระเบียงมองออกไปเห็นสนามหญ้า แปลงไฮเดรนเยีย และทางเดินหินที่ทอดผ่านสวนไปยังลำธารซึ่งไหลผ่านที่พัก': 'ຈາກລະບຽງເບິ່ງອອກໄປເຫັນສະໜາມຫຍ້າ ແປງດອກໄຮເດຣນເຈຍ ແລະ ທາງຍ່າງຫີນທີ່ທອດຜ່ານສວນໄປຫາລຳທານທີ່ໄຫຼຜ່ານທີ່ພັກ',
+ 'ห้องนอนเฮือนมหาเศรษฐี ผนังไม้ทั้งห้อง เตียงใหญ่และโต๊ะเครื่องแป้ง': 'ຫ້ອງນອນເຮືອນມະຫາເສດຖີ ຝາໄມ້ທັງຫ້ອງ ຕຽງໃຫຍ່ ແລະ ໂຕະແຕ່ງໜ້າ',
+ 'ห้องนอนอีกห้องของเฮือนมหาเศรษฐี ผนังไม้ไผ่สาน เตียงใหญ่และตู้ข้างเตียง': 'ຫ້ອງນອນອີກຫ້ອງຂອງເຮືອນມະຫາເສດຖີ ຝາໄມ້ໄຜ່ສານ ຕຽງໃຫຍ່ ແລະ ຕູ້ຂ້າງຕຽງ',
+ 'สนามหญ้า แปลงไฮเดรนเยีย และทางเดินหินในสวนของทุ่งหวายโฮมสเตย์': 'ສະໜາມຫຍ້າ ແປງດອກໄຮເດຣນເຈຍ ແລະ ທາງຍ່າງຫີນໃນສວນຂອງທົ່ງຫວາຍໂຮມສະເຕ',
+ 'เฮือนมหาเศรษฐี': 'ເຮືອນມະຫາເສດຖີ',
 }
 
 # ═══════════ house rules — เงื่อนไขการจอง/กฎที่พัก (markup: tools/house-rules.html) ═══════════
@@ -604,7 +642,8 @@ def build(th_path, lang, D):
     h = rewrite_links(h, lang)
     # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
     for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'",
-                    "'/rooms/udomsuk/'", "'/rooms/mangkhang/'", "'/rooms/choklap/'"):
+                    "'/rooms/udomsuk/'", "'/rooms/mangkhang/'", "'/rooms/choklap/'",
+                    "'/rooms/mahasetthi/'"):
         h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)

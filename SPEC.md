@@ -291,7 +291,12 @@ jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใ�
 - **หน้า detail เต็นท์ (20 ส.ค. 2026):** /rooms/tent/ ครบ 3 ภาษา — T1-T8 ทั้ง 8 ใน
   ROOM_URL ชี้หน้าเดียวกัน, การ์ดหน้าแรกมีลิงก์, ราคา/หลัง 600/800, ไม่มีแถวเตียงเสริม
   (ไม่มีข้อมูลยืนยัน), รูป: tent-close-chairs (hero), tent-row-lights, tent-firepit-circle,
-  tent-lawn-view / เหลือหน้า detail: R1, R2, R5-R9 (รอรูปจาก Pist)
+  tent-lawn-view / เหลือหน้า detail: R5, R6, R9 (รอรูปจาก Pist)
+- **หน้า detail เฮือนมหาเศรษฐี R1 (23 ส.ค. 2026):** /rooms/mahasetthi/ ครบ 3 ภาษา
+  (ROOM_URL + การ์ดหน้าแรก + sitemap) — รูปจาก Pist 4 ใบ: mahasetthi-hero (ระเบียง
+  เพดานไม้ไผ่สาน เก้าอี้โยกหวาย), mahasetthi-bed-1 (ห้องผนังไม้ + โต๊ะเครื่องแป้ง),
+  mahasetthi-bed-2 (ห้องผนังไม้ไผ่สาน), mahasetthi-garden (สนามหญ้า/ไฮเดรนเยีย/ทางเดินหิน)
+  / ยังไม่มีคลิป — บล็อก .rd-video เว้นเป็น comment ไว้ตามแบบ choklap
 - **โลโก้ทางการ (20 ส.ค. 2026):** ใช้ images/logo-thongwai-320.png (มีคำ ທົ່ງຫວາຍ
   ໂຮມສະເຕ, พื้นโปร่งใส, ตัดข้อความอังกฤษดำล่างออกตาม Pist) ทุกจุด: topbar ทุกหน้า
   46px / drawer 38px / fb-card / หัวเอกสารการจอง — ไฟล์ต้นฉบับใหญ่ logo-thongwai.png
