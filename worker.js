@@ -334,13 +334,14 @@ export default {
            occupancy (ไม่งั้น % ทะลุ 100) — แยกรายงานเป็น legacyNights ── */
         case 'stats': {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะเจ้าของเท่านั้น' });
-          const rooms = (await env.DB.prepare('SELECT id,name,sort FROM rooms ORDER BY sort').all()).results;
+          const rooms = (await env.DB.prepare('SELECT id,name,sort,price FROM rooms ORDER BY sort').all()).results;
           const all = (await env.DB.prepare(
             'SELECT room,checkin,checkout,created,phone,name,status FROM bookings').all()).results;
           const roomSet = new Set(rooms.map(r => r.id));
           const CAP = rooms.length || 1;
           const today = todayStr();
           const d365 = addDaysStr(today, -365), d30 = addDaysStr(today, -30);
+          const d730 = addDaysStr(today, -730);   // ฐานอ้างอิงใช้ 2 ปี เพื่อให้แต่ละ (ฤดู × วัน) มี n พอ
           const N = s => new Date(s + 'T00:00:00Z');
           const nightsOf = b => Math.max(1, Math.round((N(b.checkout) - N(b.checkin)) / 864e5));
           const leadOf = b => {
@@ -356,7 +357,10 @@ export default {
           /* ── ไล่รายคืนครั้งเดียว เก็บลง perDay แล้วใช้ต่อทุกกราฟ ── */
           const perDay = {}, perRoom = {}, months = {}, lead = [0,0,0,0,0,0],
                 stay = [0,0,0,0], repeat = {};
-          let totalNights = 0, futureBookings = 0, legacyNights = 0;
+          const LEADS = [0, 3, 7, 14, 30, 60];        // จุดวัดเส้นโค้งการจอง (วันก่อนเข้าพัก)
+          const pkOn = LEADS.map(() => 0);
+          let pkFinal = 0, totalNights = 0, futureBookings = 0, legacyNights = 0;
+          let firstNight = '9999-12-31';   // วันแรกที่มีข้อมูลจริง — กันไม่ให้ช่วงก่อนเปิดกิจการถูกนับเป็น "ขายไม่ได้"
           for (const b of bs) {
             const nights = nightsOf(b);
             totalNights += nights;
@@ -375,9 +379,16 @@ export default {
             let d = b.checkin;
             while (d < b.checkout) {
               if (real) {
+                if (d < firstNight) firstNight = d;
                 perDay[d] = (perDay[d] || 0) + 1;
                 months[d.slice(0, 7)] = (months[d.slice(0, 7)] || 0) + 1;
                 if (d >= d365) perRoom[b.room] = (perRoom[b.room] || 0) + 1;
+                /* เส้นโค้งการจอง: คืนนี้ถูกจองไว้ล่วงหน้ากี่วัน — ใช้แปลง
+                   "ตอนนี้จองแล้วเท่านี้" เป็น "สุดท้ายน่าจะได้เท่าไร" */
+                if (d < today && d >= d730 && ld >= 0) {
+                  pkFinal++;
+                  for (let k = 0; k < LEADS.length; k++) if (ld >= LEADS[k]) pkOn[k]++;
+                }
               }
               d = addDaysStr(d, 1);
             }
@@ -389,15 +400,21 @@ export default {
             { label: 'ร้อน (มี.ค.–พ.ค.)', m: [3,4,5] },
             { label: 'ฝน (มิ.ย.–ต.ค.)',  m: [6,7,8,9,10] },
           ];
+          const seasonOf = d => SEASONS.findIndex(s => s.m.includes(Number(d.slice(5, 7))));
           const dowN = [0,0,0,0,0,0,0], dowCap = [0,0,0,0,0,0,0];
           const seasonN = SEASONS.map(() => [0,0,0,0,0,0,0]);
           const seasonCap = SEASONS.map(() => [0,0,0,0,0,0,0]);
+          const baseN = SEASONS.map(() => [0,0,0,0,0,0,0]);      // ฐานอ้างอิง 2 ปี
+          const baseCap = SEASONS.map(() => [0,0,0,0,0,0,0]);
           const soldDates = [];
-          let soldFull = 0, soldNear = 0, nights30 = 0;
-          for (let d = d365; d < today; d = addDaysStr(d, 1)) {
-            const n = perDay[d] || 0, w = N(d).getUTCDay(), mo = Number(d.slice(5, 7));
+          let soldFull = 0, soldNear = 0, nights30 = 0, histN = 0, histCap = 0;
+          const hStart = firstNight > d730 ? firstNight : d730;
+          for (let d = hStart; d < today; d = addDaysStr(d, 1)) {
+            const n = perDay[d] || 0, w = N(d).getUTCDay(), si = seasonOf(d);
+            histN += n; histCap += CAP;
+            if (si >= 0) { baseN[si][w] += n; baseCap[si][w] += CAP; }
+            if (d < d365) continue;                              // ที่เหลือใช้หน้าต่าง 12 เดือนตามเดิม
             dowN[w] += n; dowCap[w] += CAP;
-            const si = SEASONS.findIndex(s => s.m.includes(mo));
             if (si >= 0) { seasonN[si][w] += n; seasonCap[si][w] += CAP; }
             if (n >= CAP) { soldFull++; soldDates.push(d); }
             else if (n >= CAP * 0.9) soldNear++;
@@ -421,6 +438,99 @@ export default {
             if (i < 60) f60 += n;
             f90 += n;
           }
+
+
+          /* ══ เครื่องมือชี้เป้า: วันไหนควรทำอะไร ════════════════════════
+             หลักคิด: "จองน้อย" ไม่ใช่สัญญาณ — อังคารหน้าฝนจองน้อยคือเรื่องปกติ
+             สัญญาณจริงคือ "น้อยกว่าที่วันแบบเดียวกันเคยทำได้" ณ ระยะเวลาเท่ากัน
+             จึงต้องมี 2 ชิ้น: (1) ฐานอ้างอิงต่อ (ฤดู × วันในสัปดาห์)
+             (2) เส้นโค้งการจอง — ปกติเหลืออีก X วัน ควรจองไปแล้วกี่ % ของยอดจบ ══ */
+
+          // (1) ฐานอ้างอิง + shrinkage: ช่องที่ n น้อยจะถูกดึงเข้าหาค่าเฉลี่ยรวม
+          //     กัน overfit จากช่องที่มีข้อมูลไม่กี่วัน (พารามิเตอร์เดียว = M)
+          const M = 10 * CAP;                       // เท่ากับ "ยืมข้อมูลมา 10 คืน"
+          const histPct = histCap ? histN / histCap : 0;
+          const baseline = SEASONS.map((_, si) => [0,1,2,3,4,5,6].map(w => {
+            const n = baseN[si][w], cap = baseCap[si][w];
+            const raw = cap ? n / cap : 0;
+            const adj = (n + M * histPct) / (cap + M);
+            return { pct: Math.round(adj * 100), raw: Math.round(raw * 100), cap, days: Math.round(cap / CAP) };
+          }));
+
+          // (2) เส้นโค้งการจองจากของจริง 2 ปี
+          const pickup = LEADS.map((L, k) => ({ lead: L, ratio: pkFinal ? pkOn[k] / pkFinal : 1 }));
+          const ratioAt = L => {
+            let r = 1;
+            for (const p of pickup) if (L >= p.lead) r = p.ratio;
+            return r > 0.02 ? r : 0.02;
+          };
+
+          const avgPrice = Math.round(
+            rooms.reduce((a, r) => a + (Number(r.price) || 0), 0) / (rooms.length || 1));
+
+          /* คาดการณ์รายวันข้างหน้า แล้วเทียบกับฐาน */
+          const MIN_DAYS = 8;        // ช่องฐานต้องเคยเปิดขายจริงอย่างน้อย 8 ครั้ง ถึงจะเชื่อ
+          const GAP_PP = 12;         // ต่ำกว่าฐานอย่างน้อย 12 จุด ถึงนับว่าผิดปกติ
+          const ACT_FROM = 5, ACT_TO = 90;   // ใกล้กว่านี้ทำอะไรไม่ทัน
+          /* ขอบเขตจริงมาจากข้อมูล ไม่ใช่ตัวเลขที่ตั้งเอง: ถ้าในอดีต ณ ระยะนั้น
+             ยังแทบไม่มีใครจอง (เช่นลูกค้าที่นี่จองล่วงหน้าไม่เกินเดือน) การที่วันนั้น
+             ยังว่างคือ "ปกติ" ไม่ใช่สัญญาณ — ห้ามเตือน ไม่งั้นได้เตือนลวงทุกวันศุกร์ยาวๆ */
+          const MIN_RATIO = 0.15;
+          const MIN_SHORT = 2;       // ห่างจากปกติน้อยกว่า 2 หลัง = ยังไม่ใช่เรื่อง
+          const daily = forward.map((x, i) => {
+            const w = N(x.d).getUTCDay(), si = seasonOf(x.d);
+            const b = si >= 0 ? baseline[si][w] : null;
+            const r = ratioAt(i);
+            const expRooms = Math.min(CAP, x.n / r);
+            const expPct = Math.round(expRooms / CAP * 100);
+            const basePct = b ? b.pct : 0;
+            const gap = basePct - expPct;
+            /* กรองด้วยหน่วยที่ "วัดได้จริงวันนี้" ไม่ใช่หน่วยที่คำนวณต่อ:
+               วันแบบนี้ ณ ระยะนี้ ปกติควรจองไปแล้วกี่หลัง เทียบกับที่จองจริง
+               — ถ้าห่างกันไม่ถึง 2 หลัง มันคือ noise ไม่ใช่ปัญหา ต่อให้ % ดูน่าตกใจ
+               (ฐาน 14% → คาด 0% ดูเหมือนพัง แต่จริงๆ ต่างกันแค่ครึ่งหลัง) */
+            const shortNow = basePct / 100 * CAP * r - x.n;
+            const solid = !!b && b.days >= MIN_DAYS && pkFinal > 0 && r >= MIN_RATIO;
+            return { d: x.d, w, out: i, booked: x.n, expPct, basePct, gap,
+                     expRooms, solid, shortNow: Math.round(shortNow * 10) / 10,
+                     flag: solid && i >= ACT_FROM && i <= ACT_TO && gap >= GAP_PP
+                           && gap / 100 * CAP >= 1.5 && shortNow >= MIN_SHORT };
+          });
+
+          /* รวมวันติดกันเป็นช่วง แล้วเรียงตามเงินที่เสี่ยงจะหายจริง (ราคาป้ายเฉลี่ย) */
+          let horizon = 0;
+          for (let i = 0; i < daily.length; i++) if (daily[i].solid) horizon = i;
+          const alerts = [];
+          for (let i = 0; i < daily.length; i++) {
+            if (!daily[i].flag) continue;
+            let j = i;
+            while (j + 1 < daily.length && daily[j + 1].flag) j++;
+            const grp = daily.slice(i, j + 1);
+            const rooms_ = grp.reduce((a, x) => a + x.gap / 100 * CAP, 0);
+            const willSell = grp.reduce((a, x) => a + x.expRooms, 0);
+            const be = r => Math.max(1, Math.ceil(willSell * r / (1 - r)));
+            alerts.push({
+              from: grp[0].d, to: grp[grp.length - 1].d, days: grp.length,
+              dows: grp.map(x => x.w), out: grp[0].out,
+              basePct: Math.round(grp.reduce((a, x) => a + x.basePct, 0) / grp.length),
+              expPct: Math.round(grp.reduce((a, x) => a + x.expPct, 0) / grp.length),
+              booked: grp.reduce((a, x) => a + x.booked, 0),
+              shortNow: Math.round(grp.reduce((a, x) => a + x.shortNow, 0) * 10) / 10,
+              rooms: Math.round(rooms_ * 10) / 10,
+              baht: Math.round(rooms_ * avgPrice),
+              willSell: Math.round(willSell * 10) / 10,
+              be10: be(0.10), be20: be(0.20), be30: be(0.30),
+            });
+            i = j;
+          }
+          alerts.sort((a, b) => b.baht - a.baht);
+
+          /* จุดอ่อนเชิงโครงสร้าง: ช่องที่ต่ำเรื้อรัง — แก้ด้วยโปรรายวันไม่ขึ้น ต้องเปลี่ยนสินค้า/ตลาด */
+          const weak = [];
+          SEASONS.forEach((s0, si) => baseline[si].forEach((c, w) => {
+            if (c.days >= MIN_DAYS && histN > 0) weak.push({ season: s0.label, si, w, pct: c.pct, days: c.days });
+          }));
+          weak.sort((a, b) => a.pct - b.pct);
 
           /* ── Pace: on the books สำหรับ 90 วันข้างหน้า เทียบ ณ จุดเดียวกันปีที่แล้ว
              ใช้ -364 วัน เพื่อให้วันในสัปดาห์ตรงกัน (52 สัปดาห์เป๊ะ) ── */
@@ -477,10 +587,14 @@ export default {
 
           return json({ ok: true,
             months: monthRows, dow: dowRows, seasons: seasonRows, rooms: roomRows,
-            lead, stay, repeat: repeatRows, forward,
+            lead, stay, repeat: repeatRows, forward: daily,
+            alerts: alerts.slice(0, 8), weak: weak.slice(0, 4), horizon,
+            baseline, seasonLabels: SEASONS.map(x => x.label),
+            pickup: pickup.map(p => ({ lead: p.lead, pct: Math.round(p.ratio * 100) })),
             summary: {
               bookings: bs.length, totalNights, nights30, futureBookings,
-              units: CAP, legacyNights, today,
+              units: CAP, legacyNights, today, avgPrice,
+              histPct: Math.round(histPct * 100), pkFinal,
               curPct: cur ? cur.pct : 0,
               curNights: cur ? cur.nights : 0, curCap: cur ? cur.cap : 0,
               mtdPct: pct(mtdN, mtdDays * CAP), mtdDays,

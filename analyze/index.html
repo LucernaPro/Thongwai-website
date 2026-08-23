@@ -63,6 +63,21 @@ a{color:var(--glow)}
 .big .delta{font-family:'Mitr';font-size:1.1rem}
 .up{color:var(--ok)} .down{color:var(--warn)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.strip .d.alert i{background:var(--warn)}
+.act{border-left:3px solid var(--warn);margin-bottom:10px}
+.act h3{font-family:'Mitr';font-size:1rem;color:var(--cream);margin-bottom:2px}
+.act .why{font-size:.82rem;opacity:.8;margin:6px 0;line-height:1.6}
+.act .money{font-family:'Mitr';color:var(--warn);font-size:1.3rem}
+.act .be{font-size:.8rem;background:rgba(246,200,119,.08);border-radius:10px;padding:9px 12px;margin-top:8px;line-height:1.7}
+.act .be b{color:var(--glow)}
+.calm{text-align:center;padding:22px 12px;line-height:1.7}
+.calm b{font-family:'Mitr';color:var(--ok);font-size:1.05rem;display:block;margin-bottom:4px}
+.heat{display:grid;grid-template-columns:auto repeat(7,1fr);gap:3px;font-size:.75rem}
+.heat div{padding:7px 2px;text-align:center;border-radius:5px}
+.heat .hh{opacity:.6;background:none}
+.heat .rl{text-align:left;opacity:.75;white-space:nowrap;padding-right:8px}
+.heat .cell b{display:block;font-family:'Mitr';font-size:.85rem}
+.heat .cell i{font-style:normal;font-size:.6rem;opacity:.5}
 .chips span{font-size:.76rem;background:rgba(246,200,119,.12);border:1px solid rgba(246,200,119,.2);border-radius:99px;padding:3px 10px}
 </style>
 </head>
@@ -84,6 +99,10 @@ a{color:var(--glow)}
 
 <div id="app" class="wrap" style="display:none">
   <div class="cards" id="kpis"></div>
+
+  <h2>🎯 ควรทำอะไร ตอนนี้</h2>
+  <div class="sub" id="actSub"></div>
+  <div id="chAct"></div>
 
   <h2>90 วันข้างหน้า — ห้องที่ขายไปแล้ว</h2>
   <div class="sub">แท่งเตี้ย = วันที่ยังว่างมาก คือวันที่ยิงโฆษณาแล้วคุ้มที่สุด · เสาร์-อาทิตย์สีทอง · เต็มทุกหลังสีเขียว</div>
@@ -109,6 +128,16 @@ a{color:var(--glow)}
   <div class="sub">คิดเป็น % ของความจุ ไม่ใช่จำนวนคืนดิบ — เทียบกันได้จริงเพราะแต่ละวันในสัปดาห์มีจำนวนครั้งไม่เท่ากัน</div>
   <div class="tabs" id="chDowTabs"></div>
   <div class="card" style="margin-top:10px"><div class="bars" style="height:120px" id="chDow"></div></div>
+
+  <h2>จุดอ่อนประจำ (เชิงโครงสร้าง)</h2>
+  <div class="sub">ฐานอ้างอิง 2 ปี แยกตาม ฤดู × วันในสัปดาห์ — ช่องแดงคือที่ขายไม่ออกเป็นนิสัย
+  ลดราคาวันต่อวันแก้ไม่ได้ ต้องเปลี่ยนของที่ขายหรือเปลี่ยนกลุ่มลูกค้า</div>
+  <div class="card" id="chHeat"></div>
+
+  <h2>เส้นโค้งการจอง</h2>
+  <div class="sub">ลูกค้าที่นี่จองล่วงหน้าจริงแค่ไหน — ตัวเลขนี้คือสิ่งที่ทำให้บอกได้ว่า "วันนั้นยังว่าง" คือปกติหรือผิดปกติ
+  และเป็นตัวกำหนดว่ามองไปข้างหน้าได้ไกลสุดกี่วันก่อนจะเป็นการเดา</div>
+  <div class="card" id="chPickup"></div>
 
   <h2>คืนที่ขายหมดทุกหลัง</h2>
   <div class="sub">ย้อนหลัง 365 วัน — ถ้าตัวเลขนี้สูง แปลว่าราคายังต่ำกว่าที่ตลาดยอมจ่าย ไม่ใช่แค่ขายเก่ง วันที่เต็มคือวันที่ควรทดสอบขึ้นราคาก่อนใคร</div>
@@ -192,13 +221,66 @@ function render(d){
 
   /* ── 90 วันข้างหน้า ── */
   $('chFwd').innerHTML = d.forward.map(x => {
-    const w = new Date(x.d + 'T00:00:00Z').getUTCDay();
-    const cls = x.n >= CAP ? 'full' : x.n === 0 ? 'free' : (w === 5 || w === 6 || w === 0) ? 'we' : '';
-    const h = x.n === 0 ? 3 : Math.max(4, Math.round(x.n / CAP * 100));
-    return `<div class="d ${cls}" title="${dTh(x.d)} (${DOW[w]}) — ขายแล้ว ${x.n}/${CAP} · ว่าง ${CAP - x.n} หลัง"><i style="height:${h}%"></i></div>`;
+    const w = x.w, n = x.booked;
+    const cls = x.flag ? 'alert' : n >= CAP ? 'full' : n === 0 ? 'free' : (w === 5 || w === 6 || w === 0) ? 'we' : '';
+    const h = n === 0 ? 3 : Math.max(4, Math.round(n / CAP * 100));
+    return `<div class="d ${cls}" title="${dTh(x.d)} (${DOW[w]}) — ขายแล้ว ${n}/${CAP} · ว่าง ${CAP - n} หลัง${x.solid ? ' · ต่างจากปกติ ' + (x.shortNow > 0 ? '-' : '+') + Math.abs(x.shortNow) + ' หลัง' : ''}"><i style="height:${h}%"></i></div>`;
   }).join('');
   $('chFwdTick').innerHTML = d.forward.map((x, i) =>
     `<span>${i === 0 || x.d.slice(8) === '01' ? ymTh(x.d.slice(0,7)) : ''}</span>`).join('');
+
+
+  /* ── ชี้เป้า: ควรทำอะไรตอนนี้ ── */
+  const dowRange = a => {
+    const u = [...new Set(a.dows)].map(w => DOW[w]);
+    return u.length > 2 ? u[0] + '-' + u[u.length - 1] : u.join(',');
+  };
+  $('actSub').innerHTML = d.alerts.length
+    ? `เทียบกับ "วันแบบเดียวกัน ฤดูเดียวกัน ณ ระยะเวลาเท่ากัน" ในอดีต 2 ปี — เรียงตามเงินที่กำลังจะหายจริง ·
+       ระยะที่ข้อมูลพูดได้จริงคือ <b>${d.horizon} วันข้างหน้า</b> ไกลกว่านั้นยังไม่มีใครจองเป็นปกติอยู่แล้ว จึงไม่เตือน`
+    : `เทียบกับ "วันแบบเดียวกัน ฤดูเดียวกัน ณ ระยะเวลาเท่ากัน" ในอดีต 2 ปี · ระยะที่ข้อมูลพูดได้จริง ${d.horizon} วันข้างหน้า`;
+
+  $('chAct').innerHTML = d.alerts.length ? d.alerts.map(a => `
+    <div class="card act">
+      <h3>${dTh(a.from)}${a.days > 1 ? ' – ' + dTh(a.to) : ''} <span style="opacity:.6;font-size:.85rem">(${dowRange(a)}) · อีก ${a.out} วัน</span></h3>
+      <div class="big"><span class="money">≈ ${a.baht.toLocaleString()} ฿</span>
+        <span style="opacity:.7;font-size:.85rem">ที่กำลังจะหายไป (${a.rooms} หลัง-คืน · ราคาป้ายเฉลี่ย)</span></div>
+      <p class="why">ตอนนี้จองแล้ว <b>${a.booked} หลัง</b> — วันแบบนี้ ณ ระยะนี้ปกติควรจองไปแล้วมากกว่านี้ราว
+        <b>${a.shortNow} หลัง</b> · ถ้าปล่อยไว้คาดว่าจะจบที่ <b>${a.expPct}%</b> ขณะที่ปกติได้ <b>${a.basePct}%</b></p>
+      <div class="be">ถ้าจะลดราคา ต้องดึงเพิ่มให้ได้เท่าไรถึงคุ้ม (เพราะลดแล้วห้องที่ยังไงก็ขายได้ ${a.willSell} หลัง ก็โดนลดด้วย):<br>
+        ลด 10% → ต้องได้เพิ่ม <b>${a.be10} หลัง</b> · ลด 20% → <b>${a.be20} หลัง</b> · ลด 30% → <b>${a.be30} หลัง</b></div>
+    </div>`).join('')
+    : `<div class="card calm"><b>ไม่มีวันไหนผิดปกติในระยะที่ตัดสินได้</b>
+       ทุกวันข้างหน้าจองมาตามจังหวะปกติของวันแบบนั้น — ยังไม่ต้องลดราคาอะไร
+       <div style="font-size:.8rem;opacity:.6;margin-top:8px">เงียบแบบนี้ดีกว่าเตือนมั่ว ระบบจะพูดเมื่อห่างจากปกติเกิน 2 หลังจริงๆ เท่านั้น</div></div>`;
+
+  /* ── heatmap จุดอ่อนโครงสร้าง ── */
+  const worst = new Set(d.weak.map(x => x.si + ':' + x.w));
+  const hcol = p => {
+    const t = Math.max(0, Math.min(1, p / 85));
+    return `background:rgba(${Math.round(232 - t * 90)},${Math.round(150 + t * 74)},${Math.round(62 + t * 121)},${.10 + t * .30})`;
+  };
+  $('chHeat').innerHTML = '<div class="heat">' +
+    '<div class="hh rl"></div>' + DOW.map(x => `<div class="hh">${x}</div>`).join('') +
+    d.baseline.map((row, si) => `<div class="rl">${d.seasonLabels[si]}</div>` + row.map((c, w) => `
+      <div class="cell" style="${hcol(c.pct)};${worst.has(si + ':' + w) ? 'outline:1px solid var(--warn)' : ''}"
+        title="${d.seasonLabels[si]} ${DOW[w]} — เฉลี่ย ${c.pct}% จากข้อมูล ${c.days} วัน (ดิบ ${c.raw}%)">
+        <b>${c.days >= 8 ? c.pct + '%' : '–'}</b><i>${c.days} วัน</i></div>`).join('')).join('') +
+    '</div>' +
+    (d.weak.length ? `<p class="note">แย่สุด: ${d.weak.map(x => x.season.split(' ')[0] + ' ' + DOW[x.w] + ' (' + x.pct + '%)').join(' · ')} —
+      ช่องพวกนี้คือที่ที่ควรคิดเป็นแพ็กเกจ (พักยาว / กลุ่มบริษัท / ลูกค้าท้องถิ่น) มากกว่าลดราคารายวัน</p>`
+      : '<p class="note">ข้อมูลยังไม่พอสรุปจุดอ่อนประจำ — ช่องที่ขึ้น – คือยังเปิดขายไม่ถึง 8 ครั้ง</p>') +
+    `<p class="note">ตัวเลขถูกดึงเข้าหาค่าเฉลี่ยรวม (${s.histPct}%) ตามจำนวนข้อมูลที่มี — ช่องที่ข้อมูลน้อยจะไม่แสดงค่าสุดโต่ง</p>`;
+
+  /* ── เส้นโค้งการจอง ── */
+  const mxPk = Math.max(...d.pickup.map(x => x.pct), 1);
+  $('chPickup').innerHTML = d.pickup.map(x => `
+    <div class="hrow"><span class="nm">เหลืออีก ${x.lead} วัน</span>
+      <span class="tr"><i style="width:${Math.round(x.pct / mxPk * 100)}%"></i></span>
+      <span class="v">${x.pct}%</span><span class="n"></span></div>`).join('') +
+    `<p class="note">อ่านว่า: ก่อนถึงวันเข้าพัก X วัน ปกติจะมีคนจองไปแล้วกี่ % ของยอดที่จะได้ทั้งหมด ·
+     คำนวณจาก ${s.pkFinal.toLocaleString()} คืนขายจริง 2 ปี · จุดที่เส้นต่ำกว่า 15% คือระยะที่ยังบอกอะไรไม่ได้
+     ระบบจึงไม่เตือนเกิน ${d.horizon} วัน</p>`;
 
   /* ── pace ── */
   const diff = s.pacePrev ? Math.round((s.paceAdj - s.pacePrev) / s.pacePrev * 100) : null;
