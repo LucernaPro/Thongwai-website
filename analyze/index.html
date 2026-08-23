@@ -7,7 +7,7 @@
 <title>ทุ่งหวาย · วิเคราะห์ (เจ้าของ)</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--dusk:#152227;--pine:#2e4a38;--cream:#f5efe3;--glow:#f6c877;--lantern:#e8963e;--ok:#9fe0b7}
+:root{--dusk:#152227;--pine:#2e4a38;--cream:#f5efe3;--glow:#f6c877;--lantern:#e8963e;--ok:#9fe0b7;--warn:#f0a898}
 *{box-sizing:border-box;margin:0}
 body{font-family:'Sarabun',sans-serif;background:var(--dusk);color:var(--cream);padding-bottom:60px}
 .wrap{max-width:860px;margin:0 auto;padding:0 16px}
@@ -15,31 +15,55 @@ header{background:var(--pine);padding:14px 0;margin-bottom:18px}
 header .wrap{display:flex;align-items:center;justify-content:space-between}
 h1{font-family:'Mitr';color:var(--glow);font-size:1.1rem}
 h2{font-family:'Mitr';color:var(--glow);font-size:1rem;margin:26px 0 4px}
-.sub{font-size:.8rem;opacity:.65;margin-bottom:12px}
+.sub{font-size:.8rem;opacity:.65;margin-bottom:12px;line-height:1.5}
 .card{background:rgba(245,239,227,.05);border:1px solid rgba(246,200,119,.18);border-radius:14px;padding:16px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .kpi b{font-family:'Mitr';font-size:1.5rem;color:var(--glow);display:block}
 .kpi span{font-size:.8rem;opacity:.75}
+.kpi i{font-style:normal;font-size:.72rem;opacity:.55;display:block;margin-top:2px}
 .bars{display:flex;align-items:flex-end;gap:4px;height:150px;margin-top:10px}
 .bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
 .bars .b i{display:block;background:var(--lantern);border-radius:4px 4px 0 0;min-height:2px}
 .bars .b.now i{background:var(--ok)}
 .bars .b small{font-size:.62rem;opacity:.7;margin-top:4px;white-space:nowrap}
 .bars .b em{font-style:normal;font-size:.66rem;color:var(--glow)}
+.bars .b.thin{opacity:.38}
 .hrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.85rem}
 .hrow .nm{flex:0 0 150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hrow .tr{flex:1;background:rgba(245,239,227,.08);border-radius:99px;height:14px;overflow:hidden}
 .hrow .tr i{display:block;height:100%;background:var(--lantern);border-radius:99px}
-.hrow .v{flex:0 0 46px;text-align:right;font-size:.8rem;color:var(--glow)}
+.hrow .v{flex:0 0 62px;text-align:right;font-size:.8rem;color:var(--glow)}
+.hrow .n{flex:0 0 54px;text-align:right;font-size:.72rem;opacity:.5}
+.hrow.thin{opacity:.4}
 table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:8px}
 td,th{padding:7px 4px;border-bottom:1px dashed rgba(246,200,119,.15);text-align:left}
 th{font-size:.78rem;opacity:.7;font-weight:500}
 #login{max-width:360px;margin:80px auto}
 input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(246,200,119,.3);background:rgba(245,239,227,.06);color:var(--cream);font-family:'Sarabun';font-size:1rem;margin:6px 0}
 button{font-family:'Mitr';background:var(--lantern);color:var(--dusk);border:none;border-radius:999px;padding:12px 24px;font-size:1rem;cursor:pointer;width:100%;margin-top:8px}
-.err{color:#f0a898;font-size:.85rem;min-height:1.2em;margin-top:8px}
+.err{color:var(--warn);font-size:.85rem;min-height:1.2em;margin-top:8px}
 a{color:var(--glow)}
 .note{font-size:.78rem;opacity:.6;margin-top:8px;line-height:1.6}
+/* แถบรายวัน 90 วันข้างหน้า */
+.strip{display:flex;align-items:flex-end;gap:1px;height:96px}
+.strip .d{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;cursor:default;min-width:0}
+.strip .d i{display:block;background:var(--lantern);border-radius:2px 2px 0 0;min-height:2px}
+.strip .d.we i{background:var(--glow)}
+.strip .d.full i{background:var(--ok)}
+.strip .d.free i{background:rgba(245,239,227,.14)}
+.ticks{display:flex;gap:1px;margin-top:5px;font-size:.62rem;opacity:.6}
+.ticks span{flex:1;min-width:0;white-space:nowrap;overflow:hidden}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.72rem;opacity:.7;margin-top:10px}
+.legend s{text-decoration:none;display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tabs{display:flex;gap:6px;margin:10px 0 0;flex-wrap:wrap}
+.tabs button{width:auto;margin:0;padding:6px 14px;font-size:.8rem;background:rgba(245,239,227,.08);color:var(--cream)}
+.tabs button.on{background:var(--lantern);color:var(--dusk)}
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.big b{font-family:'Mitr';font-size:2rem;color:var(--glow)}
+.big .delta{font-family:'Mitr';font-size:1.1rem}
+.up{color:var(--ok)} .down{color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{font-size:.76rem;background:rgba(246,200,119,.12);border:1px solid rgba(246,200,119,.2);border-radius:99px;padding:3px 10px}
 </style>
 </head>
 <body>
@@ -61,17 +85,42 @@ a{color:var(--glow)}
 <div id="app" class="wrap" style="display:none">
   <div class="cards" id="kpis"></div>
 
+  <h2>90 วันข้างหน้า — ห้องที่ขายไปแล้ว</h2>
+  <div class="sub">แท่งเตี้ย = วันที่ยังว่างมาก คือวันที่ยิงโฆษณาแล้วคุ้มที่สุด · เสาร์-อาทิตย์สีทอง · เต็มทุกหลังสีเขียว</div>
+  <div class="card">
+    <div class="strip" id="chFwd"></div>
+    <div class="ticks" id="chFwdTick"></div>
+    <div class="legend">
+      <span><s style="background:var(--glow)"></s>ศุกร์-อาทิตย์</span>
+      <span><s style="background:var(--lantern)"></s>วันธรรมดา</span>
+      <span><s style="background:var(--ok)"></s>เต็มทุกหลัง</span>
+    </div>
+  </div>
+
+  <h2>เทียบปีที่แล้ว ณ วันเดียวกัน (pace)</h2>
+  <div class="sub">คืนที่จองไว้แล้วสำหรับ 90 วันข้างหน้า เทียบกับที่จองไว้แล้ว ณ จุดเดียวกันของปีก่อน — เลขนี้บอกว่าโตหรือหด โดยไม่ปนกับฤดูกาล</div>
+  <div class="card" id="chPace"></div>
+
   <h2>อัตราการเข้าพักรายเดือน</h2>
-  <div class="sub">คืนขายเทียบความจุ (จำนวนหลังปัจจุบัน × วันในเดือน) — เดือนปัจจุบันสีเขียว รวมจองล่วงหน้าแล้ว</div>
+  <div class="sub">คืนขายเทียบความจุ (จำนวนหลังปัจจุบัน × วันในเดือน) — เดือนปัจจุบันสีเขียว รวมจองล่วงหน้าแล้ว จึงยังไม่ควรเอาไปเทียบกับเดือนที่จบแล้วตรงๆ</div>
   <div class="card"><div class="bars" id="chMonths"></div></div>
 
   <h2>รายวันในสัปดาห์</h2>
-  <div class="sub">คืนขายรวม 12 เดือนล่าสุด แยกตามคืนวัน — ไว้ตัดสินใจโปรวันธรรมดา</div>
-  <div class="card"><div class="bars" style="height:110px" id="chDow"></div></div>
+  <div class="sub">คิดเป็น % ของความจุ ไม่ใช่จำนวนคืนดิบ — เทียบกันได้จริงเพราะแต่ละวันในสัปดาห์มีจำนวนครั้งไม่เท่ากัน</div>
+  <div class="tabs" id="chDowTabs"></div>
+  <div class="card" style="margin-top:10px"><div class="bars" style="height:120px" id="chDow"></div></div>
+
+  <h2>คืนที่ขายหมดทุกหลัง</h2>
+  <div class="sub">ย้อนหลัง 365 วัน — ถ้าตัวเลขนี้สูง แปลว่าราคายังต่ำกว่าที่ตลาดยอมจ่าย ไม่ใช่แค่ขายเก่ง วันที่เต็มคือวันที่ควรทดสอบขึ้นราคาก่อนใคร</div>
+  <div class="card" id="chSold"></div>
 
   <h2>ผลงานรายห้อง (12 เดือนล่าสุด)</h2>
-  <div class="sub">คืนขายต่อหลัง — หลังท้ายตารางคือโอกาส: รูปไม่สวย? ยังไม่มีหน้าเว็บ? ราคา?</div>
+  <div class="sub">% ของ 365 คืน — หลังท้ายตารางคือโอกาส: รูปไม่สวย? ยังไม่มีหน้าเว็บ? ราคา?</div>
   <div class="card" id="chRooms"></div>
+
+  <h2>การยกเลิก</h2>
+  <div class="sub">นับจากรายการที่สถานะเป็น "ยกเลิก" (ระบบไม่ลบแถวทิ้ง) — ใช้ตัดสินใจเรื่องมัดจำ ไม่ใช่ดูเฉยๆ</div>
+  <div class="card" id="chCancel"></div>
 
   <h2>ลูกค้าจองล่วงหน้ากี่วัน</h2>
   <div class="sub">ระยะจากวันจองถึงวันเข้าพัก — ไว้กำหนดจังหวะโพสต์/ยิงโฆษณา</div>
@@ -84,9 +133,7 @@ a{color:var(--glow)}
   <div class="sub">ลิสต์ VIP — ทักก่อนไฮซีซั่น ดูแลพิเศษ</div>
   <div class="card"><table id="chRepeat"></table></div>
 
-  <p class="note">หมายเหตุความแม่น: ตัวชี้วัดทั้งหมดนับจาก "คืนขาย" ซึ่งแม่น 100% จากสมุดจอง ·
-  เดือนเก่าเทียบกับความจุปัจจุบัน · วันที่เต็มไม่ได้แปลว่า demand หยุดแค่นั้น (คนโทรมาแล้วเต็มไม่ถูกบันทึก) ·
-  ยังไม่แสดงรายได้เพราะสมุดเก่าบันทึกมัดจำไม่ใช่ราคาจ่ายจริง — เก็บราคาจริงไปสักพักแล้วค่อยเปิดหมวดรายได้</p>
+  <p class="note" id="note"></p>
 </div>
 
 <script>
@@ -95,6 +142,10 @@ const API = '/api';
 const store = { user: localStorage.getItem('tw_user'), pass: localStorage.getItem('tw_pass') };
 const TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const ymTh = ym => TH_M[Number(ym.slice(5)) - 1] + ' ' + (Number(ym.slice(0,4)) + 543).toString().slice(-2);
+const dTh = d => Number(d.slice(8)) + ' ' + TH_M[Number(d.slice(5,7)) - 1];
+const DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+/* n น้อย = อย่าเชื่อ: ทำให้จางและติดหมายเหตุ แทนที่จะโชว์ % สวยๆ จากกลุ่มตัวอย่าง 3 คืน */
+const MIN_N = 30;
 
 async function api(params){
   const u = new URL(API, location.origin);
@@ -124,52 +175,124 @@ $('lbtn').onclick = async () => {
   boot();
 };
 
-function render(d){
-  const s = d.summary;
-  $('kpis').innerHTML = [
-    ['การจองทั้งหมด', s.bookings.toLocaleString() + ' รายการ'],
-    ['คืนขายสะสม', s.totalNights.toLocaleString() + ' คืน'],
-    ['30 วันล่าสุด', s.nights30.toLocaleString() + ' คืน'],
-    ['เดือนนี้เข้าพัก', s.curPct + '%'],
-    ['จองล่วงหน้าค้างอยู่', s.futureBookings + ' รายการ'],
-  ].map(([k,v]) => `<div class="card kpi"><b>${v}</b><span>${k}</span></div>`).join('');
+let DATA = null;
 
+function render(d){
+  DATA = d;
+  const s = d.summary, CAP = s.units;
+
+  $('kpis').innerHTML = [
+    ['ว่าง 30 วันข้างหน้า', (100 - s.f30) + '%', 'ขายไปแล้ว ' + s.f30 + '%'],
+    ['ว่าง 90 วันข้างหน้า', (100 - s.f90) + '%', 'ขายไปแล้ว ' + s.f90 + '%'],
+    ['เดือนนี้ถึงเมื่อวาน', s.mtdPct + '%', s.mtdDays + ' คืนที่ผ่านมา'],
+    ['คืนที่เต็มทุกหลัง', s.soldFull + ' คืน', 'ใกล้เต็มอีก ' + s.soldNear + ' คืน'],
+    ['อัตรายกเลิก', s.cancelPct + '%', '12 เดือนล่าสุด ' + s.cancelRecentPct + '%'],
+    ['จองล่วงหน้าค้างอยู่', s.futureBookings + ' รายการ', 'สะสม ' + s.totalNights.toLocaleString() + ' คืน'],
+  ].map(([k,v,i]) => `<div class="card kpi"><b>${v}</b><span>${k}</span><i>${i}</i></div>`).join('');
+
+  /* ── 90 วันข้างหน้า ── */
+  $('chFwd').innerHTML = d.forward.map(x => {
+    const w = new Date(x.d + 'T00:00:00Z').getUTCDay();
+    const cls = x.n >= CAP ? 'full' : x.n === 0 ? 'free' : (w === 5 || w === 6 || w === 0) ? 'we' : '';
+    const h = x.n === 0 ? 3 : Math.max(4, Math.round(x.n / CAP * 100));
+    return `<div class="d ${cls}" title="${dTh(x.d)} (${DOW[w]}) — ขายแล้ว ${x.n}/${CAP} · ว่าง ${CAP - x.n} หลัง"><i style="height:${h}%"></i></div>`;
+  }).join('');
+  $('chFwdTick').innerHTML = d.forward.map((x, i) =>
+    `<span>${i === 0 || x.d.slice(8) === '01' ? ymTh(x.d.slice(0,7)) : ''}</span>`).join('');
+
+  /* ── pace ── */
+  const diff = s.pacePrev ? Math.round((s.paceAdj - s.pacePrev) / s.pacePrev * 100) : null;
+  $('chPace').innerHTML = `
+    <div class="big">
+      <b>${s.paceNow.toLocaleString()} คืน</b>
+      <span style="opacity:.7">ปีที่แล้ว ณ วันนี้ ${s.pacePrev.toLocaleString()} คืน</span>
+      ${diff === null ? '<span style="opacity:.6">— ยังไม่มีข้อมูลปีก่อนพอเทียบ</span>'
+        : `<span class="delta ${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}%</span>`}
+    </div>
+    <p class="note" style="margin-top:10px">เทียบแบบยุติธรรม: ตัวเลขปีก่อนคือรายการที่ "รอดมาถึงวันเข้าพักจริง" ส่วนปีนี้ยังมีสิทธิ์ถูกยกเลิก
+    จึงใช้ค่าที่หักอัตรายกเลิก ${s.cancelPct}% แล้ว = <b style="color:var(--glow)">${s.paceAdj.toLocaleString()} คืน</b> เป็นตัวเทียบ ·
+    ใช้ระยะ -364 วันเพื่อให้วันในสัปดาห์ตรงกันพอดี</p>`;
+
+  /* ── รายเดือน ── */
   const maxP = Math.max(...d.months.map(m => m.pct), 1);
+  const curYm = s.today.slice(0, 7);
   $('chMonths').innerHTML = d.months.map(m => `
-    <div class="b ${m.ym === new Date(Date.now()+7*3600e3).toISOString().slice(0,7) ? 'now' : ''}">
+    <div class="b ${m.ym === curYm ? 'now' : ''}" title="${m.nights} คืน จากความจุ ${m.cap} คืน">
       <em>${m.pct}%</em><i style="height:${Math.round(m.pct / maxP * 100)}%"></i><small>${ymTh(m.ym)}</small>
     </div>`).join('');
 
-  const DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-  const maxD = Math.max(...d.dow, 1);
-  $('chDow').innerHTML = d.dow.map((v, i) => `
-    <div class="b ${i===5||i===6||i===0 ? 'now' : ''}"><em>${v}</em><i style="height:${Math.round(v / maxD * 100)}%"></i><small>${DOW[i]}</small></div>`).join('');
+  /* ── รายวันสัปดาห์ + แยกฤดู ── */
+  const tabs = [{ label: 'ทั้งปี', dow: d.dow, n: d.dow.reduce((a,b) => a + b.n, 0) }]
+    .concat(d.seasons.map(x => ({ label: x.label, dow: x.dow, n: x.n })));
+  $('chDowTabs').innerHTML = tabs.map((t, i) =>
+    `<button class="${i === 0 ? 'on' : ''}" data-i="${i}">${t.label}</button>`).join('');
+  const drawDow = i => {
+    const t = tabs[i];
+    $('chDow').innerHTML = t.dow.map((v, w) => {
+      const thin = v.cap < MIN_N * 5;
+      return `<div class="b ${w===5||w===6||w===0 ? 'now' : ''} ${thin ? 'thin' : ''}"
+        title="${v.n} คืน จาก ${v.cap} คืนที่ขายได้${thin ? ' — ข้อมูลยังน้อย' : ''}">
+        <em>${v.pct}%</em><i style="height:${Math.max(2, v.pct)}%"></i><small>${DOW[w]}</small></div>`;
+    }).join('');
+  };
+  $('chDowTabs').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    [...$('chDowTabs').children].forEach(x => x.classList.remove('on'));
+    b.classList.add('on'); drawDow(Number(b.dataset.i));
+  };
+  drawDow(0);
 
+  /* ── คืนที่เต็ม ── */
+  $('chSold').innerHTML = `
+    <div class="big"><b>${s.soldFull}</b><span style="opacity:.75">คืนที่เต็ม ${CAP}/${CAP} หลัง</span>
+      <span style="opacity:.55">· ใกล้เต็ม (≥90%) อีก ${s.soldNear} คืน</span></div>
+    ${s.soldDates.length ? '<div class="chips">' + s.soldDates.map(x => `<span>${dTh(x)}</span>`).join('') + '</div>'
+      : '<p class="note">ยังไม่มีคืนที่เต็มทุกหลังใน 365 วันล่าสุด — ราคาปัจจุบันยังไม่ชนเพดาน demand</p>'}
+    ${s.soldFull ? '<p class="note">ลิสต์คือ 14 คืนล่าสุดที่เต็ม · ทดสอบขึ้นราคาเฉพาะวันแบบนี้ทีละตัวแปร แล้วดูว่ายอดคืนหายไหม</p>' : ''}`;
+
+  /* ── รายห้อง ── */
   const maxR = Math.max(...d.rooms.map(r => r.nights), 1);
   $('chRooms').innerHTML = d.rooms.slice().sort((a,b) => b.nights - a.nights).map(r => `
     <div class="hrow"><span class="nm">${r.name}</span>
       <span class="tr"><i style="width:${Math.round(r.nights / maxR * 100)}%"></i></span>
-      <span class="v">${r.nights}</span></div>`).join('');
+      <span class="v">${r.pct}%</span><span class="n">${r.nights} คืน</span></div>`).join('');
 
+  /* ── ยกเลิก ── */
   const LEAD = ['วันเดียวกัน','1-3 วัน','4-7 วัน','8-14 วัน','15-30 วัน','เกิน 30 วัน'];
-  const sumL = d.lead.reduce((a,b) => a+b, 0) || 1;
-  $('chLead').innerHTML = d.lead.map((v, i) => `
-    <div class="hrow"><span class="nm">${LEAD[i]}</span>
-      <span class="tr"><i style="width:${Math.round(v / sumL * 100)}%"></i></span>
-      <span class="v">${Math.round(v / sumL * 100)}%</span></div>`).join('');
+  const sumCL = s.cancelLead.reduce((a,b) => a+b, 0);
+  $('chCancel').innerHTML = `
+    <div class="big"><b>${s.cancelPct}%</b><span style="opacity:.75">${s.cancels.toLocaleString()} รายการ · เสียไป ${s.cancelNights.toLocaleString()} คืน</span></div>
+    <p class="note" style="margin:8px 0 6px">แยกตามระยะที่จองล่วงหน้าไว้ตอนแรก — ถ้าที่จองไกลๆ ยกเลิกเยอะกว่ามาก นั่นคือเหตุผลให้เก็บมัดจำสูงขึ้นเฉพาะกลุ่มนั้น</p>
+    ${sumCL ? s.cancelLead.map((v, i) => `
+      <div class="hrow ${v < 5 ? 'thin' : ''}"><span class="nm">${LEAD[i]}</span>
+        <span class="tr"><i style="width:${Math.round(v / Math.max(...s.cancelLead) * 100)}%"></i></span>
+        <span class="v">${Math.round(v / sumCL * 100)}%</span><span class="n">${v} ครั้ง</span></div>`).join('')
+      : '<p class="note">ยังไม่มีรายการยกเลิกในระบบ</p>'}`;
 
-  const STAY = ['1 คืน','2 คืน','3 คืน','4 คืนขึ้นไป'];
-  const sumS = d.stay.reduce((a,b) => a+b, 0) || 1;
-  $('chStay').innerHTML = d.stay.map((v, i) => `
-    <div class="hrow"><span class="nm">${STAY[i]}</span>
-      <span class="tr"><i style="width:${Math.round(v / sumS * 100)}%"></i></span>
-      <span class="v">${Math.round(v / sumS * 100)}%</span></div>`).join('');
+  /* ── lead / stay ── */
+  const bar = (labels, arr, el) => {
+    const sum = arr.reduce((a,b) => a+b, 0) || 1;
+    const mx = Math.max(...arr, 1);
+    $(el).innerHTML = arr.map((v, i) => `
+      <div class="hrow ${v < 5 ? 'thin' : ''}"><span class="nm">${labels[i]}</span>
+        <span class="tr"><i style="width:${Math.round(v / mx * 100)}%"></i></span>
+        <span class="v">${Math.round(v / sum * 100)}%</span><span class="n">${v} ครั้ง</span></div>`).join('');
+  };
+  bar(LEAD, d.lead, 'chLead');
+  bar(['1 คืน','2 คืน','3 คืน','4 คืนขึ้นไป'], d.stay, 'chStay');
 
   $('chRepeat').innerHTML = '<tr><th>ลูกค้า</th><th>เบอร์</th><th>จอง</th><th>ล่าสุด</th></tr>' +
     (d.repeat.length ? d.repeat.map(r => `
       <tr><td>${r.name}</td><td><a href="tel:${r.phone}">${r.phone}</a></td>
       <td>${r.n} ครั้ง</td><td>${r.last}</td></tr>`).join('')
     : '<tr><td colspan="4" style="opacity:.6">ยังไม่พบลูกค้าจองซ้ำ (เบอร์ตรงกัน ≥ 2 ครั้ง)</td></tr>');
+
+  $('note').innerHTML = `หมายเหตุความแม่น: ทุกตัวเลขคำนวณสดจากฐานข้อมูลทุกครั้งที่เปิดหน้านี้ ไม่ใช่รอบเดือน ·
+    ตัวชี้วัดหลักคือ "คืนขาย" ซึ่งแม่น 100% จากสมุดจอง · เดือนเก่าเทียบกับความจุปัจจุบัน (${CAP} หลัง) ·
+    ${s.legacyNights ? `คืนจากห้องประวัติ (กางเสริม/เหมา) ${s.legacyNights.toLocaleString()} คืน ไม่ถูกนับใน occupancy เพราะไม่มีความจุประจำ · ` : ''}
+    แท่งที่จางคือกลุ่มตัวอย่างยังน้อย อย่าเพิ่งสรุป ·
+    วันที่เต็มไม่ได้แปลว่า demand หยุดแค่นั้น — คนโทรมาแล้วเต็มยังไม่ถูกบันทึก ·
+    ยังไม่แสดงรายได้เพราะสมุดเก่าบันทึกมัดจำไม่ใช่ราคาจ่ายจริง เก็บราคาจริงไปสักพักแล้วค่อยเปิด RevPAR`;
 }
 boot();
 </script>

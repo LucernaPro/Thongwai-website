@@ -327,62 +327,169 @@ export default {
             เป็น: `${target} ${checkin} → ${checkout}` });
           return json({ ok: true });
         }
+        /* ── สถิติเจ้าของ v2 (23 ส.ค. 2026) ────────────────────────────
+           เพิ่ม: 90 วันข้างหน้า / คืนที่เต็มทุกหลัง / อัตรายกเลิก /
+           pace เทียบปีที่แล้ว ณ จุดเดียวกัน / รายวันสัปดาห์แยกฤดู / n ทุกตัว
+           ความแม่น: ห้องประวัติ "X:..." ไม่อยู่ในตาราง rooms จึงไม่นับใน
+           occupancy (ไม่งั้น % ทะลุ 100) — แยกรายงานเป็น legacyNights ── */
         case 'stats': {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะเจ้าของเท่านั้น' });
           const rooms = (await env.DB.prepare('SELECT id,name,sort FROM rooms ORDER BY sort').all()).results;
-          const bs = (await env.DB.prepare(
-            "SELECT room,checkin,checkout,created,phone,name FROM bookings WHERE status = 'จอง'").all()).results;
+          const all = (await env.DB.prepare(
+            'SELECT room,checkin,checkout,created,phone,name,status FROM bookings').all()).results;
+          const roomSet = new Set(rooms.map(r => r.id));
+          const CAP = rooms.length || 1;
           const today = todayStr();
-          const d365 = addDaysStr(today, -365);
+          const d365 = addDaysStr(today, -365), d30 = addDaysStr(today, -30);
           const N = s => new Date(s + 'T00:00:00Z');
-          const months = {}, dow = [0,0,0,0,0,0,0], perRoom = {}, lead = [0,0,0,0,0,0],
+          const nightsOf = b => Math.max(1, Math.round((N(b.checkout) - N(b.checkin)) / 864e5));
+          const leadOf = b => {
+            const cd = (b.created || '').slice(0, 10);
+            if (!isDate(cd)) return -1;
+            return Math.max(0, Math.round((N(b.checkin) - N(cd)) / 864e5));
+          };
+          const leadBucket = ld => ld === 0 ? 0 : ld <= 3 ? 1 : ld <= 7 ? 2 : ld <= 14 ? 3 : ld <= 30 ? 4 : 5;
+
+          const bs = all.filter(b => b.status === 'จอง');
+          const cx = all.filter(b => b.status !== 'จอง');
+
+          /* ── ไล่รายคืนครั้งเดียว เก็บลง perDay แล้วใช้ต่อทุกกราฟ ── */
+          const perDay = {}, perRoom = {}, months = {}, lead = [0,0,0,0,0,0],
                 stay = [0,0,0,0], repeat = {};
-          let totalNights = 0, futureBookings = 0, nights30 = 0;
-          const d30 = addDaysStr(today, -30);
+          let totalNights = 0, futureBookings = 0, legacyNights = 0;
           for (const b of bs) {
-            const nights = Math.max(1, Math.round((N(b.checkout) - N(b.checkin)) / 864e5));
+            const nights = nightsOf(b);
             totalNights += nights;
             if (b.checkin >= today) futureBookings++;
             stay[Math.min(nights, 4) - 1]++;
-            const cd = (b.created || '').slice(0, 10);
-            if (/^\d{4}-\d{2}-\d{2}$/.test(cd)) {
-              const ld = Math.max(0, Math.round((N(b.checkin) - N(cd)) / 864e5));
-              lead[ld === 0 ? 0 : ld <= 3 ? 1 : ld <= 7 ? 2 : ld <= 14 ? 3 : ld <= 30 ? 4 : 5]++;
-            }
+            const ld = leadOf(b);
+            if (ld >= 0) lead[leadBucket(ld)]++;
             const ph = (b.phone || '').replace(/\D/g, '');
             if (ph.length >= 5) {
               repeat[ph] = repeat[ph] || { n: 0, name: b.name, last: b.checkin };
               repeat[ph].n++;
               if (b.checkin > repeat[ph].last) { repeat[ph].last = b.checkin; repeat[ph].name = b.name; }
             }
-            // ไล่รายคืน
+            const real = roomSet.has(b.room);
+            if (!real) legacyNights += nights;
             let d = b.checkin;
             while (d < b.checkout) {
-              const ym = d.slice(0, 7);
-              months[ym] = (months[ym] || 0) + 1;
-              if (d >= d365 && d < today) dow[N(d).getUTCDay()]++;
-              if (d >= d365) perRoom[b.room] = (perRoom[b.room] || 0) + 1;
-              if (d >= d30 && d < today) nights30++;
+              if (real) {
+                perDay[d] = (perDay[d] || 0) + 1;
+                months[d.slice(0, 7)] = (months[d.slice(0, 7)] || 0) + 1;
+                if (d >= d365) perRoom[b.room] = (perRoom[b.room] || 0) + 1;
+              }
               d = addDaysStr(d, 1);
             }
           }
-          // 15 เดือนล่าสุด + ความจุ (เทียบ 17 หลังปัจจุบัน)
+
+          /* ── ย้อนหลัง 365 วัน: รายวันสัปดาห์ (คิดเป็น %) + แยกฤดู + คืนที่เต็ม ── */
+          const SEASONS = [
+            { label: 'หนาว (พ.ย.–ก.พ.)', m: [11,12,1,2] },
+            { label: 'ร้อน (มี.ค.–พ.ค.)', m: [3,4,5] },
+            { label: 'ฝน (มิ.ย.–ต.ค.)',  m: [6,7,8,9,10] },
+          ];
+          const dowN = [0,0,0,0,0,0,0], dowCap = [0,0,0,0,0,0,0];
+          const seasonN = SEASONS.map(() => [0,0,0,0,0,0,0]);
+          const seasonCap = SEASONS.map(() => [0,0,0,0,0,0,0]);
+          const soldDates = [];
+          let soldFull = 0, soldNear = 0, nights30 = 0;
+          for (let d = d365; d < today; d = addDaysStr(d, 1)) {
+            const n = perDay[d] || 0, w = N(d).getUTCDay(), mo = Number(d.slice(5, 7));
+            dowN[w] += n; dowCap[w] += CAP;
+            const si = SEASONS.findIndex(s => s.m.includes(mo));
+            if (si >= 0) { seasonN[si][w] += n; seasonCap[si][w] += CAP; }
+            if (n >= CAP) { soldFull++; soldDates.push(d); }
+            else if (n >= CAP * 0.9) soldNear++;
+            if (d >= d30) nights30 += n;
+          }
+          const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+          const dowRows = dowN.map((v, i) => ({ n: v, cap: dowCap[i], pct: pct(v, dowCap[i]) }));
+          const seasonRows = SEASONS.map((s, i) => ({
+            label: s.label,
+            dow: seasonN[i].map((v, w) => ({ n: v, cap: seasonCap[i][w], pct: pct(v, seasonCap[i][w]) })),
+            n: seasonN[i].reduce((a, b) => a + b, 0),
+          }));
+
+          /* ── ข้างหน้า 90 วัน (ของจริงที่ตัดสินใจได้วันนี้) ── */
+          const forward = [];
+          let f30 = 0, f60 = 0, f90 = 0;
+          for (let i = 0; i < 90; i++) {
+            const d = addDaysStr(today, i), n = perDay[d] || 0;
+            forward.push({ d, n });
+            if (i < 30) f30 += n;
+            if (i < 60) f60 += n;
+            f90 += n;
+          }
+
+          /* ── Pace: on the books สำหรับ 90 วันข้างหน้า เทียบ ณ จุดเดียวกันปีที่แล้ว
+             ใช้ -364 วัน เพื่อให้วันในสัปดาห์ตรงกัน (52 สัปดาห์เป๊ะ) ── */
+          const ly = addDaysStr(today, -364);
+          const paceWin = asOf => {                        // คืนที่ "จองไว้แล้ว" ณ วันนั้น สำหรับ 90 วันถัดไป
+            const end = addDaysStr(asOf, 90);
+            let n = 0;
+            for (const b of bs) {
+              if (!roomSet.has(b.room)) continue;
+              const cd = (b.created || '').slice(0, 10);
+              if (!isDate(cd) || cd > asOf) continue;      // กฎเดียวกันทั้งสองฝั่ง = เทียบได้จริง
+              let d = b.checkin > asOf ? b.checkin : asOf;
+              while (d < b.checkout && d < end) { n++; d = addDaysStr(d, 1); }
+            }
+            return n;
+          };
+          const paceNow = paceWin(today), pacePrev = paceWin(ly);
+
+          /* ── ยกเลิก (แถวยังอยู่ใน DB — soft delete) ── */
+          const cxLead = [0,0,0,0,0,0];
+          let cxNights = 0, cxRecent = 0, allRecent = 0;
+          for (const b of cx) {
+            cxNights += nightsOf(b);
+            const ld = leadOf(b);
+            if (ld >= 0) cxLead[leadBucket(ld)]++;
+            if ((b.created || '').slice(0, 10) >= d365) cxRecent++;
+          }
+          for (const b of all) if ((b.created || '').slice(0, 10) >= d365) allRecent++;
+          const cancelRate = all.length ? cx.length / all.length : 0;
+          const cancelRecentPct = pct(cxRecent, allRecent);
+
+          /* ── รายเดือน 15 เดือน + ห้อง + ลูกค้าซ้ำ ── */
           const ymList = Object.keys(months).sort().slice(-15);
           const monthRows = ymList.map(ym => {
             const [y, m] = ym.split('-').map(Number);
-            const cap = new Date(Date.UTC(y, m, 0)).getUTCDate() * rooms.length;
-            return { ym, nights: months[ym], cap, pct: Math.round(months[ym] / cap * 100) };
+            const cap = new Date(Date.UTC(y, m, 0)).getUTCDate() * CAP;
+            return { ym, nights: months[ym], cap, pct: pct(months[ym], cap) };
           });
-          const roomRows = rooms.map(r => ({ id: r.id, name: r.name, nights: perRoom[r.id] || 0 }));
+          const roomRows = rooms.map(r => ({
+            id: r.id, name: r.name, nights: perRoom[r.id] || 0, pct: pct(perRoom[r.id] || 0, 365),
+          }));
           const repeatRows = Object.entries(repeat).filter(([, v]) => v.n >= 2)
             .sort((a, b) => b[1].n - a[1].n).slice(0, 12)
             .map(([ph, v]) => ({ phone: ph, n: v.n, name: v.name, last: v.last }));
+          /* ── เดือนนี้: แยก "ผ่านไปแล้วจริง" ออกจาก "ทั้งเดือนรวมจองล่วงหน้า"
+             เดิมเอาคืนทั้งเดือน ÷ ความจุเต็มเดือน ทำให้เดือนปัจจุบันดูต่ำเสมอ ── */
           const curYm = today.slice(0, 7);
           const cur = monthRows.find(x => x.ym === curYm);
-          return json({ ok: true, months: monthRows, dow, rooms: roomRows, lead, stay,
-            repeat: repeatRows, summary: {
+          let mtdN = 0, mtdDays = 0;
+          for (let d = curYm + '-01'; d.slice(0, 7) === curYm; d = addDaysStr(d, 1)) {
+            if (d >= today) break;
+            mtdN += perDay[d] || 0; mtdDays++;
+          }
+
+          return json({ ok: true,
+            months: monthRows, dow: dowRows, seasons: seasonRows, rooms: roomRows,
+            lead, stay, repeat: repeatRows, forward,
+            summary: {
               bookings: bs.length, totalNights, nights30, futureBookings,
-              curPct: cur ? cur.pct : 0, units: rooms.length } });
+              units: CAP, legacyNights, today,
+              curPct: cur ? cur.pct : 0,
+              curNights: cur ? cur.nights : 0, curCap: cur ? cur.cap : 0,
+              mtdPct: pct(mtdN, mtdDays * CAP), mtdDays,
+              f30: pct(f30, 30 * CAP), f60: pct(f60, 60 * CAP), f90: pct(f90, 90 * CAP),
+              soldFull, soldNear, soldDates: soldDates.slice(-14).reverse(),
+              paceNow, pacePrev, paceAdj: Math.round(paceNow * (1 - cancelRate)),
+              cancels: cx.length, cancelPct: Math.round(cancelRate * 100),
+              cancelRecentPct, cancelNights: cxNights, cancelLead: cxLead,
+            } });
         }
         case 'export': {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
