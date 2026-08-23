@@ -272,6 +272,7 @@ footer a{color:var(--glow)}
 .btn-call{background:var(--pine);color:var(--cream)}
 .rd-body p{margin-bottom:14px;color:var(--ink)}
 .rd-video{margin-top:26px}
+.rd-video video{width:100%;height:auto;display:block;aspect-ratio:9/16;object-fit:cover;background:var(--dusk-deep);border-radius:14px}
 /* ===== section รีวิวจากผู้เข้าพัก (Reel แนวตั้ง) ===== */
 #reviews{background:var(--cream)}
 .reel-row{display:flex;gap:22px;flex-wrap:wrap;margin-top:22px}
