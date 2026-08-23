@@ -44,7 +44,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--lantern)}
 .msg.ok{display:block;background:rgba(61,139,95,.2);color:#9fe0bd}
 
 /* ---- cinema grid ---- */
-.gridbox{overflow-x:auto;border:1px solid rgba(246,200,119,.25);border-radius:14px;background:rgba(245,239,227,.04)}
+.cal{transition:opacity .12s}
+    .gridbox{overflow-x:auto;border:1px solid rgba(246,200,119,.25);border-radius:14px;background:rgba(245,239,227,.04)}
 table.cal{border-collapse:collapse;min-width:100%}
 .cal th,.cal td{border:1px solid rgba(246,200,119,.12);padding:0;height:44px}
 .cal th{background:rgba(21,34,39,.9);font-family:'Mitr';font-weight:500;font-size:.72rem;color:var(--glow);padding:6px 4px;min-width:46px;position:sticky;top:0}
@@ -370,7 +371,7 @@ $('mSave').onclick = async () => {
     room: $('mRoom').value, checkin: $('mIn').value, checkout: $('mOut').value });
   if (r.ok) {
     m.className='msg ok'; m.textContent='เลื่อนเรียบร้อย ✓';
-    setTimeout(()=>{ closeSheets(); load(); if(view==='log') loadLog(); }, 600);
+    setTimeout(()=>{ closeSheets(); load(true); if(view==='log') loadLog(); }, 600);
     return;
   }
   m.className='msg err'; m.textContent = r.error || 'ไม่สำเร็จ';
@@ -584,7 +585,7 @@ $('uAdd').onclick = async () => {
   $('uName').value=''; $('uPass').value='';
   loadUsers();
 };
-$('btnRefresh').onclick = () => { load(); if (view==='log') loadLog(); };
+$('btnRefresh').onclick = () => { load(true); if (view==='log') loadLog(); };
 
 /* ================= 2 มุมมอง ================= */
 function setView(v){
@@ -626,18 +627,56 @@ async function loadLog(){
 }
 
 /* ================= data ================= */
-async function load(){
-  $('loading').style.display='block'; $('cal').style.display='none';
+/* โหลดทีเดียวได้ช่วง -60 ถึง +DAYS+90 วัน → กด ← → ในช่วงนี้วาดจาก memory ทันที ไม่ยิง API
+   ยิงใหม่เฉพาะตอนออกนอกช่วง หรือ load(true) หลังเพิ่ม/ย้าย/ยกเลิกการจอง */
+let dataFrom = null, dataTo = null, loadSeq = 0, prefetching = false;
+
+function haveRange(){
+  return rooms.length && dataFrom
+      && viewStart >= dataFrom && addDays(viewStart, DAYS-1) <= dataTo;
+}
+
+async function fetchWindow(){
+  const from = addDays(viewStart, -60), to = addDays(viewStart, DAYS+90);
+  const seq = ++loadSeq;
+  const needRooms = !rooms.length;                    // ห้องไม่เคยเปลี่ยน โหลดครั้งเดียวพอ
+  const calls = [api({action:'bookings', from, to})];
+  if (needRooms) calls.push(api({action:'rooms'}));
+  const [rb, rr] = await Promise.all(calls);
+  if (seq !== loadSeq) return;                        // มีคลิกใหม่แซงแล้ว ทิ้งผลเก่า กันจอกระพริบสลับไปมา
+  if (needRooms){ if(!rr.ok) throw new Error('unauthorized'); rooms = rr.rooms; }
+  if(!rb.ok) throw new Error('unauthorized');
+  bookings = rb.bookings; dataFrom = from; dataTo = to;
+}
+
+async function prefetch(){                            // ใกล้ขอบช่วงแล้ว เติมเงียบๆ ผู้ใช้ไม่เห็นอะไร
+  if (prefetching || !dataFrom) return;
+  if (addDays(viewStart,-14) >= dataFrom && addDays(viewStart, DAYS+14) <= dataTo) return;
+  prefetching = true;
+  try{ await fetchWindow(); }catch(e){}
+  finally{ prefetching = false; }
+}
+
+async function load(force){
+  $('rangeLabel').textContent = thDate(viewStart) + ' – ' + thDate(addDays(viewStart, DAYS-1));
+  $('calJump').value = viewStart;                     // ตอบสนองทันทีว่าคลิกติด ไม่ต้องรอ network
+  if (!force && haveRange()){ render(); prefetch(); return; }
+
+  const cal = $('cal'), warm = rooms.length && cal.style.display !== 'none';
+  if (warm){
+    cal.style.opacity = '.45';                        // มีของเก่าอยู่ → หรี่ไว้ ไม่ซ่อนทั้งตาราง
+  }else{
+    $('loading').textContent = 'กำลังโหลด…';          // reset ข้อความ error ที่เคยค้าง
+    $('loading').style.display='block'; cal.style.display='none';
+  }
   try{
-    const [rr, rb] = await Promise.all([
-      api({action:'rooms'}),
-      api({action:'bookings', from:addDays(viewStart,-60), to:addDays(viewStart, DAYS+90)})
-    ]);
-    if(!rr.ok || !rb.ok) throw new Error('unauthorized');
-    rooms = rr.rooms; bookings = rb.bookings;
+    await fetchWindow();
     render();
   }catch(e){
     $('loading').textContent = 'โหลดไม่สำเร็จ — เช็คการตั้งค่า ⚙︎ หรืออินเทอร์เน็ต';
+    $('loading').style.display='block'; cal.style.display='none';
+  }finally{
+    cal.style.opacity = '1';
   }
 }
 
@@ -847,7 +886,7 @@ $('fSave').onclick = async () => {
     const r = await api(p);
     if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
     m.className='msg ok'; m.textContent='บันทึกแล้ว ✓ ' + r.id;
-    setTimeout(()=>{ closeSheets(); load(); }, 700);
+    setTimeout(()=>{ closeSheets(); load(true); }, 700);
   }catch(e){ m.className='msg err'; m.textContent='ส่งไม่สำเร็จ ลองใหม่'; }
 };
 
@@ -885,7 +924,7 @@ $('dCancel').onclick = async () => {
     const r = await api({action:'cancel', id:currentId});
     if(!r.ok){ m.className='msg err'; m.textContent=r.error; return; }
     m.className='msg ok'; m.textContent='ยกเลิกแล้ว ✓';
-    setTimeout(()=>{ closeSheets(); load(); if(view==='log') loadLog(); }, 600);
+    setTimeout(()=>{ closeSheets(); load(true); if(view==='log') loadLog(); }, 600);
   }catch(e){ m.className='msg err'; m.textContent='ส่งไม่สำเร็จ ลองใหม่'; }
 };
 
