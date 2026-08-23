@@ -81,6 +81,8 @@
 /rooms/jaosua2/index.html  หน้า detail เฮือนเจ้าสัว 2 (twin ของ jaosua1)
 /rooms/choklap/index.html  หน้า detail เฮือนโชคลาภเงินทอง (R2)
 /availability/index.html   หน้าปฏิทินห้องว่างเต็มระบบ (body class="avpage")
+/tools/house-rules.html    บล็อกเงื่อนไขการจอง/กฎที่พัก (ไทย = ต้นฉบับ) — ฉีดด้วย tools/apply_house_rules.py
+/tools/apply_house_rules.py  ฉีดบล็อกลง rooms/*/index.html (idempotent, มี marker BEGIN/END)
 /assets/style.css      สไตล์รวม (โทน "ค่ำที่ทุ่งหวาย": เขียวสน/ฟ้าค่ำ/ส้มโคมหวาย/ครีม)
 /assets/lightbox.js    lightbox แกลเลอรีใช้ร่วมทุกหน้า (โหลดแบบ defer)
 /admin/index.html      หน้าจัดการจอง (สร้างเสร็จ รอ API) — noindex
@@ -102,7 +104,11 @@ Lightbox (19 ส.ค. 2026): คลิกรูปใน .gal-grid ขยาย�
 ในลิ้นชัก: โลโก้+ปุ่มปิด / ลิงก์ทุก section มีลูกศร → / ปุ่มภาษา (ย้ายจาก topbar มือถือ
 มาไว้ที่นี่ — topbar มือถือซ่อน .langs) / ปุ่มโทรจองล่างสุด — JS อยู่ใน lightbox.js (?v=3)
 หน้าใหม่: ก๊อป <button .menu-btn> (ตัวแรกใน .wrap) + บล็อก drawer หลัง </header>
-JS แยกเป็น /assets/lightbox.js — แก้ style.css เมื่อไรให้ bump `?v=` ที่ลิงก์ stylesheet (ตอนนี้ v=rd1)
+JS แยกเป็น /assets/lightbox.js — แก้ style.css เมื่อไรให้ bump `?v=` ที่ลิงก์ stylesheet (ตอนนี้ v=hr1)
+**บล็อกเงื่อนไขการจอง/กฎที่พัก (23 ส.ค. 2026):** อยู่ท้ายทุกหน้า rooms/* ก่อน <footer> — id=#house-rules
+แก้เนื้อหาที่ tools/house-rules.html ที่เดียว แล้วรัน `apply_house_rules.py --apply` ตามด้วย `build_i18n.py`
+ห้ามแก้ในหน้าเว็บตรงๆ (จะโดนทับ) · คำแปล EN/LO อยู่ dict `HR` ใน build_i18n.py · CSS อยู่ style.css ไม่ inline
+marker BEGIN/END ต้องเป็นอังกฤษล้วน — build_i18n.py ตัด comment ที่มีอักษรไทยทิ้ง
 **หน้า detail = หน้าปิดการขาย (กติกา 19 ส.ค. 2026):** การ์ดราคาต้องมีปุ่มครบ 5:
 โทรจอง / แอดไลน์ (lin.ee/tvjr6Fx) / ทักเพจ Messenger (**m.me เท่านั้น ห้ามลิงก์หน้าเพจ**)
 / เปิดแผนที่นำทาง / ดูปฏิทินห้องว่าง — เฮือนใหม่ทุกหลังยึดชุดนี้

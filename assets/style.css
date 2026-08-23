@@ -413,8 +413,31 @@ a.tl:hover .nm{color:var(--glow)}
 .avw-load{margin-top:34px;opacity:.7}
 
 /* ===== บีบระยะหัว section บนมือถือ (19 ส.ค. 2026 — Pist: เว้นหัวเยอะเกิน · ปรับซ้ำ 20 ส.ค. 2026: บีบช่องไฟระหว่าง section ทั้งหน้า) ===== */
+
+/* ===== เงื่อนไขการจอง/กฎที่พัก (หน้า rooms/*) — markup: tools/house-rules.html ===== */
+/* SPEC Rule 13 (ก): พื้นสีเดียวกันเป๊ะ (cream↔cream) → section หลัง pt:0 มีช่องเดียว */
+#house-rules{padding-top:0}
+.hrules-grid{
+  display:grid;gap:0 30px;margin-top:22px;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+}
+.hrules-item{padding:18px 0;border-bottom:1px solid var(--cream-2)}
+.hrules-item h3{font-size:1rem;margin:0 0 6px}
+.hrules-item p{margin:0 0 4px;font-size:.92rem;color:var(--ink-soft)}
+.hrules-item ul{margin:0;padding-left:18px}
+.hrules-item li{font-size:.92rem;line-height:1.7;color:var(--ink-soft);margin-bottom:4px}
+.hrules-fee{
+  display:inline-block;margin-top:6px;padding:3px 10px;border-radius:6px;
+  background:var(--white);border-left:3px solid var(--lantern);
+  font-family:'Mitr','Noto Sans Lao Looped',sans-serif;font-weight:500;
+  font-size:.86rem;color:var(--pine);
+}
+
 @media(max-width:720px){
   section{padding:32px 0 40px}
+  #house-rules{padding-top:0!important}
+  .hrules-grid{gap:0;margin-top:16px}
+  .hrules-item{padding:14px 0}
   #gallery[style],section[style*="padding-top"]{padding-top:32px!important}
   #resort-gallery{padding-top:0!important}
   #rooms,#dining{padding-bottom:20px}
