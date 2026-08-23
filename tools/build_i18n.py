@@ -15,6 +15,7 @@ PAGES = {  # th path → (en path, lo path)
     'rooms/choklap/index.html': ('en/rooms/choklap/index.html', 'lo/rooms/choklap/index.html'),
     'rooms/mahasetthi/index.html': ('en/rooms/mahasetthi/index.html', 'lo/rooms/mahasetthi/index.html'),
     'rooms/mahaheng/index.html': ('en/rooms/mahaheng/index.html', 'lo/rooms/mahaheng/index.html'),
+    'rooms/lamluay/index.html': ('en/rooms/lamluay/index.html', 'lo/rooms/lamluay/index.html'),
 }
 CANON = {  # canonical path ต่อภาษา
     'index.html': '/', 'availability/index.html': '/availability/',
@@ -23,6 +24,7 @@ CANON = {  # canonical path ต่อภาษา
     'rooms/choklap/index.html': '/rooms/choklap/',
     'rooms/mahasetthi/index.html': '/rooms/mahasetthi/',
     'rooms/mahaheng/index.html': '/rooms/mahaheng/',
+    'rooms/lamluay/index.html': '/rooms/lamluay/',
 }
 
 # ═══════════ ENGLISH ═══════════
@@ -313,6 +315,22 @@ EN = {
  'ภายในห้องน้ำเฮือนมหาเฮง เครื่องทำน้ำอุ่น อ่างล้างหน้า และผนังหินก่อ': 'Inside a Maha Heng bathroom — water heater, washbasin and dry-stone wall',
  'พักได้ 10 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'Sleeps 10 (extra bed available) · Check availability or ask us through any channel',
  'เฮือนมหาเฮง': 'Maha Heng House',
+ # ── เฮือนล้ำลวย (R6) ──
+ 'เฮือนล้ำลวย — บ้านพัก 1 ห้องนอน โซนหน้ารีสอร์ท | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Lam Luay House — 1-Bedroom House by the Resort Entrance | Thongwai Homestay, Paksong',
+ 'เฮือนล้ำลวยที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 1 ห้องนอน 1 ห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้) ระเบียงหน้าบ้าน โซนหน้ารีสอร์ท เริ่ม 800 บาท/คืน โทร +856 20 91 555 288': 'Lam Luay House at Thongwai Homestay, Paksong — 1 bedroom, 1 bathroom, sleeps 2 (extra bed available). Front terrace, by the resort entrance. From 800 THB/night. Call +856 20 91 555 288',
+ 'เฮือนล้ำลวย | ทุ่งหวายโฮมสเตย์ ปากซอง': 'Lam Luay House | Thongwai Homestay, Paksong',
+ 'บ้านพัก 1 ห้องนอน 1 ห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้) เริ่ม 800 บาท/คืน': '1 bedroom, 1 bathroom, sleeps 2 (extra bed available). From 800 THB/night.',
+ 'บ้านพัก 1 ห้องนอน 1 ห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้)': '1 bedroom, 1 bathroom, sleeps 2 (extra bed available)',
+ 'ห้องนอนเฮือนล้ำลวย ทุ่งหวายโฮมสเตย์ เตียงใหญ่ ผนังไม้ไผ่สานโทนเข้ม': 'Lam Luay House bedroom at Thongwai Homestay — large bed, dark woven-bamboo walls',
+ '👥 พักได้ 2 ท่าน': '👥 Sleeps 2', '🏡 โซนหน้ารีสอร์ท': '🏡 By the resort entrance',
+ 'บ้านพักหนึ่งห้องนอน': 'One-bedroom house',
+ 'หนึ่งห้องนอน หนึ่งห้องน้ำ สำหรับ 2 ท่าน': 'One bedroom, one bathroom, for 2 guests',
+ 'เฮือนล้ำลวยเป็นบ้านพัก<strong>หนึ่งห้องนอน หนึ่งห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้)</strong> อยู่โซนหน้ารีสอร์ท เหมาะกับคู่เดินทางที่ต้องการหลังเล็กเป็นส่วนตัว': 'Lam Luay House is a <strong>one-bedroom, one-bathroom house sleeping 2 (extra bed available)</strong>, set by the resort entrance — a small house to yourselves, suited to couples.',
+ 'ห้องนอนกรุผนังไม้ไผ่สานโทนเข้ม ปูพื้นไม้ เตียงใหญ่หัวเตียงไม้พร้อมเครื่องนอนครบ ผ้าคาดลายพื้นเมืองและหมอนอิง ผ้าม่านผ้าฝ้ายสีขาว และภาพเมล็ดกาแฟใส่กรอบแขวนข้างเตียง': 'The bedroom has dark woven-bamboo walls and a wooden floor, with a large bed and timber headboard, full bedding, a traditional-pattern runner and cushions, white cotton curtains, and a framed picture of coffee cherries beside the bed.',
+ 'ห้องน้ำในตัวกรุผนังด้วยไม้ไผ่ลำและกระเบื้องขาว ปูพื้นกระเบื้องลายไม้ มีเครื่องทำน้ำอุ่นพร้อมฝักบัว กระจก และสบู่-แชมพูติดผนัง': 'The en-suite bathroom is finished in bamboo poles and white tile with wood-effect floor tiles, and has a water heater with a shower, a mirror, and wall-mounted soap and shampoo.',
+ 'ห้องน้ำในตัวของเฮือนล้ำลวย ผนังไม้ไผ่ลำ เครื่องทำน้ำอุ่นพร้อมฝักบัว': 'The en-suite bathroom of Lam Luay House — bamboo-pole walls, water heater with shower',
+ 'พักได้ 2 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'Sleeps 2 (extra bed available) · Check availability or ask us through any channel',
+ 'เฮือนล้ำลวย': 'Lam Luay House',
 }
 
 # ═══════════ ລາວ ═══════════
@@ -588,6 +606,22 @@ LO = {
  'ภายในห้องน้ำเฮือนมหาเฮง เครื่องทำน้ำอุ่น อ่างล้างหน้า และผนังหินก่อ': 'ພາຍໃນຫ້ອງນ້ຳເຮືອນມະຫາເຮງ ເຄື່ອງເຮັດນ້ຳອຸ່ນ ອ່າງລ້າງໜ້າ ແລະ ຝາຫີນກໍ່',
  'พักได้ 10 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ 10 ທ່ານ (ເສີມຕຽງໄດ້) · ກວດສອບວັນວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
  'เฮือนมหาเฮง': 'ເຮືອນມະຫາເຮງ',
+ # ── เฮือนล้ำลวย (R6) ──
+ 'เฮือนล้ำลวย — บ้านพัก 1 ห้องนอน โซนหน้ารีสอร์ท | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນລ້ຳລວຍ — ເຮືອນພັກ 1 ຫ້ອງນອນ ໂຊນໜ້າທີ່ພັກ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'เฮือนล้ำลวยที่ทุ่งหวายโฮมสเตย์ ปากซอง — บ้านพัก 1 ห้องนอน 1 ห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้) ระเบียงหน้าบ้าน โซนหน้ารีสอร์ท เริ่ม 800 บาท/คืน โทร +856 20 91 555 288': 'ເຮືອນລ້ຳລວຍທີ່ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ — ເຮືອນພັກ 1 ຫ້ອງນອນ 1 ຫ້ອງນ້ຳ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້) ລະບຽງໜ້າເຮືອນ ໂຊນໜ້າທີ່ພັກ ເລີ່ມ 800 ບາດ/ຄືນ ໂທ +856 20 91 555 288',
+ 'เฮือนล้ำลวย | ทุ่งหวายโฮมสเตย์ ปากซอง': 'ເຮືອນລ້ຳລວຍ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ',
+ 'บ้านพัก 1 ห้องนอน 1 ห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้) เริ่ม 800 บาท/คืน': 'ເຮືອນພັກ 1 ຫ້ອງນອນ 1 ຫ້ອງນ້ຳ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້) ເລີ່ມ 800 ບາດ/ຄືນ',
+ 'บ้านพัก 1 ห้องนอน 1 ห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้)': 'ເຮືອນພັກ 1 ຫ້ອງນອນ 1 ຫ້ອງນ້ຳ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້)',
+ 'ห้องนอนเฮือนล้ำลวย ทุ่งหวายโฮมสเตย์ เตียงใหญ่ ผนังไม้ไผ่สานโทนเข้ม': 'ຫ້ອງນອນເຮືອນລ້ຳລວຍ ທົ່ງຫວາຍໂຮມສະເຕ ຕຽງໃຫຍ່ ຝາໄມ້ໄຜ່ສານໂທນເຂັ້ມ',
+ '👥 พักได้ 2 ท่าน': '👥 ພັກໄດ້ 2 ທ່ານ', '🏡 โซนหน้ารีสอร์ท': '🏡 ໂຊນໜ້າທີ່ພັກ',
+ 'บ้านพักหนึ่งห้องนอน': 'ເຮືອນພັກໜຶ່ງຫ້ອງນອນ',
+ 'หนึ่งห้องนอน หนึ่งห้องน้ำ สำหรับ 2 ท่าน': 'ໜຶ່ງຫ້ອງນອນ ໜຶ່ງຫ້ອງນ້ຳ ສຳລັບ 2 ທ່ານ',
+ 'เฮือนล้ำลวยเป็นบ้านพัก<strong>หนึ่งห้องนอน หนึ่งห้องน้ำ พักได้ 2 ท่าน (เสริมเตียงได้)</strong> อยู่โซนหน้ารีสอร์ท เหมาะกับคู่เดินทางที่ต้องการหลังเล็กเป็นส่วนตัว': 'ເຮືອນລ້ຳລວຍເປັນເຮືອນພັກ<strong>ໜຶ່ງຫ້ອງນອນ ໜຶ່ງຫ້ອງນ້ຳ ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້)</strong> ຢູ່ໂຊນໜ້າທີ່ພັກ ເໝາະກັບຄູ່ເດີນທາງທີ່ຕ້ອງການເຮືອນຫຼັງນ້ອຍເປັນສ່ວນຕົວ',
+ 'ห้องนอนกรุผนังไม้ไผ่สานโทนเข้ม ปูพื้นไม้ เตียงใหญ่หัวเตียงไม้พร้อมเครื่องนอนครบ ผ้าคาดลายพื้นเมืองและหมอนอิง ผ้าม่านผ้าฝ้ายสีขาว และภาพเมล็ดกาแฟใส่กรอบแขวนข้างเตียง': 'ຫ້ອງນອນກຸຝາໄມ້ໄຜ່ສານໂທນເຂັ້ມ ປູພື້ນໄມ້ ຕຽງໃຫຍ່ຫົວຕຽງໄມ້ພ້ອມເຄື່ອງນອນຄົບ ຜ້າຄາດລາຍພື້ນເມືອງ ແລະ ໝອນອີງ ຜ້າມ່ານຝ້າຍສີຂາວ ແລະ ຮູບແກ່ນກາເຟໃສ່ກອບແຂວນຂ້າງຕຽງ',
+ 'ห้องน้ำในตัวกรุผนังด้วยไม้ไผ่ลำและกระเบื้องขาว ปูพื้นกระเบื้องลายไม้ มีเครื่องทำน้ำอุ่นพร้อมฝักบัว กระจก และสบู่-แชมพูติดผนัง': 'ຫ້ອງນ້ຳໃນຕົວກຸຝາດ້ວຍລຳໄມ້ໄຜ່ ແລະ ກະເບື້ອງຂາວ ປູພື້ນກະເບື້ອງລາຍໄມ້ ມີເຄື່ອງເຮັດນ້ຳອຸ່ນພ້ອມຝັກບົວ ແວ່ນ ແລະ ສະບູ-ແຊມພູຕິດຝາ',
+ 'ห้องน้ำในตัวของเฮือนล้ำลวย ผนังไม้ไผ่ลำ เครื่องทำน้ำอุ่นพร้อมฝักบัว': 'ຫ້ອງນ້ຳໃນຕົວຂອງເຮືອນລ້ຳລວຍ ຝາລຳໄມ້ໄຜ່ ເຄື່ອງເຮັດນ້ຳອຸ່ນພ້ອມຝັກບົວ',
+ 'พักได้ 2 ท่าน (เสริมเตียงได้) · ตรวจสอบวันว่างหรือสอบถามเพิ่มเติมได้ทุกช่องทาง': 'ພັກໄດ້ 2 ທ່ານ (ເສີມຕຽງໄດ້) · ກວດສອບວັນວ່າງ ຫຼື ສອບຖາມເພີ່ມເຕີມໄດ້ທຸກຊ່ອງທາງ',
+ 'เฮือนล้ำลวย': 'ເຮືອນລ້ຳລວຍ',
 }
 
 # ═══════════ house rules — เงื่อนไขการจอง/กฎที่พัก (markup: tools/house-rules.html) ═══════════
@@ -679,7 +713,7 @@ def build(th_path, lang, D):
     # ลิงก์ใน JS literals (การ์ดปฏิทิน + ป้ายการ์ดหน้าแรก) — รูรั่วที่ทำให้ภาษาไม่ติดตาม
     for js_path in ("'/availability/'", "'/rooms/jaosua1/'", "'/rooms/jaosua2/'", "'/rooms/tent/'",
                     "'/rooms/udomsuk/'", "'/rooms/mangkhang/'", "'/rooms/choklap/'",
-                    "'/rooms/mahasetthi/'", "'/rooms/mahaheng/'"):
+                    "'/rooms/mahasetthi/'", "'/rooms/mahaheng/'", "'/rooms/lamluay/'"):
         h = h.replace(js_path, f"'/{lang}" + js_path[1:])
     h = re.sub(r'<div class="langs">.*?</div>', '<div class="langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
     h = re.sub(r'<div class="mnav-langs">.*?</div>', '<div class="mnav-langs">' + lang_pills(lang, th_path) + '</div>', h, flags=re.S)
