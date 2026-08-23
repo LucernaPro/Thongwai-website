@@ -132,10 +132,22 @@ if (location.hostname.endsWith('workers.dev')) {
         <p>เฮือนเจ้าสัว 1 เป็นบ้านไม้ทรงจั่วสูงตั้งอยู่ริมลำธารใต้ร่มไม้ใหญ่ ห้องนอนมีประตูบานคู่เปิดออกสู่ระเบียงไม้ด้านหลังได้โดยตรง</p>
         <p>ระเบียงหลังบ้านหันสู่ลำธาร พร้อมชุดโต๊ะและเก้าอี้ไม้สำหรับนั่งพักผ่อนริมน้ำ ท่ามกลางเสียงลำธารที่ไหลผ่านด้านล่าง</p>
 
-        <!-- VIDEO: เมื่อมีคลิปห้องนี้ ให้วางโค้ด embed ในบล็อกด้านล่างแล้วลบ display:none ออก -->
-        <div class="rd-video" style="display:none">
+        <div class="rd-video">
           <h3 style="margin-bottom:10px">พาชมบ้าน</h3>
-          <!-- วาง iframe คลิปตรงนี้ -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+            <div>
+              <video controls playsinline preload="metadata" poster="/images/jaosua-bedroom-poster.webp" width="720" height="1280" style="width:100%;border-radius:14px;background:#000">
+                <source src="/videos/jaosua-bedroom.mp4" type="video/mp4">
+              </video>
+              <div style="text-align:center;font-size:.85rem;opacity:.75;margin-top:6px">ห้องนอน</div>
+            </div>
+            <div>
+              <video controls playsinline preload="metadata" poster="/images/jaosua-bathroom-poster.webp" width="720" height="1280" style="width:100%;border-radius:14px;background:#000">
+                <source src="/videos/jaosua-bathroom.mp4" type="video/mp4">
+              </video>
+              <div style="text-align:center;font-size:.85rem;opacity:.75;margin-top:6px">ห้องน้ำ</div>
+            </div>
+          </div>
         </div>
 
         <h3 style="margin:26px 0 4px">ภาพบรรยากาศ</h3>
