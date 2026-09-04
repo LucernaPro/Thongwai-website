@@ -124,7 +124,10 @@ Section รีวิว #reviews (19 ส.ค. 2026): อยู่ถัดจา
 สเปคคลิป: H.264 high + AAC + `-movflags +faststart` แนวตั้ง 720x1280, **ต้อง <24MB**
 (ลิมิต Cloudflare Workers 25MiB/ไฟล์) + poster webp จากเฟรมจริงใน /images/
 (ห้าม poster จอดำ) — คลิปปัจจุบัน: review-resort-tour.mp4 (พาชมรีสอร์ท+เฮือน),
-review-tent.mp4 (รีวิวเต็นท์ ชุดขาว) ทั้งคู่รีวิวจากผู้เข้าพัก / เพิ่มคลิปใหม่:
+review-tent.mp4 (รีวิวเต็นท์ ชุดขาว) ทั้งคู่รีวิวจากผู้เข้าพัก,
+breakfast.mp4 (4 ก.ย. 2026 — คลิปอาหารเช้า caption = รายการเมนู 9 อย่างตาม Pist:
+สลัด ข้าวผัด ข้าวต้ม ไส้กรอก ไข่ดาว ผลไม้ ของหวาน ขนมปัง น้ำผลไม้ — แก้เมนูที่ .cap span
+ใน index.html + คู่แปล EN/LO ใน build_i18n.py แล้วรัน build) / เพิ่มคลิปใหม่:
 ก๊อป .reel-card ตาม comment ในโค้ด
 รูปเฮือนเจ้าสัว (19 ส.ค. 2026): jaosua-balcony.webp (ระเบียงหลังบ้าน A-frame),
 jaosua-river-deck.webp (ระเบียงริมลำธาร) — ใช้ในแกลเลอรีหน้า detail ทั้งสองหลัง
