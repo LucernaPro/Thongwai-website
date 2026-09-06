@@ -42,6 +42,12 @@
   .fi{width:100%;padding:11px 12px;border:1px solid var(--cream2);border-radius:9px;
       font-family:inherit;font-size:16px;background:var(--cream)}
   .fmsg{margin:10px 0 0;font-size:.85rem;color:var(--red)}
+  .wide{display:block;margin-top:8px;padding:12px;border-radius:10px;text-align:center;
+    text-decoration:none;font-weight:600;font-size:.9rem;border:1px solid var(--cream2);
+    background:var(--white);color:var(--pine)}
+  .links{display:flex;gap:18px;justify-content:center;margin-top:18px;
+    padding-top:16px;border-top:1px solid var(--cream2)}
+  .links a{color:var(--soft);font-size:.86rem;text-decoration:none;border-bottom:1px solid var(--cream2)}
   .langs{display:flex;gap:8px;justify-content:center;margin-top:18px}
   .langs a{padding:5px 14px;border-radius:99px;border:1px solid var(--cream2);
     background:var(--white);color:var(--soft);text-decoration:none;font-size:.82rem}
@@ -70,6 +76,7 @@ const lang = pickLang();
 
 const T = {
   th:{ wait:'ได้รับสลิปแล้ว รอตรวจสอบ', waitSub:'ทางที่พักจะตรวจสอบยอดและยืนยันให้ กรุณาเก็บลิงก์นี้ไว้เพื่อดูสถานะ',
+       home:'กลับหน้าแรก', rooms:'ดูห้องพักทั้งหมด', avail:'เช็คห้องว่าง', map:'เส้นทางไปที่พัก',
        find:'ตรวจสอบสถานะการจอง', findSub:'กรอกชื่อผู้จองและเลขท้ายเบอร์โทร 4 ตัว',
        fName:'ชื่อผู้จอง', fLast4:'เลขท้ายเบอร์โทร 4 ตัว', fGo:'ค้นหา',
        fNone:'ไม่พบการจอง กรุณาตรวจสอบชื่อและเบอร์โทรอีกครั้ง หรือติดต่อทางที่พัก',
@@ -82,6 +89,7 @@ const T = {
        paid:'มัดจำที่ชำระ', ref:'เลขที่การจอง', call:'โทรหาที่พัก', line:'แชทไลน์',
        n:'คืน', save:'บันทึกลิงก์หน้านี้ไว้ หรือแคปหน้าจอเก็บไว้' },
   en:{ wait:'Slip received — being checked', waitSub:'We are verifying your transfer. Keep this link to follow the status.',
+       home:'Back to home', rooms:'See all rooms', avail:'Check availability', map:'Get directions',
        find:'Check your booking', findSub:'Enter the guest name and the last 4 digits of the phone number',
        fName:'Guest name', fLast4:'Last 4 digits of phone', fGo:'Search',
        fNone:'No booking found. Check the name and number, or contact us.',
@@ -94,6 +102,7 @@ const T = {
        paid:'Deposit paid', ref:'Booking ref', call:'Call us', line:'Chat on LINE',
        n:'nights', n1:'night', save:'Save this link or take a screenshot' },
   lo:{ wait:'ໄດ້ຮັບສະລິບແລ້ວ ລໍຖ້າກວດສອບ', waitSub:'ທາງທີ່ພັກຈະກວດສອບຍອດ ແລະ ຢືນຢັນໃຫ້ ກະລຸນາເກັບລິ້ງນີ້ໄວ້',
+       home:'ກັບໜ້າຫຼັກ', rooms:'ເບິ່ງຫ້ອງພັກທັງໝົດ', avail:'ກວດຫ້ອງວ່າງ', map:'ເສັ້ນທາງໄປທີ່ພັກ',
        find:'ກວດສອບສະຖານະການຈອງ', findSub:'ຕື່ມຊື່ຜູ້ຈອງ ແລະ ເລກທ້າຍເບີໂທ 4 ໂຕ',
        fName:'ຊື່ຜູ້ຈອງ', fLast4:'ເລກທ້າຍເບີໂທ 4 ໂຕ', fGo:'ຄົ້ນຫາ',
        fNone:'ບໍ່ພົບການຈອງ ກະລຸນາກວດຊື່ ແລະ ເບີໂທອີກຄັ້ງ ຫຼື ຕິດຕໍ່ທາງທີ່ພັກ',
@@ -120,15 +129,27 @@ const esc = t => String(t??'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','
 const num = n => Number(n||0).toLocaleString('en-US');
 const nights = (a,b) => Math.max(1, Math.round((new Date(b)-new Date(a))/864e5));
 
+const base = lang === 'th' ? '' : '/' + lang;      // /en/... , /lo/... , ไทยอยู่ราก
+
+// ทางออกจากหน้านี้ — ไม่ปล่อยให้ลูกค้าตัน ต้องมีที่ไปต่อเสมอ
+function exits(kind){
+  return `<div class="cta">
+       <a class="btn main" href="tel:+8562091555288">${esc(T.call)}</a>
+       <a class="btn" href="https://lin.ee/tvjr6Fx">${esc(T.line)}</a>
+     </div>
+     ${kind === 'ok' ? `<a class="wide" href="https://maps.app.goo.gl/7SpH7qq64s1iKQvr7">${esc(T.map)}</a>` : ''}
+     <div class="links">
+       <a href="${base}/">${esc(T.home)}</a>
+       <a href="${base}/availability/">${esc(T.avail)}</a>
+     </div>`;
+}
+
 function shell(kind, title, sub, inner){
   const icon = { ok:'✓', wait:'⏳', no:'✕' }[kind];
   document.getElementById('out').innerHTML =
     `<div class="state"><span class="dot ${kind}">${icon}</span><h1>${esc(title)}</h1></div>
      <p class="sub">${esc(sub)}</p>${inner||''}
-     <div class="cta">
-       <a class="btn main" href="tel:+8562091555288">${esc(T.call)}</a>
-       <a class="btn" href="https://lin.ee/tvjr6Fx">${esc(T.line)}</a>
-     </div>`;
+     ${exits(kind)}`;
 }
 
 function findForm(msg){
@@ -139,10 +160,7 @@ function findForm(msg){
      <input class="fi" id="fLast4" inputmode="numeric" maxlength="4">
      ${msg ? `<p class="fmsg">${esc(msg)}</p>` : ''}
      <button class="btn main" id="fGo" style="width:100%;margin-top:16px;border:0;cursor:pointer;font-family:inherit">${esc(T.fGo)}</button>
-     <div class="cta">
-       <a class="btn" href="tel:+8562091555288">${esc(T.call)}</a>
-       <a class="btn" href="https://lin.ee/tvjr6Fx">${esc(T.line)}</a>
-     </div>`;
+     ${exits('wait')}`;
   document.getElementById('fGo').onclick = async () => {
     const n = document.getElementById('fName').value.trim();
     const l = document.getElementById('fLast4').value.trim();
@@ -162,11 +180,7 @@ function findForm(msg){
           <dt>${esc(T.paid)}</dt><dd class="big">฿${num(b.amount)}</dd>
           <dt>${esc(T.ref)}</dt><dd>${esc(b.id)}</dd>
         </dl>
-        <p class="ref"><b>${esc(label[b.state] || '')}</b></p>`).join('') +
-      `<div class="cta">
-         <a class="btn main" href="tel:+8562091555288">${esc(T.call)}</a>
-         <a class="btn" href="https://lin.ee/tvjr6Fx">${esc(T.line)}</a>
-       </div>`;
+        <p class="ref"><b>${esc(label[b.state] || '')}</b></p>`).join('') + exits('wait');
   };
 }
 
