@@ -435,9 +435,10 @@ a.tl:hover .nm{color:var(--glow)}
 
 
 /* ===== จองออนไลน์ + ชำระมัดจำ (หน้า availability) ===== */
-.avw-book{margin-top:8px;width:100%;padding:9px;border:0;border-radius:8px;
-  background:var(--pine);color:#fff;font-family:inherit;font-weight:500;font-size:.88rem;cursor:pointer}
-.avw-book:hover{background:#25603c}
+.avw-book{margin-top:8px;width:100%;padding:9px;border:1px solid rgba(246,200,119,.45);
+  border-radius:8px;background:transparent;color:var(--glow);font-family:inherit;
+  font-weight:500;font-size:.82rem;cursor:pointer}
+.avw-book:hover{background:rgba(246,200,119,.12)}
 .bk-scrim{position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:60}
 .bk{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);
   width:min(420px,calc(100vw - 28px));max-height:88vh;overflow:auto;
@@ -459,6 +460,23 @@ a.tl:hover .nm{color:var(--glow)}
 .bk .bk-up{color:var(--pine)}
 .bk .bk-ok{color:#fff}
 /* การ์ดเงื่อนไขยกเลิก — ต้องเห็นชัดก่อนจ่ายเงิน */
+/* บล็อกเลือกวิธีจอง — ทักแชทมาก่อน จองเองเป็นทางเลือกรอง */
+.bway{margin-top:26px;padding:24px 20px;border-radius:16px;
+  background:rgba(246,200,119,.10);border:1px solid rgba(246,200,119,.35)}
+.bway-h{margin:0;font-family:'Mitr','Noto Sans Lao Looped',sans-serif;font-size:1.25rem;
+  font-weight:600;color:var(--glow);line-height:1.4}
+.bway-s{margin:6px 0 16px;font-size:.92rem;color:rgba(245,239,227,.8)}
+.bway-btns{display:flex;gap:10px;flex-wrap:wrap}
+.bway-b{flex:1 1 180px;padding:15px 18px;border-radius:12px;text-align:center;
+  text-decoration:none;font-family:'Mitr','Noto Sans Lao Looped',sans-serif;font-weight:500;
+  font-size:1rem;background:rgba(245,239,227,.08);border:1px solid rgba(246,200,119,.45);
+  color:var(--cream)}
+.bway-b.line{background:var(--lantern);border-color:var(--lantern);color:#3a2408;font-weight:600}
+@media(max-width:600px){
+  .bway{padding:20px 16px}
+  .bway-h{font-size:1.1rem}
+  .bway-b{flex:1 1 100%;padding:14px}
+}
 .avw-or{margin:30px 0 12px;padding-top:22px;border-top:1px solid rgba(246,200,119,.25);
   text-align:center;font-size:.92rem;color:rgba(245,239,227,.85)}
 .bk .bk-alt2{margin:14px 0 0;text-align:center;font-size:.85rem;color:var(--ink-soft)}

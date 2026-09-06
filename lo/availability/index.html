@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=alt1">
+<link rel="stylesheet" href="/assets/style.css?v=bw1">
 </head>
 <body class="avpage">
 
@@ -101,6 +101,16 @@ if (location.hostname.endsWith('workers.dev')) {
     <h2 style="color:var(--white)">ເລືອກວັນທີເຂົ້າພັກ</h2>
     <p class="lead">ເລືອກວັນທີໃນປະຕິທິນເພື່ອກວດເບິ່ງຫ້ອງວ່າງຂອງທຸກເຮືອນ ແລະ ເຕັນ ກວດລ່ວງໜ້າໄດ້ສູງສຸດ 3 ເດືອນ</p>
 
+    <div class="bway">
+      <p class="bway-h">ຈອງງ່າຍທີ່ສຸດ — ທັກມາລົມກັບເຈົ້າຂອງ</p>
+      <p class="bway-s">ສອບຖາມໄດ້ທຸກເລື່ອງ ເຈົ້າຂອງຈັດການຈອງໃຫ້ທັງໝົດ</p>
+      <div class="bway-btns">
+        <a class="bway-b line" href="https://lin.ee/tvjr6Fx">ແອດ LINE ຈອງ</a>
+        <a class="bway-b" href="https://m.me/thongwaihomestay">ທັກ Facebook</a>
+        <a class="bway-b" href="tel:+8562091555288">ໂທ +856 20 91 555 288</a>
+      </div>
+    </div>
+
     <div class="avw-load" id="avwLoad">ກຳລັງໂຫຼດປະຕິທິນ…</div>
 
     <div class="avw" id="avw" style="display:none">
@@ -115,7 +125,7 @@ if (location.hostname.endsWith('workers.dev')) {
       <div class="avw-grid" id="avwGrid"></div>
       <div class="avw-sel" id="avwSel"></div>
       <div class="avw-rooms" id="avwRooms"></div>
-      <p class="avw-or">ຫຼື ໃຫ້ເຈົ້າຂອງຈອງໃຫ້ — ທັກມາລົມກ່ອນໄດ້ ບໍ່ຕ້ອງຈອງເອງ</p>
+      <p class="avw-or">ຕິດຕໍ່ເຈົ້າຂອງໄດ້ທຸກຊ່ອງທາງ ຫຼື ກວດສອບການຈອງທີ່ເຮັດໄວ້ແລ້ວ</p>
       <div class="avw-cta">
         <a class="btn btn-lantern" href="tel:+8562091555288">ໂທຈອງ +856 20 91 555 288</a>
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">ແອດ LINE ຈອງ</a>
@@ -240,7 +250,7 @@ const AVW_DAYS = 92;
         (url ? `<a class="tl" href="${url}">${inner}</a>` : `<span class="tl">${inner}</span>`) +
         `<span class="avw-pill ${busy ? 'full' : 'free'}">${busy ? 'ເຕັມ' : 'ວ່າງ'}</span>` +
         (busy && nf ? `<button class="avw-next" data-d="${nf}">ວ່າງຖັດໄປ ${thDate(nf)} →</button>` : '') +
-        (busy ? '' : `<button class="avw-book" data-book="${r.id}">ຈອງເລີຍ</button>`) +
+        (busy ? '' : `<button class="avw-book" data-book="${r.id}">ຈອງເອງທັນທີ · ຈ່າຍຜ່ານ QR</button>`) +
       `</div>`;
     }).join('');
   };

@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=alt1">
+<link rel="stylesheet" href="/assets/style.css?v=bw1">
 </head>
 <body class="avpage">
 
@@ -97,6 +97,16 @@ if (location.hostname.endsWith('workers.dev')) {
     <h2 style="color:var(--white)">เลือกวันที่เข้าพัก</h2>
     <p class="lead">เลือกวันที่ในปฏิทินเพื่อตรวจสอบห้องว่างของทุกเฮือนและเต็นท์ ตรวจสอบล่วงหน้าได้สูงสุด 3 เดือน</p>
 
+    <div class="bway">
+      <p class="bway-h">จองง่ายที่สุด — ทักมาคุยกับเจ้าของ</p>
+      <p class="bway-s">สอบถามได้ทุกเรื่อง เจ้าของจัดการจองให้ทั้งหมด</p>
+      <div class="bway-btns">
+        <a class="bway-b line" href="https://lin.ee/tvjr6Fx">แอดไลน์จอง</a>
+        <a class="bway-b" href="https://m.me/thongwaihomestay">ทัก Facebook</a>
+        <a class="bway-b" href="tel:+8562091555288">โทร +856 20 91 555 288</a>
+      </div>
+    </div>
+
     <div class="avw-load" id="avwLoad">กำลังโหลดปฏิทิน…</div>
 
     <div class="avw" id="avw" style="display:none">
@@ -111,7 +121,7 @@ if (location.hostname.endsWith('workers.dev')) {
       <div class="avw-grid" id="avwGrid"></div>
       <div class="avw-sel" id="avwSel"></div>
       <div class="avw-rooms" id="avwRooms"></div>
-      <p class="avw-or">หรือให้เจ้าของจองให้ — ทักมาคุยก่อนได้ ไม่ต้องจองเอง</p>
+      <p class="avw-or">ติดต่อเจ้าของได้ทุกช่องทาง หรือตรวจสอบการจองที่ทำไว้แล้ว</p>
       <div class="avw-cta">
         <a class="btn btn-lantern" href="tel:+8562091555288">โทรจอง +856 20 91 555 288</a>
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">แอดไลน์จอง</a>
@@ -235,7 +245,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
         (url ? `<a class="tl" href="${url}">${inner}</a>` : `<span class="tl">${inner}</span>`) +
         `<span class="avw-pill ${busy ? 'full' : 'free'}">${busy ? 'เต็ม' : 'ว่าง'}</span>` +
         (busy && nf ? `<button class="avw-next" data-d="${nf}">ว่างถัดไป ${thDate(nf)} →</button>` : '') +
-        (busy ? '' : `<button class="avw-book" data-book="${r.id}">จองเลย</button>`) +
+        (busy ? '' : `<button class="avw-book" data-book="${r.id}">จองเองทันที · จ่ายผ่าน QR</button>`) +
       `</div>`;
     }).join('');
   };
