@@ -441,7 +441,23 @@ a.tl:hover .nm{color:var(--glow)}
 .bk-scrim{position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:60}
 .bk{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);
   width:min(420px,calc(100vw - 28px));max-height:88vh;overflow:auto;
-  background:var(--cream);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+  background:var(--cream);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.3);
+  /* ต้องกำหนดเอง — หน้านี้ body.avpage เป็นธีมมืด สืบทอดมาจะได้ตัวหนังสือสีครีมบนพื้นครีม */
+  color:var(--ink)}
+.bk *{color:inherit}
+.bk .bk-x,.bk .bk-l,.bk .bk-dates,.bk .bk-note,.bk .bk-how,.bk .bk-sum span,
+.bk .bk-item p,.bk .bk-item li{color:var(--ink-soft)}
+.bk .bk-sum b.hi,.bk .bk-amt,.bk .bk-alt b{color:var(--pine)}
+.bk .bk-err{color:#c1462d}
+.bk .bk-clock b{color:#c1462d}
+.bk .bk-go{color:#3a2408}
+.bk .bk-go.ghost{color:var(--ink-soft)}
+.bk .bk-save{color:var(--pine)}
+.bk .bk-resume{color:#2f7d4f}
+.bk .bk-tabs button{color:var(--ink-soft)}
+.bk .bk-tabs button.on{color:#fff}
+.bk .bk-up{color:var(--pine)}
+.bk .bk-ok{color:#fff}
 .bk-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--cream-2);
   position:sticky;top:0;background:var(--cream);border-radius:16px 16px 0 0}
 .bk-head b{flex:1;font-size:1rem}
