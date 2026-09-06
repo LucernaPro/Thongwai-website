@@ -91,8 +91,9 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400" title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.2</small></h1>
+  <h1>ทุ่งหวายโฮมสเตย์ · การจอง <small style="opacity:.5;font-size:.6em;font-weight:400" title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.3</small></h1>
   <span class="pill" id="whoami"></span>
+  <a id="slipBell" href="/admin/slips/" title="ตรวจสลิป" style="display:none;text-decoration:none;background:#e8963e;color:#fff;border-radius:99px;padding:4px 11px;font-size:.85rem;font-weight:600">🔔 <span id="slipN">0</span> สลิป</a>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
   <a id="btnStats" href="/analyze/" title="วิเคราะห์ (เจ้าของ)" style="display:none;text-decoration:none">📊</a>
   <button id="btnExport" title="ดาวน์โหลดสำรองการจองทั้งหมด (CSV)" style="display:none">⬇</button>
@@ -586,6 +587,20 @@ $('uAdd').onclick = async () => {
   loadUsers();
 };
 $('btnRefresh').onclick = () => { load(true); if (view==='log') loadLog(); };
+
+/* ── ป้ายสลิปรอตรวจ — poll เบาๆ ทุก 45 วิ ไม่กระทบตารางที่กำลังดูอยู่ ── */
+async function pollSlips(){
+  if (document.hidden || !store.user) return;
+  try{
+    const r = await api({action:'pending'});
+    if (!r.ok) return;
+    const n = r.waiting || 0;
+    $('slipN').textContent = n;
+    $('slipBell').style.display = n ? 'inline-block' : 'none';
+    document.title = n ? `(${n}) ทุ่งหวาย · จัดการการจอง` : 'ทุ่งหวาย · จัดการการจอง';
+  }catch(e){}
+}
+pollSlips(); setInterval(pollSlips, 45000);
 
 /* ================= 2 มุมมอง ================= */
 function setView(v){

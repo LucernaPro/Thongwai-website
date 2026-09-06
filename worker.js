@@ -450,6 +450,41 @@ async function slipImage(db, p, env) {
   return new Response(obj.body, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'private, max-age=3600' } });
 }
 
+
+/* ══════════════ ตรวจสลิป (หลัง login) ══════════════ */
+
+// รายการที่จ่ายแล้วรอตรวจ + ที่ยังถือห้องอยู่ (ยังไม่จ่าย) เพื่อให้เห็นภาพรวม
+async function pendingSlips(db) {
+  await sweepHolds(db);
+  const rows = (await db.prepare(
+    `SELECT b.id,b.room,r.name AS roomName,b.checkin,b.checkout,b.name,b.phone,
+            b.amount,b.pay,b.created,b.expires,b.slip
+     FROM bookings b LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.pay IN ('slip','hold')
+     ORDER BY CASE b.pay WHEN 'slip' THEN 0 ELSE 1 END, b.created`).all()).results;
+  return { ok: true, rows, waiting: rows.filter(r => r.pay === 'slip').length };
+}
+
+// พนักงานยืนยัน — pay = NULL แปลว่ากลายเป็นการจองปกติเหมือนที่คีย์มือ
+async function confirmSlip(db, p, me) {
+  const res = await db.prepare(
+    `UPDATE bookings SET pay = NULL, expires = NULL, staff = ?
+     WHERE id = ? AND pay = 'slip' AND status = 'จอง'`)
+    .bind(me.username, p.get('id') || '').run();
+  return res.meta.changes ? { ok: true } : { ok: false, error: 'รายการนี้ถูกจัดการไปแล้ว' };
+}
+
+// ปฏิเสธ/ยกเลิก — ปล่อยห้องคืนทันที บันทึกเหตุผลไว้ (เผื่อต้องโอนคืน)
+async function rejectSlip(db, p, me) {
+  const reason = (p.get('reason') || '').slice(0, 200);
+  const res = await db.prepare(
+    `UPDATE bookings SET status = 'ยกเลิก', pay = 'ปฏิเสธ', staff = ?,
+       note = COALESCE(note,'') || ' · ปฏิเสธสลิป: ' || ?
+     WHERE id = ? AND status = 'จอง' AND pay IN ('slip','hold')`)
+    .bind(me.username, reason || 'ไม่ระบุเหตุผล', p.get('id') || '').run();
+  return res.meta.changes ? { ok: true } : { ok: false, error: 'รายการนี้ถูกจัดการไปแล้ว' };
+}
+
 /* ── router ── */
 export default {
   async fetch(request, env, ctx) {
@@ -479,6 +514,9 @@ export default {
           return json({ ok: true, rooms });
         }
         case 'slipimg': return await slipImage(env.DB, p, env);
+        case 'pending':  return json(await pendingSlips(env.DB));
+        case 'slipok':   { const r = await confirmSlip(env.DB, p, me); await auditLog(env, ctx, me.username, 'ยืนยันสลิป', p.get('id'), {}); return json(r); }
+        case 'slipno':   { const r = await rejectSlip(env.DB, p, me);  await auditLog(env, ctx, me.username, 'ปฏิเสธสลิป', p.get('id'), { reason: p.get('reason') }); return json(r); }
         case 'bookings': return json(await listBookings(env.DB, p));
         case 'booked_on': {
           const dt = p.get('date');

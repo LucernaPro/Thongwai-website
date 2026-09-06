@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2e4a38">
+<title>ทุ่งหวาย · ตรวจสลิป</title>
+<style>
+  :root{--ink:#2b2b2b;--soft:#6b6b6b;--line:#e2ddd3;--cream:#f5efe3;--white:#fff;
+        --pine:#2e4a38;--lantern:#e8963e;--red:#c1462d;--green:#2f7d4f}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);
+       font-family:'Mitr',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px}
+  header{background:var(--pine);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;
+         position:sticky;top:0;z-index:5}
+  header h1{margin:0;font-size:1.05rem;font-weight:600;flex:1}
+  header a,header button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:8px;
+         padding:6px 12px;font:inherit;font-size:.85rem;cursor:pointer;text-decoration:none}
+  .wrap{max-width:900px;margin:0 auto;padding:16px}
+  .msg{padding:14px;border-radius:10px;background:var(--white);border:1px solid var(--line);color:var(--soft)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden}
+  .card.waiting{border-left:4px solid var(--lantern)}
+  .card.hold{border-left:4px solid var(--line);opacity:.85}
+  .top{display:flex;gap:12px;padding:14px;flex-wrap:wrap}
+  .info{flex:1;min-width:210px}
+  .info h2{margin:0 0 4px;font-size:1rem;font-weight:600}
+  .info p{margin:2px 0;font-size:.87rem;color:var(--soft)}
+  .amt{font-size:1.3rem;font-weight:600;color:var(--pine);white-space:nowrap}
+  .amt small{display:block;font-size:.72rem;color:var(--soft);font-weight:400}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:99px;margin-bottom:6px}
+  .tag.pay{background:#fdf1e3;color:#a35d12}
+  .tag.hold{background:#f0efec;color:var(--soft)}
+  .slip{display:block;width:100%;max-width:330px;margin:0 14px 14px;border:1px solid var(--line);border-radius:8px}
+  .acts{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap}
+  .btn{flex:1;min-width:130px;padding:11px;border:0;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
+  .ok{background:var(--green);color:#fff}
+  .no{background:var(--white);color:var(--red);border:1px solid var(--red)}
+  .hint{font-size:.8rem;color:var(--soft);margin:0 0 14px}
+  @media(max-width:600px){ .slip{max-width:100%} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.0</small></h1>
+  <button id="refresh" title="โหลดใหม่">⟳</button>
+  <a href="/admin/">← การจอง</a>
+</header>
+
+<div class="wrap">
+  <p class="hint">เทียบยอดกับ statement ธนาคารก่อนกดยืนยัน · ยืนยันแล้วรายการจะกลายเป็นการจองปกติในหน้าการจอง</p>
+  <div id="list"><div class="msg">กำลังโหลด…</div></div>
+</div>
+
+<script>
+const API = '/api';
+const $ = id => document.getElementById(id);
+const store = {
+  get user(){ return localStorage.getItem('tw_user') || '' },
+  get pass(){ return localStorage.getItem('tw_pass') || '' }
+};
+async function api(params){
+  const u = new URL(API, location.origin);
+  u.searchParams.set('user', store.user);
+  u.searchParams.set('pass', store.pass);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k,v));
+  return (await fetch(u, {redirect:'follow'})).json();
+}
+const esc = s => String(s??'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const baht = n => Number(n||0).toLocaleString('th-TH');
+function nights(a,b){ return Math.max(1, Math.round((new Date(b)-new Date(a))/864e5)); }
+function mins(ms){ const s=Math.max(0,Math.round((ms-Date.now())/1000)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+
+let busy = false;
+
+async function load(){
+  if (!store.user || !store.pass){
+    $('list').innerHTML = '<div class="msg">ยังไม่ได้เข้าสู่ระบบ — <a href="/admin/">เข้าหน้าการจองเพื่อล็อกอินก่อน</a></div>';
+    return;
+  }
+  const r = await api({action:'pending'});
+  if (!r.ok){
+    $('list').innerHTML = '<div class="msg">'+esc(r.error||'โหลดไม่สำเร็จ')+'</div>';
+    return;
+  }
+  document.title = r.waiting ? `(${r.waiting}) ตรวจสลิป` : 'ทุ่งหวาย · ตรวจสลิป';
+  if (!r.rows.length){
+    $('list').innerHTML = '<div class="msg">ไม่มีรายการรอตรวจ ✓</div>';
+    return;
+  }
+  $('list').innerHTML = r.rows.map(b => {
+    const n = nights(b.checkin, b.checkout), paid = b.pay === 'slip';
+    return `<div class="card ${paid?'waiting':'hold'}">
+      <div class="top">
+        <div class="info">
+          <span class="tag ${paid?'pay':'hold'}">${paid?'จ่ายแล้ว รอตรวจ':'ยังไม่จ่าย · เหลือ '+mins(b.expires)}</span>
+          <h2>${esc(b.roomName||b.room)}</h2>
+          <p>${esc(b.name)} · ${esc(b.phone||'-')}</p>
+          <p>${esc(b.checkin)} → ${esc(b.checkout)} (${n} คืน)</p>
+          <p style="font-size:.78rem">จองเมื่อ ${esc(b.created)} · ${esc(b.id)}</p>
+        </div>
+        <div class="amt">฿${baht(b.amount)}<small>มัดจำที่ต้องได้รับ</small></div>
+      </div>
+      ${paid ? `<img class="slip" loading="lazy" src="${API}?action=slipimg&id=${encodeURIComponent(b.id)}&user=${encodeURIComponent(store.user)}&pass=${encodeURIComponent(store.pass)}" alt="สลิปโอนเงิน">` : ''}
+      <div class="acts">
+        ${paid ? `<button class="btn ok" data-ok="${esc(b.id)}">✓ ยอดตรง ยืนยันการจอง</button>` : ''}
+        <button class="btn no" data-no="${esc(b.id)}">${paid?'✕ ปฏิเสธ':'✕ ยกเลิก'} / ปล่อยห้องคืน</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.addEventListener('click', async e => {
+  const ok = e.target.closest('[data-ok]'), no = e.target.closest('[data-no]');
+  if ((!ok && !no) || busy) return;
+  busy = true; e.target.disabled = true;
+  try{
+    let r;
+    if (ok) r = await api({action:'slipok', id: ok.dataset.ok});
+    else {
+      const reason = prompt('เหตุผลที่ปฏิเสธ (บันทึกไว้เผื่อต้องโอนคืน)') ;
+      if (reason === null){ busy=false; e.target.disabled=false; return; }
+      r = await api({action:'slipno', id: no.dataset.no, reason});
+    }
+    if (!r.ok) alert(r.error || 'ทำรายการไม่สำเร็จ');
+  } finally { busy = false; await load(); }
+});
+
+$('refresh').onclick = load;
+load();
+setInterval(() => { if (!busy && !document.hidden) load(); }, 30000);
+</script>
+</body>
+</html>
