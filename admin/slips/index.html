@@ -103,7 +103,7 @@ async function load(){
           <p>${esc(b.checkin)} → ${esc(b.checkout)} (${n} คืน)</p>
           <p style="font-size:.78rem">จองเมื่อ ${esc(b.created)} · ${esc(b.id)}</p>
         </div>
-        <div class="amt">฿${baht(b.amount)}<small>มัดจำที่ต้องได้รับ</small></div>
+        <div class="amt">฿${baht(b.amount)}<small>ยอดที่ต้องได้รับ</small></div>
       </div>
       ${paid ? `<img class="slip" loading="lazy" src="${API}?action=slipimg&id=${encodeURIComponent(b.id)}&user=${encodeURIComponent(store.user)}&pass=${encodeURIComponent(store.pass)}" alt="สลิปโอนเงิน">` : ''}
       <div class="acts">

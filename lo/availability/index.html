@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=nc1">
+<link rel="stylesheet" href="/assets/style.css?v=fp1">
 </head>
 <body class="avpage">
 
@@ -365,11 +365,11 @@ const AVW_DAYS = 92;
       <div class="bk-sum" id="bkSum">…</div>
       <div class="bk-nocancel">
         <b>ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້</b>
-        <p>ເງິນມັດຈຳທີ່ຊຳລະແລ້ວ ບໍ່ສາມາດຂໍຄືນໄດ້ທຸກກໍລະນີ ກະລຸນາກວດຫ້ອງພັກ ແລະ ວັນທີໃຫ້ແນ່ໃຈກ່ອນຊຳລະເງິນ</p>
+        <p>ຍອດທີ່ຊຳລະແລ້ວ ບໍ່ສາມາດຂໍຄືນໄດ້ທຸກກໍລະນີ ກະລຸນາກວດຫ້ອງພັກ ແລະ ວັນທີໃຫ້ແນ່ໃຈກ່ອນຊຳລະເງິນ</p>
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ຂ້າພະເຈົ້າຮັບຊາບ ແລະ ຍອມຮັບເງື່ອນໄຂນີ້</span></label>
       </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
-      <button class="bk-go" id="bkGo">ຮັບ QR ເພື່ອຊຳລະມັດຈຳ</button>`;
+      <button class="bk-go" id="bkGo">ຮັບ QR ເພື່ອຊຳລະເງິນ</button>`;
     quote();
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
@@ -383,8 +383,9 @@ const AVW_DAYS = 92;
     const r = await (await fetch(`/api?action=quote&room=${st.room}&checkin=${st.checkin}&checkout=${addD(st.checkin, st.nights)}`)).json();
     if (!r.ok) { $('bkSum').textContent = r.error; return; }
     st.total = r.total; st.deposit = r.deposit;
-    $('bkSum').innerHTML = `<span>ລວມທັງໝົດ</span><b>฿${num(r.total)}</b>
-      <span>ເງິນມັດຈຳທີ່ຕ້ອງໂອນ</span><b class="hi">฿${num(r.deposit)}</b>`;
+    $('bkSum').innerHTML = `<span>ລາຄາຕໍ່ຄືນ</span><b>฿${num(r.price)}</b>
+      <span>ຈຳນວນຄືນ</span><b>${r.nights}</b>
+      <span>ຍອດທີ່ຕ້ອງຊຳລະ</span><b class="hi">฿${num(r.deposit)}</b>`;
   }
 
   
@@ -410,7 +411,7 @@ const AVW_DAYS = 92;
       <p class="bk-warn">${esc(r.error)}${r.holding ? ` · <b id="bkCd">${Math.floor(r.secondsLeft/60)}:${String(r.secondsLeft%60).padStart(2,'0')}</b>` : ''}</p>
       ${r.alternatives?.length ? `<p class="bk-l">ຫ້ອງວ່າງໃນຊ່ວງດຽວກັນ</p>` +
         r.alternatives.map(a => `<button class="bk-alt" data-alt="${a.id}" data-nm="${esc(a.name)}">
-          <span>${esc(a.name)}</span><b>฿${num(a.total)} · <i>ເງິນມັດຈຳ</i> ฿${num(a.deposit)}</b></button>`).join('')
+          <span>${esc(a.name)}</span><b>฿${num(a.total)}</b></button>`).join('')
         : '<p class="bk-l">ບໍ່ມີຫ້ອງວ່າງໃນຊ່ວງນີ້</p>'}
       <button class="bk-go ghost" id="bkBack">ປິດ</button>`;
     body.querySelectorAll('[data-alt]').forEach(b => b.onclick = () => {
@@ -432,9 +433,9 @@ const AVW_DAYS = 92;
     const lak = Math.ceil(st.deposit * LAK / 1000) * 1000;
     body.innerHTML = `
       ${st.resumed ? '<p class="bk-resume">ສືບຕໍ່ຈາກເດີມໄດ້ເລີຍ</p>' : ''}
-      <div class="bk-amt">฿${num(st.deposit)}<small>ເງິນມັດຈຳທີ່ຕ້ອງໂອນ</small></div>
+      <div class="bk-amt">฿${num(st.deposit)}<small>ຍອດທີ່ຕ້ອງຊຳລະ (ເຕັມຈຳນວນ)</small></div>
       <div class="bk-clock">ເວລາທີ່ເຫຼືອ <b id="bkCd">5:00</b></div>
-      <p class="bk-nc2">ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້ · ມັດຈຳບໍ່ຄືນທຸກກໍລະນີ</p>
+      <p class="bk-nc2">ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້ · ເງິນບໍ່ຄືນທຸກກໍລະນີ</p>
       <div class="bk-tabs">
         <button class="on" data-t="pp">ພ້ອມເພ (ໄທ)</button>
         <button data-t="thb">BCEL ບາດ</button>
@@ -491,7 +492,7 @@ const AVW_DAYS = 92;
       if (left <= 0) { clearInterval(timer); expired(); }
     }, 1000);
 
-    $('bkFile').onchange = e => upload(e.target.files[0]);
+    $('bkFile').onchange = e => preview(e.target.files[0]);
   }
 
   function waiting(){
@@ -514,21 +515,36 @@ const AVW_DAYS = 92;
   }
 
   
-  async function upload(file){
+  async function preview(file){
     if (!file) return;
     clearInterval(timer); timer = null;          
-    $('bkUpL').textContent = 'ກຳລັງດຳເນີນການ…';
+    let blob; try { blob = await shrink(file); } catch(e){ return pay(); }
+    const url = URL.createObjectURL(blob);
+    body.innerHTML = `
+      <p class="bk-room">ກວດຮູບສະລິບກ່ອນສົ່ງ</p>
+      <p class="bk-dates">ຍອດທີ່ຕ້ອງຊຳລະ ฿${num(st.deposit)} · <i>ກວດວ່າແມ່ນສະລິບໂອນເງິນໃບທີ່ຖືກຕ້ອງ</i></p>
+      <div class="bk-prev"><img src="${url}" alt=""></div>
+      <button class="bk-go" id="bkSend">ແມ່ນແລ້ວ ສົ່ງສະລິບນີ້</button>
+      <label class="bk-go ghost" id="bkAgain" style="display:block;text-align:center;cursor:pointer">ເລືອກຮູບໃໝ່
+        <input type="file" id="bkFile2" accept="image/jpeg,image/png,image/webp,image/heic" hidden></label>
+      <p class="bk-err" id="bkUpErr"></p>`;
+    $('bkSend').onclick = () => { URL.revokeObjectURL(url); upload(blob); };
+    $('bkFile2').onchange = e => { URL.revokeObjectURL(url); preview(e.target.files[0]); };
+  }
+
+  
+  async function upload(blob){
+    if (!blob) return;
+    const btn = $('bkSend'); if (btn) { btn.disabled = true; btn.textContent = 'ກຳລັງດຳເນີນການ…'; }
     try{
-      const blob = await shrink(file);
       const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
         { method:'POST', body: blob })).json();
       if (!r.ok) throw new Error(r.error);
       st.stage = 'done'; remember();     
       waiting();
     }catch(err){
-      $('bkUpL').textContent = 'ໂອນແລ້ວ ແນບສະລິບບ່ອນນີ້';
-      $('bkUpErr').textContent = err.message || 'ສົ່ງບໍ່ສຳເລັດ';
-      pay();
+      const m = $('bkUpErr'); if (m) m.textContent = err.message || 'ສົ່ງບໍ່ສຳເລັດ';
+      if (btn) { btn.disabled = false; btn.textContent = 'ແມ່ນແລ້ວ ສົ່ງສະລິບນີ້'; }
     }
   }
 

@@ -265,7 +265,7 @@ async function cancelBooking(db, p) {
 
 const HOLD_MS   = 5 * 60 * 1000;   // ถือห้อง 5 นาที
 const GRACE_MS  = 5 * 60 * 1000;   // ต่อให้เงียบๆ อีก 5 นาที "เฉพาะเมื่อไม่มีใครรอ"
-const DEPOSIT   = 0.5;             // มัดจำครึ่งหนึ่งของยอดรวม
+const DEPOSIT   = 1.0;             // ★ เก็บเต็มจำนวน (6 ก.ย. 2026 — เดิม 0.5) แก้ตัวเลขนี้ตัวเดียวพอ
 
 // ปล่อยห้องที่ถือไว้แล้วไม่จ่าย — เรียกก่อนทุก query ที่อ่านห้องว่าง
 // ต่อเวลาให้อัตโนมัติถ้ายังไม่มีใครมาสนใจห้องนั้น (มี waiting=0) เพื่อไม่ตัดลูกค้าจริงทิ้งฟรีๆ
@@ -437,6 +437,14 @@ async function uploadSlip(request, db, p, env) {
   const buf = await request.arrayBuffer();
   if (!buf.byteLength) return { ok: false, error: 'ไม่พบไฟล์สลิป' };
   if (buf.byteLength > 3_000_000) return { ok: false, error: 'ไฟล์ใหญ่เกินไป' };
+  if (buf.byteLength < 4_000) return { ok: false, error: 'ไฟล์เล็กเกินไป ไม่น่าจะเป็นสลิป' };
+  // เช็คหัวไฟล์จริง ไม่เชื่อนามสกุลหรือ content-type ที่เบราว์เซอร์บอกมา
+  const b = new Uint8Array(buf.slice(0, 12));
+  const isJpg = b[0] === 0xFF && b[1] === 0xD8;
+  const isPng = b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47;
+  const isWebp = b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50;
+  if (!isJpg && !isPng && !isWebp)
+    return { ok: false, error: 'ไฟล์นี้ไม่ใช่รูปภาพ กรุณาแนบรูปสลิปโอนเงิน' };
   const key = `slips/${id}.jpg`;
   await env.SLIPS.put(key, buf, { httpMetadata: { contentType: 'image/jpeg' } });
 

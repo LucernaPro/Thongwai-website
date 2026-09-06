@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=nc1">
+<link rel="stylesheet" href="/assets/style.css?v=fp1">
 </head>
 <body class="avpage">
 
@@ -267,7 +267,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
 })();
 </script>
 <script src="/assets/lightbox.js?v=4" defer></script>
-<!-- ═══ แผงจองออนไลน์ + ชำระมัดจำ ═══ -->
+<!-- ═══ แผงจองออนไลน์ + ชำระเงิน ═══ -->
 <div class="bk-scrim" id="bkScrim" hidden></div>
 <div class="bk" id="bk" hidden role="dialog" aria-modal="true" aria-labelledby="bkTitle">
   <div class="bk-head">
@@ -362,11 +362,11 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       <div class="bk-sum" id="bkSum">…</div>
       <div class="bk-nocancel">
         <b>จองแล้วยกเลิกไม่ได้</b>
-        <p>มัดจำที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี กรุณาตรวจสอบห้องพักและวันที่ให้แน่ใจก่อนชำระเงิน</p>
+        <p>ยอดที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี กรุณาตรวจสอบห้องพักและวันที่ให้แน่ใจก่อนชำระเงิน</p>
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ข้าพเจ้ารับทราบและยอมรับเงื่อนไขนี้</span></label>
       </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
-      <button class="bk-go" id="bkGo">รับ QR เพื่อชำระมัดจำ</button>`;
+      <button class="bk-go" id="bkGo">รับ QR เพื่อชำระเงิน</button>`;
     quote();
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
@@ -380,8 +380,9 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     const r = await (await fetch(`/api?action=quote&room=${st.room}&checkin=${st.checkin}&checkout=${addD(st.checkin, st.nights)}`)).json();
     if (!r.ok) { $('bkSum').textContent = r.error; return; }
     st.total = r.total; st.deposit = r.deposit;
-    $('bkSum').innerHTML = `<span>ยอดรวม</span><b>฿${num(r.total)}</b>
-      <span>มัดจำที่ต้องโอน</span><b class="hi">฿${num(r.deposit)}</b>`;
+    $('bkSum').innerHTML = `<span>ราคาต่อคืน</span><b>฿${num(r.price)}</b>
+      <span>จำนวนคืน</span><b>${r.nights}</b>
+      <span>ยอดที่ต้องชำระ</span><b class="hi">฿${num(r.deposit)}</b>`;
   }
 
   /* ── ขั้นที่ 2: ถือห้อง + QR ── */
@@ -407,7 +408,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       <p class="bk-warn">${esc(r.error)}${r.holding ? ` · <b id="bkCd">${Math.floor(r.secondsLeft/60)}:${String(r.secondsLeft%60).padStart(2,'0')}</b>` : ''}</p>
       ${r.alternatives?.length ? `<p class="bk-l">ห้องว่างช่วงเดียวกัน</p>` +
         r.alternatives.map(a => `<button class="bk-alt" data-alt="${a.id}" data-nm="${esc(a.name)}">
-          <span>${esc(a.name)}</span><b>฿${num(a.total)} · <i>ยอดมัดจำ</i> ฿${num(a.deposit)}</b></button>`).join('')
+          <span>${esc(a.name)}</span><b>฿${num(a.total)}</b></button>`).join('')
         : '<p class="bk-l">ไม่มีห้องว่างช่วงนี้</p>'}
       <button class="bk-go ghost" id="bkBack">ปิด</button>`;
     body.querySelectorAll('[data-alt]').forEach(b => b.onclick = () => {
@@ -429,9 +430,9 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     const lak = Math.ceil(st.deposit * LAK / 1000) * 1000;
     body.innerHTML = `
       ${st.resumed ? '<p class="bk-resume">ทำต่อจากเดิมได้เลย</p>' : ''}
-      <div class="bk-amt">฿${num(st.deposit)}<small>มัดจำที่ต้องโอน</small></div>
+      <div class="bk-amt">฿${num(st.deposit)}<small>ยอดที่ต้องชำระ (เต็มจำนวน)</small></div>
       <div class="bk-clock">เหลือเวลา <b id="bkCd">5:00</b></div>
-      <p class="bk-nc2">จองแล้วยกเลิกไม่ได้ · มัดจำไม่คืนทุกกรณี</p>
+      <p class="bk-nc2">จองแล้วยกเลิกไม่ได้ · เงินไม่คืนทุกกรณี</p>
       <div class="bk-tabs">
         <button class="on" data-t="pp">พร้อมเพย์ (ไทย)</button>
         <button data-t="thb">BCEL บาท</button>
@@ -488,7 +489,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       if (left <= 0) { clearInterval(timer); expired(); }
     }, 1000);
 
-    $('bkFile').onchange = e => upload(e.target.files[0]);
+    $('bkFile').onchange = e => preview(e.target.files[0]);
   }
 
   function waiting(){
@@ -510,22 +511,38 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     $('bkBack').onclick = close;
   }
 
-  /* ── อัปสลิป: ย่อรูปในเครื่องก่อนส่ง ประหยัดเน็ตลูกค้าและพื้นที่เรา ── */
-  async function upload(file){
+  /* ── ให้ดูรูปที่เลือกก่อนส่งจริง — กันแนบรูปผิดใบ ──
+     เลือกจากคลังรูปทีเดียวแล้วส่งเลยคือจุดที่พลาดง่ายที่สุด ต้องเห็นก่อนว่าใช่ใบไหน */
+  async function preview(file){
     if (!file) return;
-    clearInterval(timer); timer = null;          // กดแนบ = หยุดนาฬิกาทันที
-    $('bkUpL').textContent = 'กำลังดำเนินการ…';
+    clearInterval(timer); timer = null;          // เลือกรูปแล้ว = หยุดนาฬิกา
+    let blob; try { blob = await shrink(file); } catch(e){ return pay(); }
+    const url = URL.createObjectURL(blob);
+    body.innerHTML = `
+      <p class="bk-room">ตรวจสอบรูปสลิปก่อนส่ง</p>
+      <p class="bk-dates">ยอดที่ต้องชำระ ฿${num(st.deposit)} · <i>ตรวจว่าเป็นสลิปโอนเงินใบที่ถูกต้อง</i></p>
+      <div class="bk-prev"><img src="${url}" alt=""></div>
+      <button class="bk-go" id="bkSend">ใช่ ส่งสลิปนี้</button>
+      <label class="bk-go ghost" id="bkAgain" style="display:block;text-align:center;cursor:pointer">เลือกรูปใหม่
+        <input type="file" id="bkFile2" accept="image/jpeg,image/png,image/webp,image/heic" hidden></label>
+      <p class="bk-err" id="bkUpErr"></p>`;
+    $('bkSend').onclick = () => { URL.revokeObjectURL(url); upload(blob); };
+    $('bkFile2').onchange = e => { URL.revokeObjectURL(url); preview(e.target.files[0]); };
+  }
+
+  /* ── ส่งสลิปขึ้นเซิร์ฟเวอร์ ── */
+  async function upload(blob){
+    if (!blob) return;
+    const btn = $('bkSend'); if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ…'; }
     try{
-      const blob = await shrink(file);
       const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
         { method:'POST', body: blob })).json();
       if (!r.ok) throw new Error(r.error);
       st.stage = 'done'; remember();     // เก็บต่อ เพื่อโชว์การ์ด "การจองของคุณ" ตอนกลับมาเปิดเว็บ
       waiting();
     }catch(err){
-      $('bkUpL').textContent = 'โอนแล้ว แนบสลิปที่นี่';
-      $('bkUpErr').textContent = err.message || 'ส่งไม่สำเร็จ';
-      pay();
+      const m = $('bkUpErr'); if (m) m.textContent = err.message || 'ส่งไม่สำเร็จ';
+      if (btn) { btn.disabled = false; btn.textContent = 'ใช่ ส่งสลิปนี้'; }
     }
   }
 

@@ -669,7 +669,7 @@ LO = {
 # ═══════════ house rules — เงื่อนไขการจอง/กฎที่พัก (markup: tools/house-rules.html) ═══════════
 # th: (en, lo) — คู่มือเดียว แก้ที่นี่ที่เดียวทั้งสองภาษา
 HR = {
- 'มัดจำที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี': ('The deposit is non-refundable under any circumstances.', 'ເງິນມັດຈຳທີ່ຊຳລະແລ້ວ ບໍ່ສາມາດຂໍຄືນໄດ້ທຸກກໍລະນີ'),
+ 'การจองผ่านเว็บไซต์ต้องชำระเต็มจำนวน และไม่สามารถขอคืนเงินได้ทุกกรณี': ('Bookings made on the website must be paid in full and are non-refundable under any circumstances.', 'ການຈອງຜ່ານເວັບໄຊຕ້ອງຊຳລະເຕັມຈຳນວນ ແລະ ບໍ່ສາມາດຂໍຄືນເງິນໄດ້ທຸກກໍລະນີ'),
  'กรุณาอ่านก่อนทำการจอง': ('Please read before you book', 'ກະລຸນາອ່ານກ່ອນຈອງ'),
  'เงื่อนไขการจองและกฎที่พัก': ('Booking conditions &amp; house rules', 'ເງື່ອນໄຂການຈອງ ແລະ ກົດລະບຽບຂອງທີ່ພັກ'),
  'การจองห้องพัก': ('Room booking', 'ການຈອງຫ້ອງພັກ'),
@@ -698,6 +698,19 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ตรวจสอบรูปสลิปก่อนส่ง': ('Check the slip before sending', 'ກວດຮູບສະລິບກ່ອນສົ່ງ'),
+ 'ใช่ ส่งสลิปนี้': ('Yes, send this slip', 'ແມ່ນແລ້ວ ສົ່ງສະລິບນີ້'),
+ 'เลือกรูปใหม่': ('Choose another image', 'ເລືອກຮູບໃໝ່'),
+ 'ตรวจว่าเป็นสลิปโอนเงินใบที่ถูกต้อง': ('Make sure this is the correct transfer slip', 'ກວດວ່າແມ່ນສະລິບໂອນເງິນໃບທີ່ຖືກຕ້ອງ'),
+ 'ไฟล์นี้ไม่ใช่รูปภาพ กรุณาแนบรูปสลิปโอนเงิน': ('This file is not an image. Please attach a photo of the transfer slip.', 'ໄຟລ໌ນີ້ບໍ່ແມ່ນຮູບພາບ ກະລຸນາແນບຮູບສະລິບໂອນເງິນ'),
+ 'ไฟล์เล็กเกินไป ไม่น่าจะเป็นสลิป': ('That file is too small to be a slip', 'ໄຟລ໌ນ້ອຍເກີນໄປ ບໍ່ໜ້າຈະແມ່ນສະລິບ'),
+ 'ยอดที่ต้องชำระ ฿': ('Amount due ฿', 'ຍອດທີ່ຕ້ອງຊຳລະ ฿'),
+ 'ราคาต่อคืน': ('Per night', 'ລາຄາຕໍ່ຄືນ'),
+ 'ยอดที่ต้องชำระ (เต็มจำนวน)': ('Amount due (paid in full)', 'ຍອດທີ່ຕ້ອງຊຳລະ (ເຕັມຈຳນວນ)'),
+ 'ยอดที่ต้องชำระ': ('Amount due', 'ຍອດທີ່ຕ້ອງຊຳລະ'),
+ 'รับ QR เพื่อชำระเงิน': ('Get QR to pay', 'ຮັບ QR ເພື່ອຊຳລະເງິນ'),
+ 'ยอดที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี กรุณาตรวจสอบห้องพักและวันที่ให้แน่ใจก่อนชำระเงิน': ('The amount paid is non-refundable under any circumstances. Please check the room and dates carefully before you pay.', 'ຍອດທີ່ຊຳລະແລ້ວ ບໍ່ສາມາດຂໍຄືນໄດ້ທຸກກໍລະນີ ກະລຸນາກວດຫ້ອງພັກ ແລະ ວັນທີໃຫ້ແນ່ໃຈກ່ອນຊຳລະເງິນ'),
+ 'จองแล้วยกเลิกไม่ได้ · เงินไม่คืนทุกกรณี': ('No cancellation · non-refundable', 'ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້ · ເງິນບໍ່ຄືນທຸກກໍລະນີ'),
  'จองแล้วยกเลิกไม่ได้': ('No cancellation once booked', 'ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້'),
  'มัดจำที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี กรุณาตรวจสอบห้องพักและวันที่ให้แน่ใจก่อนชำระเงิน': ('The deposit is non-refundable under any circumstances. Please check the room and dates carefully before you pay.', 'ເງິນມັດຈຳທີ່ຊຳລະແລ້ວ ບໍ່ສາມາດຂໍຄືນໄດ້ທຸກກໍລະນີ ກະລຸນາກວດຫ້ອງພັກ ແລະ ວັນທີໃຫ້ແນ່ໃຈກ່ອນຊຳລະເງິນ'),
  'ข้าพเจ้ารับทราบและยอมรับเงื่อนไขนี้': ('I understand and accept this condition', 'ຂ້າພະເຈົ້າຮັບຊາບ ແລະ ຍອມຮັບເງື່ອນໄຂນີ້'),

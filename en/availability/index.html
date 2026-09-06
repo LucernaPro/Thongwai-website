@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=nc1">
+<link rel="stylesheet" href="/assets/style.css?v=fp1">
 </head>
 <body class="avpage">
 
@@ -365,11 +365,11 @@ const AVW_DAYS = 92;
       <div class="bk-sum" id="bkSum">…</div>
       <div class="bk-nocancel">
         <b>No cancellation once booked</b>
-        <p>The deposit is non-refundable under any circumstances. Please check the room and dates carefully before you pay.</p>
+        <p>The amount paid is non-refundable under any circumstances. Please check the room and dates carefully before you pay.</p>
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>I understand and accept this condition</span></label>
       </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
-      <button class="bk-go" id="bkGo">Get QR to pay the deposit</button>`;
+      <button class="bk-go" id="bkGo">Get QR to pay</button>`;
     quote();
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
@@ -383,8 +383,9 @@ const AVW_DAYS = 92;
     const r = await (await fetch(`/api?action=quote&room=${st.room}&checkin=${st.checkin}&checkout=${addD(st.checkin, st.nights)}`)).json();
     if (!r.ok) { $('bkSum').textContent = r.error; return; }
     st.total = r.total; st.deposit = r.deposit;
-    $('bkSum').innerHTML = `<span>Total</span><b>฿${num(r.total)}</b>
-      <span>Deposit to transfer</span><b class="hi">฿${num(r.deposit)}</b>`;
+    $('bkSum').innerHTML = `<span>Per night</span><b>฿${num(r.price)}</b>
+      <span>Nights</span><b>${r.nights}</b>
+      <span>Amount due</span><b class="hi">฿${num(r.deposit)}</b>`;
   }
 
   
@@ -410,7 +411,7 @@ const AVW_DAYS = 92;
       <p class="bk-warn">${esc(r.error)}${r.holding ? ` · <b id="bkCd">${Math.floor(r.secondsLeft/60)}:${String(r.secondsLeft%60).padStart(2,'0')}</b>` : ''}</p>
       ${r.alternatives?.length ? `<p class="bk-l">Rooms free for the same dates</p>` +
         r.alternatives.map(a => `<button class="bk-alt" data-alt="${a.id}" data-nm="${esc(a.name)}">
-          <span>${esc(a.name)}</span><b>฿${num(a.total)} · <i>deposit</i> ฿${num(a.deposit)}</b></button>`).join('')
+          <span>${esc(a.name)}</span><b>฿${num(a.total)}</b></button>`).join('')
         : '<p class="bk-l">No rooms free for these dates</p>'}
       <button class="bk-go ghost" id="bkBack">Close</button>`;
     body.querySelectorAll('[data-alt]').forEach(b => b.onclick = () => {
@@ -432,9 +433,9 @@ const AVW_DAYS = 92;
     const lak = Math.ceil(st.deposit * LAK / 1000) * 1000;
     body.innerHTML = `
       ${st.resumed ? '<p class="bk-resume">Pick up where you left off</p>' : ''}
-      <div class="bk-amt">฿${num(st.deposit)}<small>Deposit to transfer</small></div>
+      <div class="bk-amt">฿${num(st.deposit)}<small>Amount due (paid in full)</small></div>
       <div class="bk-clock">Time left <b id="bkCd">5:00</b></div>
-      <p class="bk-nc2">No cancellation · deposit non-refundable</p>
+      <p class="bk-nc2">No cancellation · non-refundable</p>
       <div class="bk-tabs">
         <button class="on" data-t="pp">PromptPay (TH)</button>
         <button data-t="thb">BCEL THB</button>
@@ -491,7 +492,7 @@ const AVW_DAYS = 92;
       if (left <= 0) { clearInterval(timer); expired(); }
     }, 1000);
 
-    $('bkFile').onchange = e => upload(e.target.files[0]);
+    $('bkFile').onchange = e => preview(e.target.files[0]);
   }
 
   function waiting(){
@@ -514,21 +515,36 @@ const AVW_DAYS = 92;
   }
 
   
-  async function upload(file){
+  async function preview(file){
     if (!file) return;
     clearInterval(timer); timer = null;          
-    $('bkUpL').textContent = 'Working…';
+    let blob; try { blob = await shrink(file); } catch(e){ return pay(); }
+    const url = URL.createObjectURL(blob);
+    body.innerHTML = `
+      <p class="bk-room">Check the slip before sending</p>
+      <p class="bk-dates">Amount due ฿${num(st.deposit)} · <i>Make sure this is the correct transfer slip</i></p>
+      <div class="bk-prev"><img src="${url}" alt=""></div>
+      <button class="bk-go" id="bkSend">Yes, send this slip</button>
+      <label class="bk-go ghost" id="bkAgain" style="display:block;text-align:center;cursor:pointer">Choose another image
+        <input type="file" id="bkFile2" accept="image/jpeg,image/png,image/webp,image/heic" hidden></label>
+      <p class="bk-err" id="bkUpErr"></p>`;
+    $('bkSend').onclick = () => { URL.revokeObjectURL(url); upload(blob); };
+    $('bkFile2').onchange = e => { URL.revokeObjectURL(url); preview(e.target.files[0]); };
+  }
+
+  
+  async function upload(blob){
+    if (!blob) return;
+    const btn = $('bkSend'); if (btn) { btn.disabled = true; btn.textContent = 'Working…'; }
     try{
-      const blob = await shrink(file);
       const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
         { method:'POST', body: blob })).json();
       if (!r.ok) throw new Error(r.error);
       st.stage = 'done'; remember();     
       waiting();
     }catch(err){
-      $('bkUpL').textContent = 'Paid? Attach your slip here';
-      $('bkUpErr').textContent = err.message || 'Upload failed';
-      pay();
+      const m = $('bkUpErr'); if (m) m.textContent = err.message || 'Upload failed';
+      if (btn) { btn.disabled = false; btn.textContent = 'Yes, send this slip'; }
     }
   }
 
