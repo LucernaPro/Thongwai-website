@@ -290,6 +290,8 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   /* ── กู้การจองที่ค้างไว้ ──
      ลูกค้าต้องออกจากเว็บไปแอปธนาคารเสมอ ถ้าเผลอปิดแท็บจะกลับมาแนบสลิปไม่ได้
      จึงจำ id/tok ไว้ในเครื่อง แล้วถามเซิร์ฟเวอร์ตอนเปิดหน้าใหม่ว่ายังทันไหม ── */
+  const pageLang = () => location.pathname.startsWith('/en/') ? 'en'
+                        : location.pathname.startsWith('/lo/') ? 'lo' : 'th';
   const KEY = 'tw_hold';
   const remember = () => { try{ localStorage.setItem(KEY, JSON.stringify(
       { id:st.id, tok:st.tok, deposit:st.deposit, roomName:st.roomName })); }catch(e){} };
@@ -318,7 +320,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     el.innerHTML = `<div><b>การจองของคุณ</b>
         <span>${esc(r.roomName)} · ${esc(r.checkin)} → ${esc(r.checkout)}</span>
         <span class="stt">${ok ? 'ยืนยันแล้ว' : 'รอตรวจสลิป'}</span></div>
-      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}">ดูรายละเอียด</a>`;
+      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}&lang=${pageLang()}">ดูรายละเอียด</a>`;
     const host = document.querySelector('#availability .wrap');
     const anchor = document.getElementById('avw');
     if (host && anchor) host.insertBefore(el, anchor); else host?.appendChild(el);
@@ -490,7 +492,8 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   }
 
   function waiting(){
-    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id) + '&tok=' + encodeURIComponent(st.tok);
+    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id)
+              + '&tok=' + encodeURIComponent(st.tok) + '&lang=' + pageLang();
     body.innerHTML = `<div class="bk-ok">✓</div>
       <p class="bk-done">ส่งสลิปแล้ว รอตรวจสอบ</p>
       <p class="bk-note">เราจะยืนยันการจองหลังตรวจสลิป</p>

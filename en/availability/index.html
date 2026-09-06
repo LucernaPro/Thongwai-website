@@ -293,6 +293,8 @@ const AVW_DAYS = 92;
   let st = {}, timer = null;
 
   
+  const pageLang = () => location.pathname.startsWith('/en/') ? 'en'
+                        : location.pathname.startsWith('/lo/') ? 'lo' : 'th';
   const KEY = 'tw_hold';
   const remember = () => { try{ localStorage.setItem(KEY, JSON.stringify(
       { id:st.id, tok:st.tok, deposit:st.deposit, roomName:st.roomName })); }catch(e){} };
@@ -321,7 +323,7 @@ const AVW_DAYS = 92;
     el.innerHTML = `<div><b>Your booking</b>
         <span>${esc(r.roomName)} · ${esc(r.checkin)} → ${esc(r.checkout)}</span>
         <span class="stt">${ok ? 'Confirmed' : 'Being checked'}</span></div>
-      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}">View details</a>`;
+      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}&lang=${pageLang()}">View details</a>`;
     const host = document.querySelector('#availability .wrap');
     const anchor = document.getElementById('avw');
     if (host && anchor) host.insertBefore(el, anchor); else host?.appendChild(el);
@@ -493,7 +495,8 @@ const AVW_DAYS = 92;
   }
 
   function waiting(){
-    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id) + '&tok=' + encodeURIComponent(st.tok);
+    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id)
+              + '&tok=' + encodeURIComponent(st.tok) + '&lang=' + pageLang();
     body.innerHTML = `<div class="bk-ok">✓</div>
       <p class="bk-done">Slip received — awaiting check</p>
       <p class="bk-note">We'll confirm your booking once the slip is checked</p>

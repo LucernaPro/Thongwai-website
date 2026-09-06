@@ -293,6 +293,8 @@ const AVW_DAYS = 92;
   let st = {}, timer = null;
 
   
+  const pageLang = () => location.pathname.startsWith('/en/') ? 'en'
+                        : location.pathname.startsWith('/lo/') ? 'lo' : 'th';
   const KEY = 'tw_hold';
   const remember = () => { try{ localStorage.setItem(KEY, JSON.stringify(
       { id:st.id, tok:st.tok, deposit:st.deposit, roomName:st.roomName })); }catch(e){} };
@@ -321,7 +323,7 @@ const AVW_DAYS = 92;
     el.innerHTML = `<div><b>ການຈອງຂອງທ່ານ</b>
         <span>${esc(r.roomName)} · ${esc(r.checkin)} → ${esc(r.checkout)}</span>
         <span class="stt">${ok ? 'ຢືນຢັນແລ້ວ' : 'ລໍຖ້າກວດສະລິບ'}</span></div>
-      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}">ເບິ່ງລາຍລະອຽດ</a>`;
+      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}&lang=${pageLang()}">ເບິ່ງລາຍລະອຽດ</a>`;
     const host = document.querySelector('#availability .wrap');
     const anchor = document.getElementById('avw');
     if (host && anchor) host.insertBefore(el, anchor); else host?.appendChild(el);
@@ -493,7 +495,8 @@ const AVW_DAYS = 92;
   }
 
   function waiting(){
-    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id) + '&tok=' + encodeURIComponent(st.tok);
+    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id)
+              + '&tok=' + encodeURIComponent(st.tok) + '&lang=' + pageLang();
     body.innerHTML = `<div class="bk-ok">✓</div>
       <p class="bk-done">ສົ່ງສະລິບແລ້ວ ລໍຖ້າກວດສອບ</p>
       <p class="bk-note">ພວກເຮົາຈະຢືນຢັນການຈອງຫຼັງກວດສະລິບ</p>

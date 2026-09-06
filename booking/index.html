@@ -42,18 +42,31 @@
   .fi{width:100%;padding:11px 12px;border:1px solid var(--cream2);border-radius:9px;
       font-family:inherit;font-size:16px;background:var(--cream)}
   .fmsg{margin:10px 0 0;font-size:.85rem;color:var(--red)}
+  .langs{display:flex;gap:8px;justify-content:center;margin-top:18px}
+  .langs a{padding:5px 14px;border-radius:99px;border:1px solid var(--cream2);
+    background:var(--white);color:var(--soft);text-decoration:none;font-size:.82rem}
+  .langs a.on{background:var(--pine);color:var(--white);border-color:var(--pine)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <a class="brand" href="/"><img src="/images/logo-thongwai-96.webp" alt=""><b>ทุ่งหวายโฮมสเตย์</b></a>
   <div id="out" class="card"><div class="err">กำลังโหลด…</div></div>
+  <div class="langs" id="langs"></div>
 </div>
 
 <script>
 const P = new URLSearchParams(location.search);
-const L = (navigator.language||'th').slice(0,2);
-const lang = P.get('lang') || (L==='en'?'en':L==='lo'?'lo':'th');
+/* ภาษาต้องตามที่ลูกค้าเลือกบนเว็บ ไม่ใช่ภาษาของเครื่อง
+   ลำดับ: ?lang= ในลิงก์ → tw_lang ที่เว็บจำไว้ → ไทย (ภาษาหลักของที่พัก) */
+function pickLang(){
+  const q = P.get('lang');
+  if (q === 'th' || q === 'en' || q === 'lo') return q;
+  try { const v = localStorage.getItem('tw_lang');
+        if (v === 'th' || v === 'en' || v === 'lo') return v; } catch(e){}
+  return 'th';
+}
+const lang = pickLang();
 
 const T = {
   th:{ wait:'ได้รับสลิปแล้ว รอตรวจสอบ', waitSub:'ทางที่พักจะตรวจสอบยอดและยืนยันให้ กรุณาเก็บลิงก์นี้ไว้เพื่อดูสถานะ',
@@ -79,7 +92,7 @@ const T = {
        gone:'Booking not found', goneSub:'The link may have expired, or the booking was cancelled.',
        room:'Room', inn:'Check-in', out:'Check-out', nights:'Nights', guest:'Guest',
        paid:'Deposit paid', ref:'Booking ref', call:'Call us', line:'Chat on LINE',
-       n:'nights', save:'Save this link or take a screenshot' },
+       n:'nights', n1:'night', save:'Save this link or take a screenshot' },
   lo:{ wait:'ໄດ້ຮັບສະລິບແລ້ວ ລໍຖ້າກວດສອບ', waitSub:'ທາງທີ່ພັກຈະກວດສອບຍອດ ແລະ ຢືນຢັນໃຫ້ ກະລຸນາເກັບລິ້ງນີ້ໄວ້',
        find:'ກວດສອບສະຖານະການຈອງ', findSub:'ຕື່ມຊື່ຜູ້ຈອງ ແລະ ເລກທ້າຍເບີໂທ 4 ໂຕ',
        fName:'ຊື່ຜູ້ຈອງ', fLast4:'ເລກທ້າຍເບີໂທ 4 ໂຕ', fGo:'ຄົ້ນຫາ',
@@ -95,6 +108,14 @@ const T = {
 }[lang];
 
 document.documentElement.lang = lang;
+
+// ปุ่มสลับภาษา — คงพารามิเตอร์เดิมไว้ เปลี่ยนแค่ lang
+document.getElementById('langs').innerHTML =
+  [['th','ไทย'],['en','EN'],['lo','ລາວ']].map(([code, label]) => {
+    const q = new URLSearchParams(location.search);
+    q.set('lang', code);
+    return `<a href="?${q}"${code === lang ? ' class="on"' : ''}>${label}</a>`;
+  }).join('');
 const esc = t => String(t??'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const num = n => Number(n||0).toLocaleString('en-US');
 const nights = (a,b) => Math.max(1, Math.round((new Date(b)-new Date(a))/864e5));
@@ -137,7 +158,7 @@ function findForm(msg){
           <dt>${esc(T.room)}</dt><dd>${esc(b.roomName)}</dd>
           <dt>${esc(T.inn)}</dt><dd>${esc(b.checkin)}</dd>
           <dt>${esc(T.out)}</dt><dd>${esc(b.checkout)}</dd>
-          <dt>${esc(T.nights)}</dt><dd>${nights(b.checkin,b.checkout)} ${esc(T.n)}</dd>
+          <dt>${esc(T.nights)}</dt><dd>${nights(b.checkin,b.checkout)} ${esc(nights(b.checkin,b.checkout) === 1 ? (T.n1 || T.n) : T.n)}</dd>
           <dt>${esc(T.paid)}</dt><dd class="big">฿${num(b.amount)}</dd>
           <dt>${esc(T.ref)}</dt><dd>${esc(b.id)}</dd>
         </dl>
@@ -162,7 +183,7 @@ function findForm(msg){
       <dt>${esc(T.room)}</dt><dd>${esc(r.roomName)}</dd>
       <dt>${esc(T.inn)}</dt><dd>${esc(r.checkin)}</dd>
       <dt>${esc(T.out)}</dt><dd>${esc(r.checkout)}</dd>
-      <dt>${esc(T.nights)}</dt><dd>${nights(r.checkin, r.checkout)} ${esc(T.n)}</dd>
+      <dt>${esc(T.nights)}</dt><dd>${nights(r.checkin, r.checkout)} ${esc(nights(r.checkin, r.checkout) === 1 ? (T.n1 || T.n) : T.n)}</dd>
       <dt>${esc(T.guest)}</dt><dd>${esc(r.name)}</dd>
       <dt>${esc(T.paid)}</dt><dd class="big">฿${num(r.amount)}</dd>
     </dl>
