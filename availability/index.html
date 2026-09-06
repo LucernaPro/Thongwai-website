@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=bk1">
+<link rel="stylesheet" href="/assets/style.css?v=qr1">
 </head>
 <body class="avpage">
 
@@ -387,6 +387,8 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       </div>
       <div class="bk-qr" id="bkQr"></div>
       <p class="bk-note" id="bkNote">สแกนจ่ายด้วยแอปธนาคาร</p>
+      <button class="bk-save" id="bkSave">บันทึกรูป QR ไว้สแกน</button>
+      <p class="bk-how">บันทึกรูปแล้วเปิดแอปธนาคาร เลือกสแกนจากรูปภาพ</p>
       <label class="bk-up" id="bkUpL">โอนแล้ว แนบสลิปที่นี่
         <input type="file" id="bkFile" accept="image/jpeg,image/png,image/webp,image/heic" hidden></label>
       <p class="bk-err" id="bkUpErr"></p>`;
@@ -408,6 +410,24 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     };
     body.querySelectorAll('.bk-tabs button').forEach(b => b.onclick = () => show(b.dataset.t));
     show('pp');
+
+    $('bkSave').onclick = async () => {
+      const btn = $('bkSave'), was = btn.textContent;
+      btn.disabled = true; btn.textContent = 'กำลังดำเนินการ…';
+      try {
+        const src = $('bkQr').querySelector('img').src;
+        const png = await toPng(src);
+        const file = new File([png], 'thongwai-qr.png', { type: 'image/png' });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file] });        // iOS/Android → เลือก "บันทึกรูปภาพ"
+        } else {
+          const u = URL.createObjectURL(png), a = document.createElement('a');
+          a.href = u; a.download = 'thongwai-qr.png'; a.click();
+          setTimeout(() => URL.revokeObjectURL(u), 4000);
+        }
+      } catch (e) { /* ผู้ใช้กดยกเลิกแชร์ = ไม่ใช่ error */ }
+      btn.disabled = false; btn.textContent = was;
+    };
 
     let left = Math.round((st.expires - Date.now())/1000);
     timer = setInterval(() => {
@@ -446,6 +466,25 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       $('bkUpErr').textContent = err.message || 'ส่งไม่สำเร็จ';
       pay();
     }
+  }
+
+  function toPng(src){
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const w = img.naturalWidth || 600, h = img.naturalHeight || 600;
+        const k = Math.min(2, 900 / Math.max(w, h));
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(w * k); cv.height = Math.round(h * k);
+        const cx = cv.getContext('2d');
+        cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
+        cx.drawImage(img, 0, 0, cv.width, cv.height);
+        cv.toBlob(b => b ? res(b) : rej(new Error('อ่านรูปไม่ได้')), 'image/png');
+      };
+      img.onerror = () => rej(new Error('อ่านรูปไม่ได้'));
+      img.src = src;
+    });
   }
 
   function shrink(file){
