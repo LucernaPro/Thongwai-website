@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=fx1">
+<link rel="stylesheet" href="/assets/style.css?v=bk2">
 </head>
 <body class="avpage">
 
@@ -465,9 +465,13 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   }
 
   function waiting(){
+    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id) + '&tok=' + encodeURIComponent(st.tok);
     body.innerHTML = `<div class="bk-ok">✓</div>
       <p class="bk-done">ส่งสลิปแล้ว รอตรวจสอบ</p>
       <p class="bk-note">เราจะยืนยันการจองหลังตรวจสลิป</p>
+      <p class="bk-ref">${esc(st.id)}</p>
+      <a class="bk-go" href="${url}" style="display:block;text-align:center;text-decoration:none">ดูสถานะการจอง</a>
+      <p class="bk-how">เก็บลิงก์นี้ไว้ดูสถานะและใช้ตอนเช็คอิน</p>
       <button class="bk-go ghost" id="bkBack">ปิด</button>`;
     $('bkBack').onclick = close;
   }

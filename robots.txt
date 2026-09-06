@@ -1,5 +1,7 @@
 # thongwaihomestay.com — welcome, crawlers
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /booking/
 
 Sitemap: https://thongwaihomestay.com/sitemap.xml

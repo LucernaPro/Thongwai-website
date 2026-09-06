@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=fx1">
+<link rel="stylesheet" href="/assets/style.css?v=bk2">
 </head>
 <body class="avpage">
 
@@ -468,9 +468,13 @@ const AVW_DAYS = 92;
   }
 
   function waiting(){
+    const url = location.origin + '/booking/?id=' + encodeURIComponent(st.id) + '&tok=' + encodeURIComponent(st.tok);
     body.innerHTML = `<div class="bk-ok">✓</div>
       <p class="bk-done">ສົ່ງສະລິບແລ້ວ ລໍຖ້າກວດສອບ</p>
       <p class="bk-note">ພວກເຮົາຈະຢືນຢັນການຈອງຫຼັງກວດສະລິບ</p>
+      <p class="bk-ref">${esc(st.id)}</p>
+      <a class="bk-go" href="${url}" style="display:block;text-align:center;text-decoration:none">ເບິ່ງສະຖານະການຈອງ</a>
+      <p class="bk-how">ເກັບລິ້ງນີ້ໄວ້ເບິ່ງສະຖານະ ແລະ ໃຊ້ຕອນເຊັກອິນ</p>
       <button class="bk-go ghost" id="bkBack">ປິດ</button>`;
     $('bkBack').onclick = close;
   }

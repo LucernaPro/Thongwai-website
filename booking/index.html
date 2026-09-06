@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2e4a38">
+<title>สถานะการจอง · ทุ่งหวายโฮมสเตย์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;600&family=Noto+Sans+Lao+Looped:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#f5efe3;--cream2:#ece3d0;--white:#fffdf8;--ink:#24312c;--soft:#5b6a62;
+        --pine:#2e4a38;--lantern:#e8963e;--red:#c1462d;--green:#2f7d4f}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);
+       font-family:'Sarabun','Noto Sans Lao Looped',system-ui,sans-serif;line-height:1.7}
+  .wrap{max-width:460px;margin:0 auto;padding:22px 16px 40px}
+  .brand{display:flex;align-items:center;gap:9px;margin-bottom:18px;text-decoration:none;color:inherit}
+  .brand img{height:40px;width:auto}
+  .brand b{font-family:'Mitr',sans-serif;font-weight:600;font-size:1rem}
+  .card{background:var(--white);border:1px solid var(--cream2);border-radius:14px;padding:20px 18px}
+  .state{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+       justify-content:center;color:#fff;font-size:1.05rem;flex:0 0 auto}
+  .dot.ok{background:var(--green)} .dot.wait{background:var(--lantern)} .dot.no{background:var(--red)}
+  h1{font-family:'Mitr',sans-serif;font-size:1.15rem;margin:0;font-weight:600;line-height:1.35}
+  .sub{margin:6px 0 18px;font-size:.9rem;color:var(--soft)}
+  dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;padding:16px 0;
+     border-top:1px solid var(--cream2);border-bottom:1px solid var(--cream2)}
+  dt{font-size:.88rem;color:var(--soft)}
+  dd{margin:0;text-align:right;font-size:.94rem;font-weight:500}
+  dd.big{font-family:'Mitr',sans-serif;color:var(--pine);font-size:1.1rem}
+  .ref{margin:14px 0 0;text-align:center;font-size:.82rem;color:var(--soft);letter-spacing:.04em}
+  .cta{display:flex;gap:8px;margin-top:18px}
+  .btn{flex:1;padding:12px;border-radius:10px;text-align:center;text-decoration:none;
+       font-weight:600;font-size:.9rem;border:1px solid var(--cream2);background:var(--white);color:var(--pine)}
+  .btn.main{background:var(--pine);color:#fff;border-color:var(--pine)}
+  .tip{margin-top:16px;font-size:.82rem;color:var(--soft);text-align:center;line-height:1.6}
+  .err{padding:20px;text-align:center;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="/"><img src="/images/logo-thongwai-96.webp" alt=""><b>ทุ่งหวายโฮมสเตย์</b></a>
+  <div id="out" class="card"><div class="err">กำลังโหลด…</div></div>
+</div>
+
+<script>
+const P = new URLSearchParams(location.search);
+const L = (navigator.language||'th').slice(0,2);
+const lang = P.get('lang') || (L==='en'?'en':L==='lo'?'lo':'th');
+
+const T = {
+  th:{ wait:'ได้รับสลิปแล้ว รอตรวจสอบ', waitSub:'ทางที่พักจะตรวจสอบยอดและยืนยันให้ กรุณาเก็บลิงก์นี้ไว้เพื่อดูสถานะ',
+       ok:'ยืนยันการจองเรียบร้อย', okSub:'ห้องพักของท่านถูกจองเรียบร้อยแล้ว แสดงหน้านี้ตอนเช็คอินได้เลย',
+       hold:'ยังไม่ได้รับการชำระเงิน', holdSub:'กรุณาชำระมัดจำภายในเวลาที่กำหนด มิฉะนั้นห้องจะถูกปล่อยคืน',
+       no:'การจองนี้ถูกยกเลิก', noSub:'หากมีข้อสงสัย กรุณาติดต่อทางที่พัก',
+       gone:'ไม่พบการจองนี้', goneSub:'ลิงก์อาจหมดอายุ หรือการจองถูกยกเลิกไปแล้ว',
+       room:'ห้องพัก', inn:'เช็คอิน', out:'เช็คเอาท์', nights:'จำนวนคืน', guest:'ผู้จอง',
+       paid:'มัดจำที่ชำระ', ref:'เลขที่การจอง', call:'โทรหาที่พัก', line:'แชทไลน์',
+       n:'คืน', save:'บันทึกลิงก์หน้านี้ไว้ หรือแคปหน้าจอเก็บไว้' },
+  en:{ wait:'Slip received — being checked', waitSub:'We are verifying your transfer. Keep this link to follow the status.',
+       ok:'Booking confirmed', okSub:'Your room is confirmed. Show this page at check-in.',
+       hold:'Payment not received yet', holdSub:'Please pay the deposit in time or the room will be released.',
+       no:'This booking was cancelled', noSub:'Please contact us if you have any questions.',
+       gone:'Booking not found', goneSub:'The link may have expired, or the booking was cancelled.',
+       room:'Room', inn:'Check-in', out:'Check-out', nights:'Nights', guest:'Guest',
+       paid:'Deposit paid', ref:'Booking ref', call:'Call us', line:'Chat on LINE',
+       n:'nights', save:'Save this link or take a screenshot' },
+  lo:{ wait:'ໄດ້ຮັບສະລິບແລ້ວ ລໍຖ້າກວດສອບ', waitSub:'ທາງທີ່ພັກຈະກວດສອບຍອດ ແລະ ຢືນຢັນໃຫ້ ກະລຸນາເກັບລິ້ງນີ້ໄວ້',
+       ok:'ຢືນຢັນການຈອງຮຽບຮ້ອຍ', okSub:'ຫ້ອງພັກຂອງທ່ານຖືກຈອງຮຽບຮ້ອຍແລ້ວ ສະແດງໜ້ານີ້ຕອນເຊັກອິນໄດ້ເລີຍ',
+       hold:'ຍັງບໍ່ໄດ້ຮັບການຊຳລະເງິນ', holdSub:'ກະລຸນາຊຳລະມັດຈຳພາຍໃນເວລາທີ່ກຳນົດ ບໍ່ດັ່ງນັ້ນຫ້ອງຈະຖືກປ່ອຍຄືນ',
+       no:'ການຈອງນີ້ຖືກຍົກເລີກ', noSub:'ຫາກມີຂໍ້ສົງໄສ ກະລຸນາຕິດຕໍ່ທາງທີ່ພັກ',
+       gone:'ບໍ່ພົບການຈອງນີ້', goneSub:'ລິ້ງອາດໝົດອາຍຸ ຫຼື ການຈອງຖືກຍົກເລີກໄປແລ້ວ',
+       room:'ຫ້ອງພັກ', inn:'ເຊັກອິນ', out:'ເຊັກເອົາ', nights:'ຈຳນວນຄືນ', guest:'ຜູ້ຈອງ',
+       paid:'ມັດຈຳທີ່ຊຳລະ', ref:'ເລກທີ່ການຈອງ', call:'ໂທຫາທີ່ພັກ', line:'ແຊັດໄລນ໌',
+       n:'ຄືນ', save:'ບັນທຶກລິ້ງໜ້ານີ້ໄວ້ ຫຼື ຖ່າຍໜ້າຈໍເກັບໄວ້' }
+}[lang];
+
+document.documentElement.lang = lang;
+const esc = t => String(t??'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const num = n => Number(n||0).toLocaleString('en-US');
+const nights = (a,b) => Math.max(1, Math.round((new Date(b)-new Date(a))/864e5));
+
+function shell(kind, title, sub, inner){
+  const icon = { ok:'✓', wait:'⏳', no:'✕' }[kind];
+  document.getElementById('out').innerHTML =
+    `<div class="state"><span class="dot ${kind}">${icon}</span><h1>${esc(title)}</h1></div>
+     <p class="sub">${esc(sub)}</p>${inner||''}
+     <div class="cta">
+       <a class="btn main" href="tel:+8562091555288">${esc(T.call)}</a>
+       <a class="btn" href="https://lin.ee/tvjr6Fx">${esc(T.line)}</a>
+     </div>`;
+}
+
+(async () => {
+  const id = P.get('id'), tok = P.get('tok');
+  if (!id || !tok) return shell('no', T.gone, T.goneSub);
+  let r;
+  try {
+    r = await (await fetch(`/api?action=holdstatus&id=${encodeURIComponent(id)}&tok=${encodeURIComponent(tok)}`)).json();
+  } catch(e) { return shell('no', T.gone, T.goneSub); }
+  if (!r.ok || r.state === 'expired') return shell('no', T.gone, T.goneSub);
+
+  const rows = `<dl>
+      <dt>${esc(T.room)}</dt><dd>${esc(r.roomName)}</dd>
+      <dt>${esc(T.inn)}</dt><dd>${esc(r.checkin)}</dd>
+      <dt>${esc(T.out)}</dt><dd>${esc(r.checkout)}</dd>
+      <dt>${esc(T.nights)}</dt><dd>${nights(r.checkin, r.checkout)} ${esc(T.n)}</dd>
+      <dt>${esc(T.guest)}</dt><dd>${esc(r.name)}</dd>
+      <dt>${esc(T.paid)}</dt><dd class="big">฿${num(r.amount)}</dd>
+    </dl>
+    <p class="ref">${esc(T.ref)} ${esc(r.id)}</p>`;
+
+  if (r.state === 'confirmed') shell('ok',  T.ok,   T.okSub,   rows);
+  else if (r.state === 'slip') shell('wait', T.wait, T.waitSub, rows + `<p class="tip">${esc(T.save)}</p>`);
+  else if (r.state === 'hold') shell('wait', T.hold, T.holdSub, rows);
+  else shell('no', T.no, T.noSub, rows);
+
+  // ยังรอตรวจอยู่ → เช็คซ้ำเงียบๆ ทุกนาที ถ้าพนักงานกดยืนยันหน้าจะเปลี่ยนเอง
+  if (r.state === 'slip') setTimeout(() => location.reload(), 60000);
+})();
+</script>
+</body>
+</html>

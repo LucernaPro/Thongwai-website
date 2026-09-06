@@ -356,13 +356,18 @@ async function freeRooms(db, checkin, checkout, nearPrice) {
 // สถานะการถือห้อง — หน้าเว็บ poll เพื่อนับถอยหลัง
 async function holdStatus(db, p) {
   const b = await db.prepare(
-    `SELECT id,room,pay,expires,amount,status FROM bookings WHERE id = ? AND tok = ?`)
+    `SELECT b.id,b.room,r.name AS roomName,b.checkin,b.checkout,b.name,b.phone,
+            b.pay,b.expires,b.amount,b.status
+     FROM bookings b LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.id = ? AND b.tok = ?`)
     .bind(p.get('id') || '', p.get('tok') || '').first();
   if (!b) return { ok: false, error: 'ไม่พบรายการนี้' };
   if (b.pay === 'hold' && b.expires < Date.now()) return { ok: true, state: 'expired' };
-  return { ok: true, state: b.status === 'ยกเลิก' ? 'cancelled' : (b.pay || 'confirmed'),
+  return { ok: true,
+           state: b.status === 'ยกเลิก' ? 'cancelled' : (b.pay || 'confirmed'),
            secondsLeft: b.pay === 'hold' ? Math.ceil((b.expires - Date.now()) / 1000) : null,
-           amount: b.amount };
+           id: b.id, roomName: b.roomName || b.room, checkin: b.checkin, checkout: b.checkout,
+           name: b.name, phone: b.phone, amount: b.amount };
 }
 
 // ลูกค้ากดยกเลิกเอง — ปล่อยห้องคืนทันที ไม่ต้องรอหมดเวลา
