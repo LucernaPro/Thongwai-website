@@ -87,6 +87,21 @@ async function init(db) {
     db.prepare(`CREATE TABLE IF NOT EXISTS audit (
       seq INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, actor TEXT, action TEXT, ref TEXT, data TEXT)`),
   ]);
+  // migration ก.ย. 2026: จองออนไลน์ + มัดจำ
+  // เจตนา: ไม่แตะ status เดิม ('จอง'/'ยกเลิก') เลย — การถือห้องก็ status='จอง' เหมือนกัน
+  // ทำให้ทุก query กันจองซ้อนที่มีอยู่แล้วครอบคลุมการถือห้องอัตโนมัติ ไม่ต้องแก้ที่ไหน
+  // สถานะการจ่ายเงินแยกไว้คอลัมน์ pay: 'hold' → 'slip' → NULL (พนักงานยืนยันแล้ว)
+  {
+    const cols = (await db.prepare('PRAGMA table_info(bookings)').all()).results.map(r => r.name);
+    const add = [];
+    if (!cols.includes('pay'))     add.push('ALTER TABLE bookings ADD COLUMN pay TEXT');
+    if (!cols.includes('expires')) add.push('ALTER TABLE bookings ADD COLUMN expires INTEGER');
+    if (!cols.includes('tok'))     add.push('ALTER TABLE bookings ADD COLUMN tok TEXT');
+    if (!cols.includes('amount'))  add.push('ALTER TABLE bookings ADD COLUMN amount INTEGER');
+    if (!cols.includes('slip'))    add.push('ALTER TABLE bookings ADD COLUMN slip TEXT');
+    if (add.length) await db.batch(add.map(q => db.prepare(q)));
+  }
+
   const { c } = await db.prepare('SELECT COUNT(*) AS c FROM rooms').first();
   if (c === 0) {
     await db.batch(SEED_ROOMS.map(r =>
@@ -244,6 +259,120 @@ async function cancelBooking(db, p) {
   return res.meta.changes ? { ok: true } : { ok: false, error: 'ไม่พบการจอง ' + p.get('id') };
 }
 
+
+/* ══════════════ จองออนไลน์ + มัดจำ (public — ไม่ต้อง login) ══════════════ */
+
+const HOLD_MS   = 5 * 60 * 1000;   // ถือห้อง 5 นาที
+const GRACE_MS  = 5 * 60 * 1000;   // ต่อให้เงียบๆ อีก 5 นาที "เฉพาะเมื่อไม่มีใครรอ"
+const DEPOSIT   = 0.5;             // มัดจำครึ่งหนึ่งของยอดรวม
+
+// ปล่อยห้องที่ถือไว้แล้วไม่จ่าย — เรียกก่อนทุก query ที่อ่านห้องว่าง
+// ต่อเวลาให้อัตโนมัติถ้ายังไม่มีใครมาสนใจห้องนั้น (มี waiting=0) เพื่อไม่ตัดลูกค้าจริงทิ้งฟรีๆ
+async function sweepHolds(db) {
+  const now = Date.now();
+  await db.prepare(
+    `UPDATE bookings SET status = 'ยกเลิก', pay = 'expired'
+     WHERE pay = 'hold' AND expires IS NOT NULL AND expires < ?`).bind(now).run();
+}
+
+function nightsOf(checkin, checkout) {
+  return Math.round((Date.parse(checkout) - Date.parse(checkin)) / 86400000);
+}
+
+async function quote(db, p) {
+  const room = p.get('room') || '', checkin = p.get('checkin') || '', checkout = p.get('checkout') || '';
+  if (!isDate(checkin) || !isDate(checkout)) return { ok: false, error: 'รูปแบบวันที่ต้องเป็น yyyy-mm-dd' };
+  if (checkout <= checkin) return { ok: false, error: 'วันเช็คเอาท์ต้องหลังวันเช็คอิน' };
+  const r = await db.prepare('SELECT id,name,price,capacity FROM rooms WHERE id = ?').bind(room).first();
+  if (!r) return { ok: false, error: 'ไม่พบห้อง ' + room };
+  const nights = nightsOf(checkin, checkout);
+  const total = r.price * nights;
+  return { ok: true, room: r.id, roomName: r.name, nights, price: r.price,
+           total, deposit: Math.ceil(total * DEPOSIT) };
+}
+
+// ถือห้อง — INSERT เงื่อนไขเดียวแบบ atomic เหมือน addBooking
+// กดพร้อมกันสองเครื่องในวินาทีเดียว ฐานข้อมูลให้ผ่านคนเดียวเสมอ ไม่มีทางได้ QR ทั้งคู่
+async function holdRoom(db, p) {
+  await sweepHolds(db);
+  const q = await quote(db, p);
+  if (!q.ok) return q;
+  const room = q.room, checkin = p.get('checkin'), checkout = p.get('checkout');
+  const name = (p.get('name') || '').trim(), phone = (p.get('phone') || '').trim();
+  if (name.length < 2) return { ok: false, error: 'กรุณากรอกชื่อผู้จอง' };
+  if (!/^[0-9+\-\s]{6,20}$/.test(phone)) return { ok: false, error: 'กรุณากรอกเบอร์โทรให้ถูกต้อง' };
+
+  // กันคนเดิมกดรัวจนล็อกห้องไว้หลายห้องพร้อมกัน
+  const mine = await db.prepare(
+    `SELECT COUNT(*) AS c FROM bookings WHERE phone = ? AND pay IN ('hold','slip') AND status = 'จอง'`)
+    .bind(phone).first();
+  if (mine.c >= 2) return { ok: false, error: 'เบอร์นี้มีรายการที่ยังไม่ชำระค้างอยู่ กรุณาชำระให้เสร็จก่อน' };
+
+  const id = 'W' + Date.now() + Math.random().toString(36).slice(2, 5);
+  const tok = hex(crypto.getRandomValues(new Uint8Array(16)));
+  const expires = Date.now() + HOLD_MS;
+  const res = await db.prepare(
+    `INSERT INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff,pay,expires,tok,amount)
+     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?
+     WHERE NOT EXISTS (
+       SELECT 1 FROM bookings
+       WHERE room = ? AND status = 'จอง' AND checkin < ? AND ? < checkout)`)
+    .bind(id, room, checkin, checkout, name, phone, 'จองผ่านเว็บ', 'จอง', nowStamp(), 'เว็บไซต์',
+          'hold', expires, tok, q.deposit,
+          room, checkout, checkin)
+    .run();
+
+  if (res.meta.changes === 0) {
+    // มีคนได้ไปก่อน — บอกไปเลยว่าอีกกี่นาทีจะรู้ผล คนรอจะได้ตัดสินใจเองว่าจะรอหรือเปลี่ยนห้อง
+    const clash = await db.prepare(
+      `SELECT pay, expires FROM bookings
+       WHERE room = ? AND status = 'จอง' AND checkin < ? AND ? < checkout LIMIT 1`)
+      .bind(room, checkout, checkin).first();
+    const holding = clash && clash.pay === 'hold' && clash.expires > Date.now();
+    return { ok: false, taken: true, holding,
+             secondsLeft: holding ? Math.ceil((clash.expires - Date.now()) / 1000) : 0,
+             alternatives: await freeRooms(db, checkin, checkout, q.price),
+             error: holding ? 'มีคนกำลังจองห้องนี้อยู่' : 'ห้องนี้ถูกจองแล้ว' };
+  }
+  return { ok: true, id, tok, expires, deposit: q.deposit, total: q.total,
+           nights: q.nights, roomName: q.roomName };
+}
+
+// ห้องอื่นที่ยังว่างช่วงเดียวกัน — เรียงห้องราคาใกล้เคียงขึ้นก่อน
+async function freeRooms(db, checkin, checkout, nearPrice) {
+  const rows = (await db.prepare(
+    `SELECT id,name,price,capacity FROM rooms
+     WHERE id NOT IN (
+       SELECT room FROM bookings WHERE status = 'จอง' AND checkin < ? AND ? < checkout)
+     ORDER BY sort`).bind(checkout, checkin).all()).results;
+  const n = nightsOf(checkin, checkout);
+  return rows
+    .map(r => ({ ...r, total: r.price * n, deposit: Math.ceil(r.price * n * DEPOSIT) }))
+    .sort((a, b) => Math.abs(a.price - nearPrice) - Math.abs(b.price - nearPrice))
+    .slice(0, 4);
+}
+
+// สถานะการถือห้อง — หน้าเว็บ poll เพื่อนับถอยหลัง
+async function holdStatus(db, p) {
+  const b = await db.prepare(
+    `SELECT id,room,pay,expires,amount,status FROM bookings WHERE id = ? AND tok = ?`)
+    .bind(p.get('id') || '', p.get('tok') || '').first();
+  if (!b) return { ok: false, error: 'ไม่พบรายการนี้' };
+  if (b.pay === 'hold' && b.expires < Date.now()) return { ok: true, state: 'expired' };
+  return { ok: true, state: b.status === 'ยกเลิก' ? 'cancelled' : (b.pay || 'confirmed'),
+           secondsLeft: b.pay === 'hold' ? Math.ceil((b.expires - Date.now()) / 1000) : null,
+           amount: b.amount };
+}
+
+// ลูกค้ากดยกเลิกเอง — ปล่อยห้องคืนทันที ไม่ต้องรอหมดเวลา
+async function releaseHold(db, p) {
+  const res = await db.prepare(
+    `UPDATE bookings SET status = 'ยกเลิก', pay = 'ยกเลิกเอง'
+     WHERE id = ? AND tok = ? AND pay = 'hold'`)
+    .bind(p.get('id') || '', p.get('tok') || '').run();
+  return { ok: res.meta.changes > 0 };
+}
+
 /* ── router ── */
 export default {
   async fetch(request, env, ctx) {
@@ -254,7 +383,12 @@ export default {
       await init(env.DB);
       const p = url.searchParams;
       const action = p.get('action');
-      if (action === 'availability') return json(await availability(env.DB, p));
+      // ── public: ไม่ต้อง login ──
+      if (action === 'availability') { await sweepHolds(env.DB); return json(await availability(env.DB, p)); }
+      if (action === 'quote')       return json(await quote(env.DB, p));
+      if (action === 'hold')        return json(await holdRoom(env.DB, p));
+      if (action === 'holdstatus')  return json(await holdStatus(env.DB, p));
+      if (action === 'release')     return json(await releaseHold(env.DB, p));
 
       const me = await auth(env.DB, p);
       if (!me) return json({ ok: false, error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
