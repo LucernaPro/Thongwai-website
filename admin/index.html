@@ -21,6 +21,11 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Sarabun',sans-serif;background:var(--dusk);color:var(--cream);font-size:16px;padding-bottom:90px}
 h1,h2,h3,button{font-family:'Mitr',sans-serif}
+/* รายการที่จองผ่านเว็บแต่ยังไม่ผ่านการตรวจ — ต้องดูออกทันที ไม่ปนกับที่ยืนยันแล้ว */
+td.busy.await{background:repeating-linear-gradient(135deg,#8a5a1e 0 7px,#a86c22 7px 14px)}
+td.busy.holding{background:repeating-linear-gradient(135deg,#4a4a4a 0 7px,#5a5a5a 7px 14px)}
+.await{color:#f0a94b;font-size:.85rem}
+.holding{color:#9aa39e;font-size:.85rem}
 header{position:sticky;top:0;z-index:30;background:var(--pine);padding:10px 14px;
   display:flex;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.4)}
 header h1{font-size:1.05rem;color:var(--glow);flex:1;min-width:0;line-height:1.25;
@@ -107,7 +112,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.5</small></h1>
+  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.6</small></h1>
   <span class="pill" id="whoami"></span>
   <a id="slipBell" class="hbell" href="/admin/slips/" title="ตรวจสลิป">🧾<span id="slipN"></span></a>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
@@ -648,7 +653,7 @@ async function loadLog(){
     $('logHead').textContent = `รับจองวัน${thDow(logDate)}ที่ ${thDate(logDate)} — ${act.length} รายการ` + (logBookings.length>act.length ? ` (+ยกเลิก ${logBookings.length-act.length})` : '');
     $('logList').innerHTML = logBookings.length ? logBookings.map(b => `
       <div class="bk log" onclick="openDetail('${b.id}')">
-        <div class="r1"><b>${b.name}</b>${b.phone?` · <a href="tel:${b.phone}" style="color:var(--glow)" onclick="event.stopPropagation()">${b.phone}</a>`:''}${b.status!=='จอง'?' <span class="cancelled">· ยกเลิกแล้ว</span>':''}</div>
+        <div class="r1"><b>${b.name}</b>${b.phone?` · <a href="tel:${b.phone}" style="color:var(--glow)" onclick="event.stopPropagation()">${b.phone}</a>`:''}${b.status!=='จอง'?' <span class="cancelled">· ยกเลิกแล้ว</span>':''}${b.status==='จอง'&&b.pay==='slip'?' <span class="await">· รอตรวจสลิป</span>':''}${b.status==='จอง'&&b.pay==='hold'?' <span class="holding">· ยังไม่ชำระ</span>':''}</div>
         <div>🏠 ${roomName(b.room)} · 📅 เข้า ${thDate(b.checkin)} → ออก ${thDate(b.checkout)} (${nightsOf(b)} คืน)</div>
         ${b.note?`<div><small>📝 ${b.note}</small></div>`:''}
         <div><small>รับจองโดย ${b.staff||'-'} · ${b.created}</small></div>
@@ -727,8 +732,10 @@ function render(){
       const past = d < todayStr() ? ' past' : '';
       if(b){
         const cls = (d===b.checkin||d===days[0]?' start':'') + (addDays(d,1)===b.checkout||d===days[days.length-1]?' end':'');
-        const nm = (d===b.checkin||d===days[0]) ? `<span class="nm">${b.name}</span>` : '';
-        h += `<td class="busy${cls}${past}" data-bid="${b.id}" title="${b.name} · ${thDate(b.checkin)} → ${thDate(b.checkout)}">${nm}</td>`;
+        const wait = b.pay === 'slip' ? ' await' : (b.pay === 'hold' ? ' holding' : '');
+        const mark = b.pay === 'slip' ? '🧾 ' : (b.pay === 'hold' ? '⏳ ' : '');
+        const nm = (d===b.checkin||d===days[0]) ? `<span class="nm">${mark}${b.name}</span>` : '';
+        h += `<td class="busy${cls}${wait}${past}" data-bid="${b.id}" title="${mark}${b.name} · ${thDate(b.checkin)} → ${thDate(b.checkout)}">${nm}</td>`;
       }else{
         h += `<td class="free${past}" data-room="${r.id}" data-date="${d}"></td>`;
       }
