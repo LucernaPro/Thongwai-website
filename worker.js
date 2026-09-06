@@ -12,6 +12,7 @@
 
 // ═══ นำเข้าสมุดจองเดิม (ชั่วคราว — ลบทิ้งหลังนำเข้าเสร็จ) ═══
 import IMPORT_DATA from './tools/import-data.json' with { type: 'json' };
+import qrcode from './tools/qrcode.js';
 
 function addDaysStr(s, n) {
   const d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n);
@@ -373,6 +374,82 @@ async function releaseHold(db, p) {
   return { ok: res.meta.changes > 0 };
 }
 
+
+/* ══════════════ QR พร้อมเพย์ + สลิป ══════════════ */
+
+const LAK_PER_THB = 650;   // ★ อัตราแลกเปลี่ยนคงที่ — เปลี่ยนตรงนี้บรรทัดเดียวพอ
+
+// สร้าง payload ตามมาตรฐาน EMVCo / Thai QR Payment
+function promptpayPayload(target, amount) {
+  const f = (id, v) => id + String(v.length).padStart(2, '0') + v;
+  const t = String(target).replace(/\D/g, '');
+  // เบอร์มือถือ 10 หลัก → 0066xxxxxxxxx | เลขบัตรประชาชน/ภาษี 13 หลัก → ใส่ตรงๆ
+  const acc = t.length >= 13 ? f('02', t) : f('01', '0066' + t.replace(/^0/, ''));
+  let p = f('00', '01') + f('01', amount ? '12' : '11')
+        + f('29', f('00', 'A000000677010111') + acc)
+        + f('53', '764') + (amount ? f('54', Number(amount).toFixed(2)) : '') + f('58', 'TH');
+  p += '6304';
+  let crc = 0xFFFF;
+  for (const ch of p) {
+    crc ^= ch.charCodeAt(0) << 8;
+    for (let i = 0; i < 8; i++) crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) & 0xFFFF : (crc << 1) & 0xFFFF;
+  }
+  return p + crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+// วาด QR เป็น SVG ฝั่งเซิร์ฟเวอร์ — เลขพร้อมเพย์ไม่เคยหลุดออกไปถึงเบราว์เซอร์ลูกค้า
+function qrSvg(text, px = 320) {
+  const q = qrcode(0, 'M');           // โหมด Byte (ทดสอบถอดกลับได้ถูกต้อง)
+  q.addData(text); q.make();
+  const n = q.getModuleCount(), quiet = 4, total = n + quiet * 2;
+  let d = '';
+  for (let r = 0; r < n; r++)
+    for (let c = 0; c < n; c++)
+      if (q.isDark(r, c)) d += `M${c + quiet} ${r + quiet}h1v1h-1z`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges" role="img" aria-label="QR พร้อมเพย์">`
+       + `<rect width="${total}" height="${total}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+
+async function payQr(db, p, env) {
+  const b = await db.prepare(
+    `SELECT id,amount,pay,expires,status FROM bookings WHERE id = ? AND tok = ?`)
+    .bind(p.get('id') || '', p.get('tok') || '').first();
+  if (!b || b.status === 'ยกเลิก') return new Response('ไม่พบรายการ', { status: 404 });
+  if (!env.PROMPTPAY_ID) return new Response('ยังไม่ได้ตั้งค่า PROMPTPAY_ID', { status: 500 });
+  const svg = qrSvg(promptpayPayload(env.PROMPTPAY_ID, b.amount));
+  return new Response(svg, { headers: { 'content-type': 'image/svg+xml', 'cache-control': 'no-store' } });
+}
+
+// รับสลิป — เก็บลง R2 แล้วหยุดนาฬิกาทันที ห้องถูกถือไว้จนพนักงานตัดสินใจ
+async function uploadSlip(request, db, p, env) {
+  const id = p.get('id') || '', tok = p.get('tok') || '';
+  const b = await db.prepare(
+    `SELECT id,room,checkin,checkout,name,phone,amount,pay,status FROM bookings WHERE id = ? AND tok = ?`)
+    .bind(id, tok).first();
+  if (!b) return { ok: false, error: 'ไม่พบรายการนี้' };
+  if (b.status === 'ยกเลิก') return { ok: false, error: 'รายการนี้หมดเวลาไปแล้ว กรุณาจองใหม่' };
+
+  const buf = await request.arrayBuffer();
+  if (!buf.byteLength) return { ok: false, error: 'ไม่พบไฟล์สลิป' };
+  if (buf.byteLength > 3_000_000) return { ok: false, error: 'ไฟล์ใหญ่เกินไป' };
+  const key = `slips/${id}.jpg`;
+  await env.SLIPS.put(key, buf, { httpMetadata: { contentType: 'image/jpeg' } });
+
+  // expires = NULL → sweepHolds ไม่แตะอีก ห้องถูกถือไว้ไม่มีกำหนดจนกว่าพนักงานจะกด
+  await db.prepare(
+    `UPDATE bookings SET pay = 'slip', slip = ?, expires = NULL WHERE id = ?`).bind(key, id).run();
+  return { ok: true, booking: b };
+}
+
+// ส่งรูปสลิปให้หน้า admin (ต้อง login แล้วเท่านั้น)
+async function slipImage(db, p, env) {
+  const b = await db.prepare('SELECT slip FROM bookings WHERE id = ?').bind(p.get('id') || '').first();
+  if (!b || !b.slip) return new Response('ไม่มีสลิป', { status: 404 });
+  const obj = await env.SLIPS.get(b.slip);
+  if (!obj) return new Response('ไม่พบไฟล์', { status: 404 });
+  return new Response(obj.body, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'private, max-age=3600' } });
+}
+
 /* ── router ── */
 export default {
   async fetch(request, env, ctx) {
@@ -389,6 +466,8 @@ export default {
       if (action === 'hold')        return json(await holdRoom(env.DB, p));
       if (action === 'holdstatus')  return json(await holdStatus(env.DB, p));
       if (action === 'release')     return json(await releaseHold(env.DB, p));
+      if (action === 'payqr')       return await payQr(env.DB, p, env);
+      if (action === 'slip')        return json(await uploadSlip(request, env.DB, p, env));
 
       const me = await auth(env.DB, p);
       if (!me) return json({ ok: false, error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
@@ -399,6 +478,7 @@ export default {
           const rooms = (await env.DB.prepare('SELECT id,name,capacity,price FROM rooms ORDER BY sort').all()).results;
           return json({ ok: true, rooms });
         }
+        case 'slipimg': return await slipImage(env.DB, p, env);
         case 'bookings': return json(await listBookings(env.DB, p));
         case 'booked_on': {
           const dt = p.get('date');
