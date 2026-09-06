@@ -264,6 +264,8 @@ footer a{color:var(--glow)}
 .rd-price-card{background:var(--white);border:1px solid var(--cream-2);border-radius:var(--radius);padding:26px 24px;box-shadow:0 4px 18px rgba(36,49,44,.06);position:sticky;top:76px}
 .rd-price-card h3{font-size:1.05rem;margin-bottom:14px;color:var(--pine)}
 .rd-price-card .price{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px dashed var(--cream-2);font-size:.95rem}
+.rd-price-card .pnote{margin-top:10px;padding-top:10px;border-top:1px solid var(--cream-2);
+  font-size:.8rem;line-height:1.55;color:var(--ink-soft)}
 .rd-price-card .price b{font-family:'Mitr',sans-serif;color:var(--pine);font-size:1.15rem}
 .rd-price-card .price small{color:var(--ink-soft)}
 .rd-price-card .note{font-size:.83rem;color:var(--ink-soft);margin-top:12px}
