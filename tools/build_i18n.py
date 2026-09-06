@@ -695,6 +695,39 @@ HR = {
 EN.update({k: v[0] for k, v in HR.items()})
 LO.update({k: v[1] for k, v in HR.items()})
 
+# ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
+BK = {
+ 'จองเลย': ('Book now', 'ຈອງເລີຍ'),
+ 'จองห้องพัก': ('Book a room', 'ຈອງຫ້ອງພັກ'),
+ 'จำนวนคืน': ('Nights', 'ຈຳນວນຄືນ'),
+ 'คืนที่พัก': ('nights', 'ຄືນ'),
+ 'ชื่อผู้จอง': ('Your name', 'ຊື່ຜູ້ຈອງ'),
+ 'เบอร์โทร': ('Phone', 'ເບີໂທ'),
+ 'ยอดรวม': ('Total', 'ລວມທັງໝົດ'),
+ 'มัดจำที่ต้องโอน': ('Deposit to transfer', 'ເງິນມັດຈຳທີ່ຕ້ອງໂອນ'),
+ 'ยอดมัดจำ': ('deposit', 'ເງິນມັດຈຳ'),
+ 'รับ QR เพื่อชำระมัดจำ': ('Get QR to pay the deposit', 'ຮັບ QR ເພື່ອຊຳລະມັດຈຳ'),
+ 'สแกนจ่ายด้วยแอปธนาคาร': ('Scan with your banking app', 'ສະແກນຈ່າຍດ້ວຍແອັບທະນາຄານ'),
+ 'พร้อมเพย์ (ไทย)': ('PromptPay (TH)', 'ພ້ອມເພ (ໄທ)'),
+ 'BCEL บาท': ('BCEL THB', 'BCEL ບາດ'),
+ 'BCEL กีบ': ('BCEL LAK', 'BCEL ກີບ'),
+ 'เหลือเวลา': ('Time left', 'ເວລາທີ່ເຫຼືອ'),
+ 'โอนแล้ว แนบสลิปที่นี่': ('Paid? Attach your slip here', 'ໂອນແລ້ວ ແນບສະລິບບ່ອນນີ້'),
+ 'กรุณาโอนยอดนี้แล้วแนบสลิป': ('Transfer this amount, then attach the slip', 'ກະລຸນາໂອນຍອດນີ້ ແລ້ວແນບສະລິບ'),
+ 'ส่งสลิปแล้ว รอตรวจสอบ': ('Slip received — awaiting check', 'ສົ່ງສະລິບແລ້ວ ລໍຖ້າກວດສອບ'),
+ 'เราจะยืนยันการจองหลังตรวจสลิป': ('We\'ll confirm your booking once the slip is checked', 'ພວກເຮົາຈະຢືນຢັນການຈອງຫຼັງກວດສະລິບ'),
+ 'หมดเวลา ห้องถูกปล่อยแล้ว': ('Time is up — the room has been released', 'ໝົດເວລາ ຫ້ອງຖືກປ່ອຍແລ້ວ'),
+ 'ห้องว่างช่วงเดียวกัน': ('Rooms free for the same dates', 'ຫ້ອງວ່າງໃນຊ່ວງດຽວກັນ'),
+ 'ไม่มีห้องว่างช่วงนี้': ('No rooms free for these dates', 'ບໍ່ມີຫ້ອງວ່າງໃນຊ່ວງນີ້'),
+ 'กรุณากรอกข้อมูลให้ครบ': ('Please fill in every field', 'ກະລຸນາຕື່ມຂໍ້ມູນໃຫ້ຄົບ'),
+ 'กำลังดำเนินการ…': ('Working…', 'ກຳລັງດຳເນີນການ…'),
+ 'อ่านรูปไม่ได้': ('Could not read that image', 'ອ່ານຮູບບໍ່ໄດ້'),
+ 'ส่งไม่สำเร็จ': ('Upload failed', 'ສົ່ງບໍ່ສຳເລັດ'),
+ 'ปิด': ('Close', 'ປິດ'),
+}
+EN.update({k: v[0] for k, v in BK.items()})
+LO.update({k: v[1] for k, v in BK.items()})
+
 NAME_MAP = {
  'en': {'R1':'Maha Setthi House','R2':'Chok Lap Ngoen Thong House','R3':'Chao Sua House 1','R4':'Chao Sua House 2','R5':'Mang Mee Ngoen Thong House','R6':'Lam Luay House','R7':'Udom Suk House','R8':'Mang Khang House','R9':'Maha Heng House','T1':'Tent 1','T2':'Tent 2','T3':'Tent 3','T4':'Tent 4','T5':'Tent 5','T6':'Tent 6','T7':'Tent 7','T8':'Tent 8'},
  'lo': {'R1':'ເຮືອນມະຫາເສດຖີ','R2':'ເຮືອນໂຊກລາບເງິນທອງ','R3':'ເຮືອນເຈົ້າສົວ 1','R4':'ເຮືອນເຈົ້າສົວ 2','R5':'ເຮືອນມັ່ງມີເງິນທອງ','R6':'ເຮືອນລ້ຳລວຍ','R7':'ເຮືອນອຸດົມສຸກ','R8':'ເຮືອນມັ່ງຄັ່ງ','R9':'ເຮືອນມະຫາເຮງ','T1':'ເຕັນ 1','T2':'ເຕັນ 2','T3':'ເຕັນ 3','T4':'ເຕັນ 4','T5':'ເຕັນ 5','T6':'ເຕັນ 6','T7':'ເຕັນ 7','T8':'ເຕັນ 8'},
@@ -737,7 +770,9 @@ def build(th_path, lang, D):
     # ตัด comment ไทย (โน้ตนักพัฒนา — หน้าแปลเป็นไฟล์ generate)
     h = re.sub(r'<!--[^>]*?[ก-๙].*?-->', '', h, flags=re.S)
     h = re.sub(r'(^|[ \t])//[^\n]*[ก-๙][^\n]*', r'\1', h, flags=re.M)
-    h = re.sub(r'/\*[^*]*[ก-๙].*?\*/', '', h, flags=re.S)
+    # (?<![\w"'/]) กัน /* ที่ติดกับตัวอักษร เช่น accept="image/*" ไม่ให้ถูกอ่านเป็นคอมเมนต์
+    # เคยทำให้โค้ด JS หาย 40 บรรทัดในหน้า en/lo แบบเงียบๆ มาแล้ว
+    h = re.sub(r'(?<![\w"\'/])/\*[^*]*[ก-๙].*?\*/', '', h, flags=re.S)
     # แทนที่ยาว→สั้น กันคำซ้อน
     hits = 0
     for k in sorted(D, key=len, reverse=True):

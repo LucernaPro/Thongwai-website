@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=img1">
+<link rel="stylesheet" href="/assets/style.css?v=bk1">
 </head>
 <body class="avpage">
 
@@ -233,11 +233,14 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
         (url ? `<a class="tl" href="${url}">${inner}</a>` : `<span class="tl">${inner}</span>`) +
         `<span class="avw-pill ${busy ? 'full' : 'free'}">${busy ? 'เต็ม' : 'ว่าง'}</span>` +
         (busy && nf ? `<button class="avw-next" data-d="${nf}">ว่างถัดไป ${thDate(nf)} →</button>` : '') +
+        (busy ? '' : `<button class="avw-book" data-book="${r.id}">จองเลย</button>`) +
       `</div>`;
     }).join('');
   };
 
   avw.addEventListener('click', e => {
+    const bk = e.target.closest('.avw-book');
+    if (bk) { openBook(bk.dataset.book, sel, D.rooms.find(r => r.id === bk.dataset.book)); return; }
     const day = e.target.closest('.avw-day:not(.dis):not(.blank), .avw-next');
     if (!day || !day.dataset.d) return;
     sel = day.dataset.d;
@@ -254,8 +257,213 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   document.getElementById('avwLoad').style.display = 'none';
   avw.style.display = 'block';
   render();
+  window.__avwReload = async () => {           // โหลดปฏิทินใหม่หลังจองสำเร็จ
+    try {
+      const r = await (await fetch('/api?action=availability&days=120')).json();
+      if (r.ok) { D.rooms = r.rooms; D.booked = r.booked; render(); }
+    } catch (e) {}
+  };
 })();
 </script>
 <script src="/assets/lightbox.js?v=4" defer></script>
+<!-- ═══ แผงจองออนไลน์ + ชำระมัดจำ ═══ -->
+<div class="bk-scrim" id="bkScrim" hidden></div>
+<div class="bk" id="bk" hidden role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+  <div class="bk-head">
+    <b id="bkTitle">จองห้องพัก</b>
+    <button class="bk-x" id="bkClose" aria-label="ปิด">✕</button>
+  </div>
+  <div class="bk-body" id="bkBody"></div>
+</div>
+
+<script>
+(function(){
+  const LAK = 650;                       // ★ อัตราแลกเปลี่ยน ตรงกับที่ตั้งไว้ใน worker.js
+  const $ = id => document.getElementById(id);
+  const bk = $('bk'), scrim = $('bkScrim'), body = $('bkBody');
+  const esc = t => String(t??'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const num = n => Number(n||0).toLocaleString('en-US');
+  const addD = (d,n) => { const x=new Date(d+'T00:00:00Z'); x.setUTCDate(x.getUTCDate()+n); return x.toISOString().slice(0,10); };
+  let st = {}, timer = null;
+
+  function open(){ bk.hidden = scrim.hidden = false; document.body.style.overflow='hidden'; }
+  function close(){
+    bk.hidden = scrim.hidden = true; document.body.style.overflow='';
+    clearInterval(timer); timer = null;
+    if (st.id && st.tok && st.stage === 'pay')            // ออกกลางคัน = ปล่อยห้องคืนทันที
+      navigator.sendBeacon?.('/api?action=release&id='+encodeURIComponent(st.id)+'&tok='+encodeURIComponent(st.tok));
+    st = {}; window.__avwReload?.();
+  }
+  $('bkClose').onclick = close; scrim.onclick = close;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !bk.hidden) close(); });
+
+  /* ── ขั้นที่ 1: กรอกข้อมูล ── */
+  window.openBook = function(roomId, checkin, room){
+    st = { room: roomId, checkin, roomName: room?.name || roomId, nights: 1, stage: 'form' };
+    open(); form();
+  };
+
+  function form(err){
+    const co = addD(st.checkin, st.nights);
+    body.innerHTML = `
+      <p class="bk-room">${esc(st.roomName)}</p>
+      <p class="bk-dates">${esc(st.checkin)} → ${esc(co)}</p>
+      <label class="bk-l">จำนวนคืน</label>
+      <div class="bk-n">
+        <button data-n="-1" ${st.nights<=1?'disabled':''}>−</button>
+        <span>${st.nights} <i>คืนที่พัก</i></span>
+        <button data-n="1" ${st.nights>=14?'disabled':''}>+</button>
+      </div>
+      <label class="bk-l">ชื่อผู้จอง</label>
+      <input class="bk-i" id="bkName" value="${esc(st.name||'')}" autocomplete="name">
+      <label class="bk-l">เบอร์โทร</label>
+      <input class="bk-i" id="bkPhone" value="${esc(st.phone||'')}" inputmode="tel" autocomplete="tel">
+      <div class="bk-sum" id="bkSum">…</div>
+      ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
+      <button class="bk-go" id="bkGo">รับ QR เพื่อชำระมัดจำ</button>`;
+    quote();
+    body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
+      st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
+      st.name = $('bkName').value; st.phone = $('bkPhone').value; form();
+    });
+    $('bkGo').onclick = hold;
+  }
+
+  async function quote(){
+    const r = await (await fetch(`/api?action=quote&room=${st.room}&checkin=${st.checkin}&checkout=${addD(st.checkin, st.nights)}`)).json();
+    if (!r.ok) { $('bkSum').textContent = r.error; return; }
+    st.total = r.total; st.deposit = r.deposit;
+    $('bkSum').innerHTML = `<span>ยอดรวม</span><b>฿${num(r.total)}</b>
+      <span>มัดจำที่ต้องโอน</span><b class="hi">฿${num(r.deposit)}</b>`;
+  }
+
+  /* ── ขั้นที่ 2: ถือห้อง + QR ── */
+  async function hold(){
+    const name = $('bkName').value.trim(), phone = $('bkPhone').value.trim();
+    if (name.length < 2 || phone.length < 6) return form('กรุณากรอกข้อมูลให้ครบ');
+    st.name = name; st.phone = phone;
+    $('bkGo').disabled = true; $('bkGo').textContent = 'กำลังดำเนินการ…';
+    const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
+      checkout:addD(st.checkin, st.nights), name, phone });
+    const r = await (await fetch('/api?' + q)).json();
+    if (!r.ok) return r.taken ? taken(r) : form(r.error);
+    Object.assign(st, { id:r.id, tok:r.tok, expires:r.expires, deposit:r.deposit, stage:'pay' });
+    pay();
+  }
+
+  /* ── ห้องถูกคนอื่นได้ไปก่อน → เสนอห้องอื่นทันที ── */
+  function taken(r){
+    body.innerHTML = `
+      <p class="bk-warn">${esc(r.error)}${r.holding ? ` · <b id="bkCd">${Math.floor(r.secondsLeft/60)}:${String(r.secondsLeft%60).padStart(2,'0')}</b>` : ''}</p>
+      ${r.alternatives?.length ? `<p class="bk-l">ห้องว่างช่วงเดียวกัน</p>` +
+        r.alternatives.map(a => `<button class="bk-alt" data-alt="${a.id}" data-nm="${esc(a.name)}">
+          <span>${esc(a.name)}</span><b>฿${num(a.total)} · <i>ยอดมัดจำ</i> ฿${num(a.deposit)}</b></button>`).join('')
+        : '<p class="bk-l">ไม่มีห้องว่างช่วงนี้</p>'}
+      <button class="bk-go ghost" id="bkBack">ปิด</button>`;
+    body.querySelectorAll('[data-alt]').forEach(b => b.onclick = () => {
+      st.room = b.dataset.alt; st.roomName = b.dataset.nm; form();
+    });
+    $('bkBack').onclick = close;
+    if (r.holding) {
+      let left = r.secondsLeft;
+      timer = setInterval(() => {
+        left--; const el = $('bkCd'); if (!el) return clearInterval(timer);
+        el.textContent = Math.floor(left/60)+':'+String(Math.max(0,left%60)).padStart(2,'0');
+        if (left <= 0) { clearInterval(timer); close(); }
+      }, 1000);
+    }
+  }
+
+  /* ── ขั้นที่ 3: จ่ายเงิน ── */
+  function pay(){
+    const lak = Math.ceil(st.deposit * LAK / 1000) * 1000;
+    body.innerHTML = `
+      <div class="bk-amt">฿${num(st.deposit)}<small>มัดจำที่ต้องโอน</small></div>
+      <div class="bk-clock">เหลือเวลา <b id="bkCd">5:00</b></div>
+      <div class="bk-tabs">
+        <button class="on" data-t="pp">พร้อมเพย์ (ไทย)</button>
+        <button data-t="thb">BCEL บาท</button>
+        <button data-t="lak">BCEL กีบ</button>
+      </div>
+      <div class="bk-qr" id="bkQr"></div>
+      <p class="bk-note" id="bkNote">สแกนจ่ายด้วยแอปธนาคาร</p>
+      <label class="bk-up" id="bkUpL">โอนแล้ว แนบสลิปที่นี่
+        <input type="file" id="bkFile" accept="image/jpeg,image/png,image/webp,image/heic" hidden></label>
+      <p class="bk-err" id="bkUpErr"></p>`;
+
+    const QR = {
+      pp:  { html: `<img src="/api?action=payqr&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}" alt="QR" width="260" height="260">`,
+             note: 'สแกนจ่ายด้วยแอปธนาคาร' },
+      thb: { html: `<img src="/images/qr-bcel-thb.webp" alt="BCEL" loading="lazy">`,
+             note: 'กรุณาโอนยอดนี้แล้วแนบสลิป' },
+      lak: { html: `<img src="/images/qr-bcel-lak.webp" alt="BCEL" loading="lazy">`,
+             note: 'กรุณาโอนยอดนี้แล้วแนบสลิป' }
+    };
+    const show = t => {
+      $('bkQr').innerHTML = QR[t].html;
+      $('bkNote').innerHTML = t === 'lak'
+        ? `<b>${num(lak)} LAK</b> · ${QR[t].note}` : QR[t].note;
+      body.querySelectorAll('.bk-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+      $('bkAmtLak')&&0;
+    };
+    body.querySelectorAll('.bk-tabs button').forEach(b => b.onclick = () => show(b.dataset.t));
+    show('pp');
+
+    let left = Math.round((st.expires - Date.now())/1000);
+    timer = setInterval(() => {
+      left--; const el = $('bkCd'); if (!el) return clearInterval(timer);
+      el.textContent = Math.floor(Math.max(0,left)/60)+':'+String(Math.max(0,left%60)).padStart(2,'0');
+      if (left <= 0) { clearInterval(timer); expired(); }
+    }, 1000);
+
+    $('bkFile').onchange = e => upload(e.target.files[0]);
+  }
+
+  function expired(){
+    st.stage = 'done';
+    body.innerHTML = `<p class="bk-warn">หมดเวลา ห้องถูกปล่อยแล้ว</p><button class="bk-go ghost" id="bkBack">ปิด</button>`;
+    $('bkBack').onclick = close;
+  }
+
+  /* ── อัปสลิป: ย่อรูปในเครื่องก่อนส่ง ประหยัดเน็ตลูกค้าและพื้นที่เรา ── */
+  async function upload(file){
+    if (!file) return;
+    clearInterval(timer); timer = null;          // กดแนบ = หยุดนาฬิกาทันที
+    $('bkUpL').textContent = 'กำลังดำเนินการ…';
+    try{
+      const blob = await shrink(file);
+      const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
+        { method:'POST', body: blob })).json();
+      if (!r.ok) throw new Error(r.error);
+      st.stage = 'done';
+      body.innerHTML = `<div class="bk-ok">✓</div>
+        <p class="bk-done">ส่งสลิปแล้ว รอตรวจสอบ</p>
+        <p class="bk-note">เราจะยืนยันการจองหลังตรวจสลิป</p>
+        <button class="bk-go ghost" id="bkBack">ปิด</button>`;
+      $('bkBack').onclick = close;
+    }catch(err){
+      $('bkUpL').textContent = 'โอนแล้ว แนบสลิปที่นี่';
+      $('bkUpErr').textContent = err.message || 'ส่งไม่สำเร็จ';
+      pay();
+    }
+  }
+
+  function shrink(file){
+    return new Promise((res, rej) => {
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = () => {
+        const w = Math.min(1000, img.width), h = Math.round(img.height * w / img.width);
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        cv.toBlob(b => b ? res(b) : rej(new Error('อ่านรูปไม่ได้')), 'image/jpeg', 0.75);
+      };
+      img.onerror = () => rej(new Error('อ่านรูปไม่ได้'));
+      img.src = url;
+    });
+  }
+})();
+</script>
+
 </body>
 </html>

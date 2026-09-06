@@ -433,6 +433,68 @@ a.tl:hover .nm{color:var(--glow)}
   font-size:.86rem;color:var(--pine);
 }
 
+
+/* ===== จองออนไลน์ + ชำระมัดจำ (หน้า availability) ===== */
+.avw-book{margin-top:8px;width:100%;padding:9px;border:0;border-radius:8px;
+  background:var(--pine);color:#fff;font-family:inherit;font-weight:500;font-size:.88rem;cursor:pointer}
+.avw-book:hover{background:#25603c}
+.bk-scrim{position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:60}
+.bk{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(420px,calc(100vw - 28px));max-height:88vh;overflow:auto;
+  background:var(--cream);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.bk-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--cream-2);
+  position:sticky;top:0;background:var(--cream);border-radius:16px 16px 0 0}
+.bk-head b{flex:1;font-size:1rem}
+.bk-x{border:0;background:none;font-size:1.1rem;cursor:pointer;color:var(--ink-soft);padding:4px 6px}
+.bk-body{padding:16px}
+.bk-room{margin:0;font-size:1.05rem;font-weight:600}
+.bk-dates{margin:2px 0 14px;font-size:.88rem;color:var(--ink-soft)}
+.bk-l{display:block;margin:12px 0 5px;font-size:.82rem;color:var(--ink-soft)}
+.bk-i{width:100%;padding:10px 12px;border:1px solid var(--cream-2);border-radius:9px;
+  font-family:inherit;font-size:.95rem;background:var(--white)}
+.bk-n{display:flex;align-items:center;gap:14px}
+.bk-n button{width:38px;height:38px;border:1px solid var(--cream-2);background:var(--white);
+  border-radius:9px;font-size:1.1rem;cursor:pointer}
+.bk-n button:disabled{opacity:.35;cursor:default}
+.bk-n span{font-weight:500}
+.bk-sum{display:grid;grid-template-columns:1fr auto;gap:5px 10px;margin:16px 0 4px;
+  padding:12px 14px;background:var(--white);border-radius:10px;font-size:.9rem}
+.bk-sum span{color:var(--ink-soft)}
+.bk-sum b{text-align:right}
+.bk-sum b.hi{color:var(--pine);font-size:1.1rem}
+.bk-go{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:var(--lantern);
+  color:#3a2408;font-family:inherit;font-weight:600;font-size:.98rem;cursor:pointer}
+.bk-go.ghost{background:var(--white);color:var(--ink-soft);border:1px solid var(--cream-2)}
+.bk-go:disabled{opacity:.6;cursor:default}
+.bk-err{margin:9px 0 0;font-size:.85rem;color:#c1462d}
+.bk-warn{margin:0 0 14px;padding:12px 14px;background:#fdf1e3;border-left:3px solid var(--lantern);
+  border-radius:8px;font-size:.9rem}
+.bk-alt{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;
+  margin-bottom:8px;padding:12px 14px;background:var(--white);border:1px solid var(--cream-2);
+  border-radius:10px;font-family:inherit;font-size:.9rem;text-align:left;cursor:pointer}
+.bk-alt:hover{border-color:var(--pine)}
+.bk-alt b{white-space:nowrap;font-size:.85rem;color:var(--pine)}
+.bk-amt{text-align:center;font-size:2rem;font-weight:600;color:var(--pine);line-height:1.15}
+.bk-amt small{display:block;font-size:.78rem;font-weight:400;color:var(--ink-soft);margin-top:2px}
+.bk-clock{text-align:center;margin:10px 0 14px;font-size:.88rem;color:var(--ink-soft)}
+.bk-clock b{color:#c1462d;font-size:1.05rem}
+.bk-tabs{display:flex;gap:6px;margin-bottom:12px}
+.bk-tabs button{flex:1;padding:8px 4px;border:1px solid var(--cream-2);background:var(--white);
+  border-radius:8px;font-family:inherit;font-size:.78rem;cursor:pointer;color:var(--ink-soft)}
+.bk-tabs button.on{background:var(--pine);color:#fff;border-color:var(--pine)}
+.bk-qr{display:flex;justify-content:center;background:var(--white);border-radius:12px;padding:12px}
+.bk-qr img{max-width:100%;height:auto;border-radius:6px}
+.bk-note{margin:10px 0 0;text-align:center;font-size:.85rem;color:var(--ink-soft)}
+.bk-up{display:block;margin-top:16px;padding:14px;text-align:center;cursor:pointer;
+  border:2px dashed var(--pine);border-radius:10px;color:var(--pine);font-weight:500;font-size:.92rem}
+.bk-ok{width:56px;height:56px;margin:6px auto 0;border-radius:50%;background:#2f7d4f;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem}
+.bk-done{margin:12px 0 0;text-align:center;font-size:1.05rem;font-weight:600}
+@media(max-width:720px){
+  .bk{width:100vw;max-width:none;height:100dvh;max-height:none;top:0;left:0;transform:none;border-radius:0}
+  .bk-head{border-radius:0}
+}
+
 @media(max-width:720px){
   section{padding:32px 0 40px}
   #house-rules{padding-top:0!important}
