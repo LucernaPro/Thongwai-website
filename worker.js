@@ -218,7 +218,7 @@ async function listBookings(db, p) {
   const from = isDate(p.get('from')) ? p.get('from') : addDays(todayStr(), -60);
   const to = isDate(p.get('to')) ? p.get('to') : addDays(todayStr(), 120);
   const bookings = (await db.prepare(
-    `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay FROM bookings
+    `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip FROM bookings
      WHERE checkin < ? AND checkout > ? ORDER BY checkin`).bind(to, from).all()).results;
   return { ok: true, bookings };
 }
@@ -555,7 +555,7 @@ export default {
           const dt = p.get('date');
           if (!/^\d{4}-\d{2}-\d{2}$/.test(dt || '')) return json({ ok: false, error: 'รูปแบบวันที่ไม่ถูกต้อง' });
           const bookings = (await env.DB.prepare(
-            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay FROM bookings
+            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip FROM bookings
              WHERE created LIKE ? ORDER BY created, id`).bind(dt + '%').all()).results;
           return json({ ok: true, bookings });
         }

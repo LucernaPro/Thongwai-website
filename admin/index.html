@@ -112,7 +112,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.6</small></h1>
+  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.7</small></h1>
   <span class="pill" id="whoami"></span>
   <a id="slipBell" class="hbell" href="/admin/slips/" title="ตรวจสลิป">🧾<span id="slipN"></span></a>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
@@ -946,8 +946,22 @@ function openDetail(id){
     ln('รายละเอียด', noteLines) +
     ln('รับจองโดย', b.staff) +
     ln('จองเมื่อ', b.created) +
-    ln('สถานะ', b.status==='จอง' ? 'จอง ✓' : '<span style="color:#ffb0a5">ยกเลิกแล้ว</span>') +
-    ln('รหัส', b.id);
+    ln('สถานะ', b.status==='จอง'
+        ? (b.pay==='slip' ? '<span style="color:#f0a94b">รอตรวจสลิป</span>'
+         : b.pay==='hold' ? '<span style="color:#9aa39e">ยังไม่ชำระ</span>'
+         : 'จอง ✓')
+        : '<span style="color:#ffb0a5">ยกเลิกแล้ว</span>') +
+    ln('รหัส', b.id) +
+    // สลิปเก็บไว้ถาวร ดูย้อนหลังได้เสมอ ไม่ได้หายไปตอนกดยืนยัน
+    (b.slip ? `<div class="ln" style="display:block">
+        <span class="k">สลิปโอนเงิน</span>
+        <a href="${API}?action=slipimg&id=${encodeURIComponent(b.id)}&user=${encodeURIComponent(store.user)}&pass=${encodeURIComponent(store.pass)}" target="_blank" rel="noopener">
+          <img src="${API}?action=slipimg&id=${encodeURIComponent(b.id)}&user=${encodeURIComponent(store.user)}&pass=${encodeURIComponent(store.pass)}"
+               alt="สลิปโอนเงิน" loading="lazy"
+               style="margin-top:8px;width:100%;max-width:300px;border-radius:10px;border:1px solid rgba(246,200,119,.3)">
+        </a>
+        <small style="display:block;opacity:.6;margin-top:5px">กดที่รูปเพื่อดูเต็มจอ</small>
+      </div>` : '');
   $('dCancel').style.display = b.status==='จอง' ? 'inline-block' : 'none';
   $('dMove').style.display = b.status==='จอง' ? 'inline-block' : 'none';
   $('dMsg').className='msg';
