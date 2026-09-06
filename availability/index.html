@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=bk2">
+<link rel="stylesheet" href="/assets/style.css?v=nc1">
 </head>
 <body class="avpage">
 
@@ -303,10 +303,25 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     }catch(e){ return; }
     if (!r.ok || r.state === 'expired' || r.state === 'cancelled') return forget();
     Object.assign(st, v, { stage: r.state === 'slip' ? 'done' : 'pay' });
-    if (r.state === 'slip' || r.state === 'confirmed') { open(); waiting(); return; }
+    if (r.state === 'slip' || r.state === 'confirmed') { myCard(v, r); return; }
     st.expires = Date.now() + (r.secondsLeft || 0) * 1000;
     st.resumed = true;
     open(); pay();
+  }
+
+  function myCard(v, r){
+    if (r.checkout && r.checkout < new Date(Date.now()+7*3600e3).toISOString().slice(0,10))
+      return forget();                                  // เข้าพักจบแล้ว ไม่ต้องโชว์อีก
+    const ok = r.state === 'confirmed';
+    const el = document.createElement('div');
+    el.className = 'mybk' + (ok ? ' ok' : '');
+    el.innerHTML = `<div><b>การจองของคุณ</b>
+        <span>${esc(r.roomName)} · ${esc(r.checkin)} → ${esc(r.checkout)}</span>
+        <span class="stt">${ok ? 'ยืนยันแล้ว' : 'รอตรวจสลิป'}</span></div>
+      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}">ดูรายละเอียด</a>`;
+    const host = document.querySelector('#availability .wrap');
+    const anchor = document.getElementById('avw');
+    if (host && anchor) host.insertBefore(el, anchor); else host?.appendChild(el);
   }
 
   function open(){ bk.hidden = scrim.hidden = false; document.body.style.overflow='hidden'; }
@@ -343,12 +358,18 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       <label class="bk-l">เบอร์โทร</label>
       <input class="bk-i" id="bkPhone" value="${esc(st.phone||'')}" inputmode="tel" autocomplete="tel">
       <div class="bk-sum" id="bkSum">…</div>
+      <div class="bk-nocancel">
+        <b>จองแล้วยกเลิกไม่ได้</b>
+        <p>มัดจำที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี กรุณาตรวจสอบห้องพักและวันที่ให้แน่ใจก่อนชำระเงิน</p>
+        <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ข้าพเจ้ารับทราบและยอมรับเงื่อนไขนี้</span></label>
+      </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
       <button class="bk-go" id="bkGo">รับ QR เพื่อชำระมัดจำ</button>`;
     quote();
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
-      st.name = $('bkName').value; st.phone = $('bkPhone').value; form();
+      st.name = $('bkName').value; st.phone = $('bkPhone').value;
+      st.agree = $('bkAgree').checked; form();
     });
     $('bkGo').onclick = hold;
   }
@@ -364,7 +385,9 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   /* ── ขั้นที่ 2: ถือห้อง + QR ── */
   async function hold(){
     const name = $('bkName').value.trim(), phone = $('bkPhone').value.trim();
+    st.agree = $('bkAgree').checked;
     if (name.length < 2 || phone.length < 6) return form('กรุณากรอกข้อมูลให้ครบ');
+    if (!st.agree) return form('กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ');
     st.name = name; st.phone = phone;
     $('bkGo').disabled = true; $('bkGo').textContent = 'กำลังดำเนินการ…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
@@ -406,6 +429,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       ${st.resumed ? '<p class="bk-resume">ทำต่อจากเดิมได้เลย</p>' : ''}
       <div class="bk-amt">฿${num(st.deposit)}<small>มัดจำที่ต้องโอน</small></div>
       <div class="bk-clock">เหลือเวลา <b id="bkCd">5:00</b></div>
+      <p class="bk-nc2">จองแล้วยกเลิกไม่ได้ · มัดจำไม่คืนทุกกรณี</p>
       <div class="bk-tabs">
         <button class="on" data-t="pp">พร้อมเพย์ (ไทย)</button>
         <button data-t="thb">BCEL บาท</button>
@@ -493,7 +517,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
         { method:'POST', body: blob })).json();
       if (!r.ok) throw new Error(r.error);
-      st.stage = 'done'; forget();
+      st.stage = 'done'; remember();     // เก็บต่อ เพื่อโชว์การ์ด "การจองของคุณ" ตอนกลับมาเปิดเว็บ
       waiting();
     }catch(err){
       $('bkUpL').textContent = 'โอนแล้ว แนบสลิปที่นี่';

@@ -458,6 +458,24 @@ a.tl:hover .nm{color:var(--glow)}
 .bk .bk-tabs button.on{color:#fff}
 .bk .bk-up{color:var(--pine)}
 .bk .bk-ok{color:#fff}
+/* การ์ดเงื่อนไขยกเลิก — ต้องเห็นชัดก่อนจ่ายเงิน */
+.bk .bk-nocancel{margin-top:16px;padding:14px;border-radius:10px;background:#fdeeea;
+  border:1.5px solid #e0a99c;color:var(--ink)}
+.bk .bk-nocancel b{display:block;font-family:'Mitr',sans-serif;font-size:1.02rem;color:#a8321c;margin-bottom:5px}
+.bk .bk-nocancel p{margin:0 0 10px;font-size:.86rem;line-height:1.6;color:#6b4a42}
+.bk .bk-nocancel label{display:flex;gap:9px;align-items:flex-start;cursor:pointer;font-size:.88rem;font-weight:500}
+.bk .bk-nocancel input{width:20px;height:20px;flex:0 0 auto;margin-top:1px;accent-color:#a8321c}
+.bk .bk-nc2{margin:0 0 12px;text-align:center;font-size:.8rem;color:#a8321c;font-weight:500}
+/* การ์ด "การจองของคุณ" บนหน้าห้องว่าง */
+.mybk{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:26px;padding:14px 16px;
+  border-radius:12px;background:rgba(246,200,119,.12);border:1px solid rgba(246,200,119,.4)}
+.mybk.ok{background:rgba(61,139,95,.16);border-color:rgba(120,200,160,.45)}
+.mybk div{flex:1;min-width:200px;display:flex;flex-direction:column;line-height:1.5}
+.mybk b{font-family:'Mitr',sans-serif;font-size:.98rem;color:var(--glow)}
+.mybk span{font-size:.85rem;color:rgba(245,239,227,.8)}
+.mybk .stt{font-weight:600;color:var(--glow)}
+.mybk a{flex:0 0 auto;padding:9px 16px;border-radius:9px;background:var(--pine);color:var(--cream);
+  text-decoration:none;font-size:.88rem;font-weight:500}
 .bk-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--cream-2);
   position:sticky;top:0;background:var(--cream);border-radius:16px 16px 0 0}
 .bk-head b{flex:1;font-size:1rem}

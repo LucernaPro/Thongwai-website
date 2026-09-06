@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=bk2">
+<link rel="stylesheet" href="/assets/style.css?v=nc1">
 </head>
 <body class="avpage">
 
@@ -306,10 +306,25 @@ const AVW_DAYS = 92;
     }catch(e){ return; }
     if (!r.ok || r.state === 'expired' || r.state === 'cancelled') return forget();
     Object.assign(st, v, { stage: r.state === 'slip' ? 'done' : 'pay' });
-    if (r.state === 'slip' || r.state === 'confirmed') { open(); waiting(); return; }
+    if (r.state === 'slip' || r.state === 'confirmed') { myCard(v, r); return; }
     st.expires = Date.now() + (r.secondsLeft || 0) * 1000;
     st.resumed = true;
     open(); pay();
+  }
+
+  function myCard(v, r){
+    if (r.checkout && r.checkout < new Date(Date.now()+7*3600e3).toISOString().slice(0,10))
+      return forget();                                  
+    const ok = r.state === 'confirmed';
+    const el = document.createElement('div');
+    el.className = 'mybk' + (ok ? ' ok' : '');
+    el.innerHTML = `<div><b>ການຈອງຂອງທ່ານ</b>
+        <span>${esc(r.roomName)} · ${esc(r.checkin)} → ${esc(r.checkout)}</span>
+        <span class="stt">${ok ? 'ຢືນຢັນແລ້ວ' : 'ລໍຖ້າກວດສະລິບ'}</span></div>
+      <a href="/booking/?id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}">ເບິ່ງລາຍລະອຽດ</a>`;
+    const host = document.querySelector('#availability .wrap');
+    const anchor = document.getElementById('avw');
+    if (host && anchor) host.insertBefore(el, anchor); else host?.appendChild(el);
   }
 
   function open(){ bk.hidden = scrim.hidden = false; document.body.style.overflow='hidden'; }
@@ -346,12 +361,18 @@ const AVW_DAYS = 92;
       <label class="bk-l">ເບີໂທ</label>
       <input class="bk-i" id="bkPhone" value="${esc(st.phone||'')}" inputmode="tel" autocomplete="tel">
       <div class="bk-sum" id="bkSum">…</div>
+      <div class="bk-nocancel">
+        <b>ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້</b>
+        <p>ເງິນມັດຈຳທີ່ຊຳລະແລ້ວ ບໍ່ສາມາດຂໍຄືນໄດ້ທຸກກໍລະນີ ກະລຸນາກວດຫ້ອງພັກ ແລະ ວັນທີໃຫ້ແນ່ໃຈກ່ອນຊຳລະເງິນ</p>
+        <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ຂ້າພະເຈົ້າຮັບຊາບ ແລະ ຍອມຮັບເງື່ອນໄຂນີ້</span></label>
+      </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
       <button class="bk-go" id="bkGo">ຮັບ QR ເພື່ອຊຳລະມັດຈຳ</button>`;
     quote();
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
-      st.name = $('bkName').value; st.phone = $('bkPhone').value; form();
+      st.name = $('bkName').value; st.phone = $('bkPhone').value;
+      st.agree = $('bkAgree').checked; form();
     });
     $('bkGo').onclick = hold;
   }
@@ -367,7 +388,9 @@ const AVW_DAYS = 92;
   
   async function hold(){
     const name = $('bkName').value.trim(), phone = $('bkPhone').value.trim();
+    st.agree = $('bkAgree').checked;
     if (name.length < 2 || phone.length < 6) return form('ກະລຸນາຕື່ມຂໍ້ມູນໃຫ້ຄົບ');
+    if (!st.agree) return form('ກະລຸນາຍອມຮັບເງື່ອນໄຂກ່ອນດຳເນີນການຕໍ່');
     st.name = name; st.phone = phone;
     $('bkGo').disabled = true; $('bkGo').textContent = 'ກຳລັງດຳເນີນການ…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
@@ -409,6 +432,7 @@ const AVW_DAYS = 92;
       ${st.resumed ? '<p class="bk-resume">ສືບຕໍ່ຈາກເດີມໄດ້ເລີຍ</p>' : ''}
       <div class="bk-amt">฿${num(st.deposit)}<small>ເງິນມັດຈຳທີ່ຕ້ອງໂອນ</small></div>
       <div class="bk-clock">ເວລາທີ່ເຫຼືອ <b id="bkCd">5:00</b></div>
+      <p class="bk-nc2">ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້ · ມັດຈຳບໍ່ຄືນທຸກກໍລະນີ</p>
       <div class="bk-tabs">
         <button class="on" data-t="pp">ພ້ອມເພ (ໄທ)</button>
         <button data-t="thb">BCEL ບາດ</button>
@@ -496,7 +520,7 @@ const AVW_DAYS = 92;
       const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
         { method:'POST', body: blob })).json();
       if (!r.ok) throw new Error(r.error);
-      st.stage = 'done'; forget();
+      st.stage = 'done'; remember();     
       waiting();
     }catch(err){
       $('bkUpL').textContent = 'ໂອນແລ້ວ ແນບສະລິບບ່ອນນີ້';
