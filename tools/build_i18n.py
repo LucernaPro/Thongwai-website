@@ -698,6 +698,10 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ไม่รวมอาหารเช้า': ('Without breakfast', 'ບໍ່ລວມອາຫານເຊົ້າ'),
+ 'รวมอาหารเช้า': ('With breakfast', 'ລວມອາຫານເຊົ້າ'),
+ 'อาหารเช้า': ('Breakfast', 'ອາຫານເຊົ້າ'),
+ 'เตียงเสริม': ('Extra beds', 'ຕຽງເສີມ'),
  'จองง่ายที่สุด — ทักมาคุยกับเจ้าของ': ('The easiest way — message us directly', 'ຈອງງ່າຍທີ່ສຸດ — ທັກມາລົມກັບເຈົ້າຂອງ'),
  'สอบถามได้ทุกเรื่อง เจ้าของจัดการจองให้ทั้งหมด': ('Ask us anything — we will handle the whole booking for you', 'ສອບຖາມໄດ້ທຸກເລື່ອງ ເຈົ້າຂອງຈັດການຈອງໃຫ້ທັງໝົດ'),
  'ทัก Facebook': ('Message on Facebook', 'ທັກ Facebook'),

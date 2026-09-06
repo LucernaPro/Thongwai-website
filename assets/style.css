@@ -481,6 +481,10 @@ a.tl:hover .nm{color:var(--glow)}
   text-align:center;font-size:.92rem;color:rgba(245,239,227,.85)}
 .bk .bk-alt2{margin:14px 0 0;text-align:center;font-size:.85rem;color:var(--ink-soft)}
 .bk .bk-alt2 a{color:var(--pine);font-weight:600;text-decoration:underline}
+.bk .bk-seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bk .bk-seg button{padding:11px 8px;border:1px solid var(--cream-2);background:var(--white);
+  border-radius:9px;font-family:inherit;font-size:.88rem;cursor:pointer;color:var(--ink-soft)}
+.bk .bk-seg button.on{background:var(--pine);color:#fff;border-color:var(--pine);font-weight:600}
 .bk .bk-ch{display:grid;grid-template-columns:auto 1fr;gap:8px}
 .bk .bk-ch select{background:var(--white)}
 .bk .bk-hint{margin:6px 0 0;font-size:.78rem;color:var(--ink-soft);line-height:1.5}

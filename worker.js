@@ -101,7 +101,30 @@ async function init(db) {
     if (!cols.includes('amount'))  add.push('ALTER TABLE bookings ADD COLUMN amount INTEGER');
     if (!cols.includes('slip'))    add.push('ALTER TABLE bookings ADD COLUMN slip TEXT');
     if (!cols.includes('contact')) add.push('ALTER TABLE bookings ADD COLUMN contact TEXT');
+    if (!cols.includes('bf'))      add.push('ALTER TABLE bookings ADD COLUMN bf INTEGER');
+    if (!cols.includes('beds'))    add.push('ALTER TABLE bookings ADD COLUMN beds INTEGER');
     if (add.length) await db.batch(add.map(q => db.prepare(q)));
+  }
+
+  // migration 6 ก.ย. 2026: ราคารวม/ไม่รวมอาหารเช้า + เตียงเสริม (รันครั้งเดียว)
+  {
+    const rc = (await db.prepare('PRAGMA table_info(rooms)').all()).results.map(r => r.name);
+    if (!rc.includes('price_bf')) {
+      await db.batch([
+        db.prepare('ALTER TABLE rooms ADD COLUMN price_bf INTEGER'),
+        db.prepare('ALTER TABLE rooms ADD COLUMN extra_max INTEGER'),
+      ]);
+      // [id, ไม่รวมอาหารเช้า, รวมอาหารเช้า, เสริมเตียงได้สูงสุด]
+      const P = [
+        ['R1', 2200, 2800, 5], ['R2', 1600, 2000, 4], ['R3', 1800, 2200, 2],
+        ['R4', 1800, 2200, 2], ['R5',  800, 1000, 1], ['R6',  800, 1000, 1],
+        ['R7', 1600, 2000, 4], ['R8', 3000, 4000, 2], ['R9', 3000, 4000, 2],
+      ];
+      for (const t of ['T1','T2','T3','T4','T5','T6','T7','T8']) P.push([t, 600, null, 0]);
+      await db.batch(P.map(([id, np, bp, ex]) =>
+        db.prepare('UPDATE rooms SET price = ?, price_bf = ?, extra_max = ? WHERE id = ?')
+          .bind(np, bp, ex, id)));
+    }
   }
 
   const { c } = await db.prepare('SELECT COUNT(*) AS c FROM rooms').first();
@@ -219,7 +242,7 @@ async function listBookings(db, p) {
   const from = isDate(p.get('from')) ? p.get('from') : addDays(todayStr(), -60);
   const to = isDate(p.get('to')) ? p.get('to') : addDays(todayStr(), 120);
   const bookings = (await db.prepare(
-    `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip,contact FROM bookings
+    `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip,contact,bf,beds FROM bookings
      WHERE checkin < ? AND checkout > ? ORDER BY checkin`).bind(to, from).all()).results;
   return { ok: true, bookings };
 }
@@ -281,15 +304,38 @@ function nightsOf(checkin, checkout) {
   return Math.round((Date.parse(checkout) - Date.parse(checkin)) / 86400000);
 }
 
+const WEEKEND_UP = 1.20;      // ★ ศุกร์+เสาร์ บวก 20% — คิดในราคาเลย ไม่แยกให้ลูกค้าเห็น
+const BED_NOBF = 200, BED_BF = 300;   // ★ เตียงเสริมต่อคืน
+
+// ศุกร์ = 5, เสาร์ = 6 (คิดจากวันที่เข้าพักของแต่ละคืน)
+const isWeekendNight = d => [5, 6].includes(new Date(d + 'T00:00:00Z').getUTCDay());
+
+// คิดราคาทีละคืน เพราะแต่ละคืนอาจคนละเรต
+function priceStay(r, checkin, checkout, bf, beds) {
+  const base = bf ? r.price_bf : r.price;
+  let total = 0;
+  for (let d = checkin; d < checkout; d = addDaysStr(d, 1)) {
+    total += Math.round(base * (isWeekendNight(d) ? WEEKEND_UP : 1));
+    total += beds * (bf ? BED_BF : BED_NOBF);   // เตียงเสริมไม่ปรับตามวัน
+  }
+  return total;
+}
+
 async function quote(db, p) {
   const room = p.get('room') || '', checkin = p.get('checkin') || '', checkout = p.get('checkout') || '';
   if (!isDate(checkin) || !isDate(checkout)) return { ok: false, error: 'รูปแบบวันที่ต้องเป็น yyyy-mm-dd' };
   if (checkout <= checkin) return { ok: false, error: 'วันเช็คเอาท์ต้องหลังวันเช็คอิน' };
-  const r = await db.prepare('SELECT id,name,price,capacity FROM rooms WHERE id = ?').bind(room).first();
+  const r = await db.prepare(
+    'SELECT id,name,price,price_bf,capacity,extra_max FROM rooms WHERE id = ?').bind(room).first();
   if (!r) return { ok: false, error: 'ไม่พบห้อง ' + room };
+
+  const bf = p.get('bf') === '1' && r.price_bf != null;
+  const beds = Math.min(Math.max(0, Number(p.get('beds')) || 0), r.extra_max || 0);
   const nights = nightsOf(checkin, checkout);
-  const total = r.price * nights;
-  return { ok: true, room: r.id, roomName: r.name, nights, price: r.price,
+  const total = priceStay(r, checkin, checkout, bf, beds);
+  return { ok: true, room: r.id, roomName: r.name, nights, bf, beds,
+           hasBf: r.price_bf != null, extraMax: r.extra_max || 0,
+           price: bf ? r.price_bf : r.price,
            total, deposit: Math.ceil(total * DEPOSIT) };
 }
 
@@ -318,13 +364,13 @@ async function holdRoom(db, p) {
   const tok = hex(crypto.getRandomValues(new Uint8Array(16)));
   const expires = Date.now() + HOLD_MS;
   const res = await db.prepare(
-    `INSERT INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff,pay,expires,tok,amount,contact)
-     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+    `INSERT INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff,pay,expires,tok,amount,contact,bf,beds)
+     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
      WHERE NOT EXISTS (
        SELECT 1 FROM bookings
        WHERE room = ? AND status = 'จอง' AND checkin < ? AND ? < checkout)`)
     .bind(id, room, checkin, checkout, name, phone, 'จองผ่านเว็บ', 'จอง', nowStamp(), 'เว็บไซต์',
-          'hold', expires, tok, q.deposit, contact,
+          'hold', expires, tok, q.deposit, contact, q.bf ? 1 : 0, q.beds,
           room, checkout, checkin)
     .run();
 
@@ -347,13 +393,15 @@ async function holdRoom(db, p) {
 // ห้องอื่นที่ยังว่างช่วงเดียวกัน — เรียงห้องราคาใกล้เคียงขึ้นก่อน
 async function freeRooms(db, checkin, checkout, nearPrice) {
   const rows = (await db.prepare(
-    `SELECT id,name,price,capacity FROM rooms
+    `SELECT id,name,price,price_bf,capacity,extra_max FROM rooms
      WHERE id NOT IN (
        SELECT room FROM bookings WHERE status = 'จอง' AND checkin < ? AND ? < checkout)
      ORDER BY sort`).bind(checkout, checkin).all()).results;
-  const n = nightsOf(checkin, checkout);
   return rows
-    .map(r => ({ ...r, total: r.price * n, deposit: Math.ceil(r.price * n * DEPOSIT) }))
+    .map(r => {
+      const total = priceStay(r, checkin, checkout, false, 0);
+      return { ...r, total, deposit: Math.ceil(total * DEPOSIT) };
+    })
     .sort((a, b) => Math.abs(a.price - nearPrice) - Math.abs(b.price - nearPrice))
     .slice(0, 4);
 }
@@ -568,7 +616,7 @@ export default {
           const dt = p.get('date');
           if (!/^\d{4}-\d{2}-\d{2}$/.test(dt || '')) return json({ ok: false, error: 'รูปแบบวันที่ไม่ถูกต้อง' });
           const bookings = (await env.DB.prepare(
-            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip,contact FROM bookings
+            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip,contact,bf,beds FROM bookings
              WHERE created LIKE ? ORDER BY created, id`).bind(dt + '%').all()).results;
           return json({ ok: true, bookings });
         }

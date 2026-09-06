@@ -369,6 +369,7 @@ const AVW_DAYS = 92;
         <span>${st.nights} <i>nights</i></span>
         <button data-n="1" ${st.nights>=14?'disabled':''}>+</button>
       </div>
+      <div id="bkOpts"></div>
       <label class="bk-l">Your name</label>
       <input class="bk-i" id="bkName" value="${esc(st.name||'')}" autocomplete="name">
       <label class="bk-l">Phone</label>
@@ -412,12 +413,46 @@ const AVW_DAYS = 92;
   }
 
   async function quote(){
-    const r = await (await fetch(`/api?action=quote&room=${st.room}&checkin=${st.checkin}&checkout=${addD(st.checkin, st.nights)}`)).json();
+    const q = new URLSearchParams({ action:'quote', room:st.room, checkin:st.checkin,
+      checkout:addD(st.checkin, st.nights), bf: st.bf ? '1' : '0', beds: st.beds || 0 });
+    const r = await (await fetch('/api?' + q)).json();
     if (!r.ok) { $('bkSum').textContent = r.error; return; }
-    st.total = r.total; st.deposit = r.deposit;
+    st.total = r.total; st.deposit = r.deposit; st.beds = r.beds; st.bf = r.bf;
+
+    
+    let o = '';
+    if (r.hasBf) o += `<label class="bk-l">Breakfast</label>
+      <div class="bk-seg" id="bkBf">
+        <button type="button" data-bf="0"${!r.bf?' class="on"':''}>Without breakfast</button>
+        <button type="button" data-bf="1"${r.bf?' class="on"':''}>With breakfast</button>
+      </div>`;
+    if (r.extraMax > 0) o += `<label class="bk-l">Extra beds</label>
+      <div class="bk-n">
+        <button type="button" data-bed="-1"${r.beds<=0?' disabled':''}>−</button>
+        <span>${r.beds} / ${r.extraMax}</span>
+        <button type="button" data-bed="1"${r.beds>=r.extraMax?' disabled':''}>+</button>
+      </div>`;
+    $('bkOpts').innerHTML = o;
+    $('bkOpts').querySelectorAll('[data-bf]').forEach(b => b.onclick = () => {
+      st.bf = b.dataset.bf === '1'; keep(); quote();
+    });
+    $('bkOpts').querySelectorAll('[data-bed]').forEach(b => b.onclick = () => {
+      st.beds = Math.max(0, Math.min(r.extraMax, (st.beds||0) + Number(b.dataset.bed)));
+      keep(); quote();
+    });
+
     $('bkSum').innerHTML = `<span>Per night</span><b>฿${num(r.price)}</b>
-      <span>Nights</span><b>${r.nights}</b>
-      <span>Amount due</span><b class="hi">฿${num(r.deposit)}</b>`;
+      <span>Nights</span><b>${r.nights}</b>` +
+      (r.beds ? `<span>Extra beds</span><b>${r.beds}</b>` : '') +
+      `<span>Amount due</span><b class="hi">฿${num(r.deposit)}</b>`;
+  }
+
+  
+  function keep(){
+    if ($('bkName')) st.name = $('bkName').value;
+    if ($('bkPhone')) st.phone = $('bkPhone').value;
+    if ($('bkCh')) { st.ch = $('bkCh').value; st.chid = $('bkChId').value; }
+    if ($('bkAgree')) st.agree = $('bkAgree').checked;
   }
 
   
@@ -431,7 +466,8 @@ const AVW_DAYS = 92;
     if (st.ch !== 'phone' && st.chid.length < 2) return form('Please fill in your contact ID');
     $('bkGo').disabled = true; $('bkGo').textContent = 'Working…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
-      checkout:addD(st.checkin, st.nights), name, phone, ch:st.ch, chid:st.chid });
+      checkout:addD(st.checkin, st.nights), name, phone, ch:st.ch, chid:st.chid,
+      bf: st.bf ? '1' : '0', beds: st.beds || 0 });
     const r = await (await fetch('/api?' + q)).json();
     if (!r.ok) return r.taken ? taken(r) : form(r.error);
     Object.assign(st, { id:r.id, tok:r.tok, expires:r.expires, deposit:r.deposit, stage:'pay' });

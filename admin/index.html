@@ -112,7 +112,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.8</small></h1>
+  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v5.9</small></h1>
   <span class="pill" id="whoami"></span>
   <a id="slipBell" class="hbell" href="/admin/slips/" title="ตรวจสลิป">🧾<span id="slipN"></span></a>
   <button id="btnRefresh" title="โหลดใหม่">⟳</button>
@@ -944,6 +944,8 @@ function openDetail(id){
     ln('จำนวนคืน', nightsOf(b) + ' คืน') +
     ln('เบอร์โทร', b.phone ? `<a href="tel:${b.phone}">${b.phone}</a>` : '') +
     ln('ช่องทางติดต่อ', b.contact) +
+    ln('อาหารเช้า', b.pay !== undefined && b.bf != null ? (b.bf ? 'รวมอาหารเช้า' : 'ไม่รวมอาหารเช้า') : '') +
+    ln('เตียงเสริม', b.beds ? b.beds + ' ที่' : '') +
     ln('รายละเอียด', noteLines) +
     ln('รับจองโดย', b.staff) +
     ln('จองเมื่อ', b.created) +
