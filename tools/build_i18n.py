@@ -698,6 +698,11 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ข้อมูลห้องว่างอัปเดตจากระบบจองของที่พัก · จองเองได้ทันที หรือทักมาให้เจ้าของจองให้ก็ได้': ('Availability comes straight from our booking system · Book instantly yourself, or message us and we will book it for you', 'ຂໍ້ມູນຫ້ອງວ່າງອັບເດດຈາກລະບົບຈອງຂອງທີ່ພັກ · ຈອງເອງໄດ້ທັນທີ ຫຼື ທັກມາໃຫ້ເຈົ້າຂອງຈອງໃຫ້ກໍ່ໄດ້'),
+ 'หรือให้เจ้าของจองให้ — ทักมาคุยก่อนได้ ไม่ต้องจองเอง': ('Or let us book for you — message us first, no need to book yourself', 'ຫຼື ໃຫ້ເຈົ້າຂອງຈອງໃຫ້ — ທັກມາລົມກ່ອນໄດ້ ບໍ່ຕ້ອງຈອງເອງ'),
+ 'ไม่สะดวกจองเอง?': ('Rather not book yourself?', 'ບໍ່ສະດວກຈອງເອງ?'),
+ 'ทักไลน์': ('Chat on LINE', 'ແຊັດໄລນ໌'),
+ 'โทรหาที่พัก': ('Call us', 'ໂທຫາທີ່ພັກ'),
  'ช่องทางติดต่อกลับ': ('How we can reach you', 'ຊ່ອງທາງຕິດຕໍ່ກັບ'),
  'โทรตามเบอร์ข้างบน': ('Call the number above', 'ໂທຕາມເບີຂ້າງເທິງ'),
  'ไอดีหรือชื่อบัญชี': ('ID or account name', 'ໄອດີ ຫຼື ຊື່ບັນຊີ'),

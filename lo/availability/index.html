@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=ct1">
+<link rel="stylesheet" href="/assets/style.css?v=alt1">
 </head>
 <body class="avpage">
 
@@ -115,13 +115,14 @@ if (location.hostname.endsWith('workers.dev')) {
       <div class="avw-grid" id="avwGrid"></div>
       <div class="avw-sel" id="avwSel"></div>
       <div class="avw-rooms" id="avwRooms"></div>
+      <p class="avw-or">ຫຼື ໃຫ້ເຈົ້າຂອງຈອງໃຫ້ — ທັກມາລົມກ່ອນໄດ້ ບໍ່ຕ້ອງຈອງເອງ</p>
       <div class="avw-cta">
         <a class="btn btn-lantern" href="tel:+8562091555288">ໂທຈອງ +856 20 91 555 288</a>
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">ແອດ LINE ຈອງ</a>
         <a class="btn btn-ghost" href="https://m.me/thongwaihomestay">ສົ່ງຂໍ້ຄວາມ Facebook</a>
         <a class="btn btn-ghost" href="/booking/">ກວດສອບສະຖານະການຈອງ</a>
       </div>
-      <p class="avw-note">ຂໍ້ມູນຫ້ອງວ່າງອັບເດດຈາກລະບົບຈອງຂອງທີ່ພັກ · ຢືນຢັນການຈອງທາງໂທລະສັບ LINE ຫຼື Facebook</p>
+      <p class="avw-note">ຂໍ້ມູນຫ້ອງວ່າງອັບເດດຈາກລະບົບຈອງຂອງທີ່ພັກ · ຈອງເອງໄດ້ທັນທີ ຫຼື ທັກມາໃຫ້ເຈົ້າຂອງຈອງໃຫ້ກໍ່ໄດ້</p>
     </div>
 
     <div class="avail-box" id="availBox" style="display:none">
@@ -380,7 +381,10 @@ const AVW_DAYS = 92;
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ຂ້າພະເຈົ້າຮັບຊາບ ແລະ ຍອມຮັບເງື່ອນໄຂນີ້</span></label>
       </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
-      <button class="bk-go" id="bkGo">ຮັບ QR ເພື່ອຊຳລະເງິນ</button>`;
+      <button class="bk-go" id="bkGo">ຮັບ QR ເພື່ອຊຳລະເງິນ</button>
+      <p class="bk-alt2">ບໍ່ສະດວກຈອງເອງ?
+        <a href="https://lin.ee/tvjr6Fx">ແຊັດໄລນ໌</a> ·
+        <a href="tel:+8562091555288">ໂທຫາທີ່ພັກ</a></p>`;
     quote();
     if (st.ch) $('bkCh').value = st.ch;
     const syncCh = () => {

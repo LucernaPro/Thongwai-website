@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=ct1">
+<link rel="stylesheet" href="/assets/style.css?v=alt1">
 </head>
 <body class="avpage">
 
@@ -115,13 +115,14 @@ if (location.hostname.endsWith('workers.dev')) {
       <div class="avw-grid" id="avwGrid"></div>
       <div class="avw-sel" id="avwSel"></div>
       <div class="avw-rooms" id="avwRooms"></div>
+      <p class="avw-or">Or let us book for you — message us first, no need to book yourself</p>
       <div class="avw-cta">
         <a class="btn btn-lantern" href="tel:+8562091555288">Call to book +856 20 91 555 288</a>
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">Book via LINE</a>
         <a class="btn btn-ghost" href="https://m.me/thongwaihomestay">Message on Facebook</a>
         <a class="btn btn-ghost" href="/booking/">Check your booking</a>
       </div>
-      <p class="avw-note">Availability is updated from the resort booking system · bookings confirmed by phone, LINE or Facebook</p>
+      <p class="avw-note">Availability comes straight from our booking system · Book instantly yourself, or message us and we will book it for you</p>
     </div>
 
     <div class="avail-box" id="availBox" style="display:none">
@@ -380,7 +381,10 @@ const AVW_DAYS = 92;
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>I understand and accept this condition</span></label>
       </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
-      <button class="bk-go" id="bkGo">Get QR to pay</button>`;
+      <button class="bk-go" id="bkGo">Get QR to pay</button>
+      <p class="bk-alt2">Rather not book yourself?
+        <a href="https://lin.ee/tvjr6Fx">Chat on LINE</a> ·
+        <a href="tel:+8562091555288">Call us</a></p>`;
     quote();
     if (st.ch) $('bkCh').value = st.ch;
     const syncCh = () => {

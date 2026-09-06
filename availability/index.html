@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=ct1">
+<link rel="stylesheet" href="/assets/style.css?v=alt1">
 </head>
 <body class="avpage">
 
@@ -111,13 +111,14 @@ if (location.hostname.endsWith('workers.dev')) {
       <div class="avw-grid" id="avwGrid"></div>
       <div class="avw-sel" id="avwSel"></div>
       <div class="avw-rooms" id="avwRooms"></div>
+      <p class="avw-or">หรือให้เจ้าของจองให้ — ทักมาคุยก่อนได้ ไม่ต้องจองเอง</p>
       <div class="avw-cta">
         <a class="btn btn-lantern" href="tel:+8562091555288">โทรจอง +856 20 91 555 288</a>
         <a class="btn btn-ghost" href="https://lin.ee/tvjr6Fx">แอดไลน์จอง</a>
         <a class="btn btn-ghost" href="https://m.me/thongwaihomestay">ส่งข้อความ Facebook</a>
         <a class="btn btn-ghost" href="/booking/">ตรวจสอบสถานะการจอง</a>
       </div>
-      <p class="avw-note">ข้อมูลห้องว่างอัปเดตจากระบบจองของที่พัก · ยืนยันการจองทางโทรศัพท์ LINE หรือ Facebook</p>
+      <p class="avw-note">ข้อมูลห้องว่างอัปเดตจากระบบจองของที่พัก · จองเองได้ทันที หรือทักมาให้เจ้าของจองให้ก็ได้</p>
     </div>
 
     <div class="avail-box" id="availBox" style="display:none">
@@ -377,7 +378,10 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ข้าพเจ้ารับทราบและยอมรับเงื่อนไขนี้</span></label>
       </div>
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
-      <button class="bk-go" id="bkGo">รับ QR เพื่อชำระเงิน</button>`;
+      <button class="bk-go" id="bkGo">รับ QR เพื่อชำระเงิน</button>
+      <p class="bk-alt2">ไม่สะดวกจองเอง?
+        <a href="https://lin.ee/tvjr6Fx">ทักไลน์</a> ·
+        <a href="tel:+8562091555288">โทรหาที่พัก</a></p>`;
     quote();
     if (st.ch) $('bkCh').value = st.ch;
     const syncCh = () => {
