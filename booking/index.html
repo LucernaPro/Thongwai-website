@@ -48,6 +48,10 @@
   .links{display:flex;gap:18px;justify-content:center;margin-top:18px;
     padding-top:16px;border-top:1px solid var(--cream2)}
   .links a{color:var(--soft);font-size:.86rem;text-decoration:none;border-bottom:1px solid var(--cream2)}
+  .live{margin-top:10px;text-align:center;font-size:.8rem;color:var(--green)}
+  .live::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--green);margin-right:6px;vertical-align:middle;animation:blip 1.6s infinite}
+  @keyframes blip{0%,100%{opacity:1}50%{opacity:.25}}
   .langs{display:flex;gap:8px;justify-content:center;margin-top:18px}
   .langs a{padding:5px 14px;border-radius:99px;border:1px solid var(--cream2);
     background:var(--white);color:var(--soft);text-decoration:none;font-size:.82rem}
@@ -76,6 +80,7 @@ const lang = pickLang();
 
 const T = {
   th:{ wait:'ได้รับสลิปแล้ว รอตรวจสอบ', waitSub:'ทางที่พักจะตรวจสอบยอดและยืนยันให้ กรุณาเก็บลิงก์นี้ไว้เพื่อดูสถานะ',
+       live:'หน้านี้อัปเดตสถานะให้เอง ไม่ต้องกดอะไร',
        home:'กลับหน้าแรก', rooms:'ดูห้องพักทั้งหมด', avail:'เช็คห้องว่าง', map:'เส้นทางไปที่พัก',
        find:'ตรวจสอบสถานะการจอง', findSub:'กรอกชื่อผู้จองและเลขท้ายเบอร์โทร 4 ตัว',
        fName:'ชื่อผู้จอง', fLast4:'เลขท้ายเบอร์โทร 4 ตัว', fGo:'ค้นหา',
@@ -89,6 +94,7 @@ const T = {
        paid:'มัดจำที่ชำระ', ref:'เลขที่การจอง', call:'โทรหาที่พัก', line:'แชทไลน์',
        n:'คืน', save:'บันทึกลิงก์หน้านี้ไว้ หรือแคปหน้าจอเก็บไว้' },
   en:{ wait:'Slip received — being checked', waitSub:'We are verifying your transfer. Keep this link to follow the status.',
+       live:'This page updates itself — nothing to press',
        home:'Back to home', rooms:'See all rooms', avail:'Check availability', map:'Get directions',
        find:'Check your booking', findSub:'Enter the guest name and the last 4 digits of the phone number',
        fName:'Guest name', fLast4:'Last 4 digits of phone', fGo:'Search',
@@ -102,6 +108,7 @@ const T = {
        paid:'Deposit paid', ref:'Booking ref', call:'Call us', line:'Chat on LINE',
        n:'nights', n1:'night', save:'Save this link or take a screenshot' },
   lo:{ wait:'ໄດ້ຮັບສະລິບແລ້ວ ລໍຖ້າກວດສອບ', waitSub:'ທາງທີ່ພັກຈະກວດສອບຍອດ ແລະ ຢືນຢັນໃຫ້ ກະລຸນາເກັບລິ້ງນີ້ໄວ້',
+       live:'ໜ້ານີ້ອັບເດດສະຖານະໃຫ້ເອງ ບໍ່ຕ້ອງກົດຫຍັງ',
        home:'ກັບໜ້າຫຼັກ', rooms:'ເບິ່ງຫ້ອງພັກທັງໝົດ', avail:'ກວດຫ້ອງວ່າງ', map:'ເສັ້ນທາງໄປທີ່ພັກ',
        find:'ກວດສອບສະຖານະການຈອງ', findSub:'ຕື່ມຊື່ຜູ້ຈອງ ແລະ ເລກທ້າຍເບີໂທ 4 ໂຕ',
        fName:'ຊື່ຜູ້ຈອງ', fLast4:'ເລກທ້າຍເບີໂທ 4 ໂຕ', fGo:'ຄົ້ນຫາ',
@@ -184,15 +191,16 @@ function findForm(msg){
   };
 }
 
-(async () => {
-  const id = P.get('id'), tok = P.get('tok');
-  if (!id || !tok) return findForm();
-  let r;
-  try {
-    r = await (await fetch(`/api?action=holdstatus&id=${encodeURIComponent(id)}&tok=${encodeURIComponent(tok)}`)).json();
-  } catch(e) { return shell('no', T.gone, T.goneSub); }
-  if (!r.ok || r.state === 'expired') return shell('no', T.gone, T.goneSub);
+/* ── สถานะต้องอัปเดตเองโดยลูกค้าไม่ต้องทำอะไร ──
+   ไม่ควรคาดหวังให้ลูกค้ารู้จักปุ่มรีเฟรช จึงเช็คซ้ำ 3 จังหวะ:
+   1) ทุก 20 วิ ระหว่างที่เปิดหน้าอยู่จริง
+   2) ทุกครั้งที่สลับกลับมาที่แท็บนี้ (เคสที่เจอบ่อยสุด)
+   3) ตอนกดย้อนกลับมาจากหน้าอื่น (bfcache)
+   และวาดทับในที่ ไม่โหลดหน้าใหม่ทั้งหน้า จะได้ไม่กระพริบ */
+const ID = P.get('id'), TOK = P.get('tok');
+let poll = null, shown = null;
 
+function paint(r){
   const rows = `<dl>
       <dt>${esc(T.room)}</dt><dd>${esc(r.roomName)}</dd>
       <dt>${esc(T.inn)}</dt><dd>${esc(r.checkin)}</dd>
@@ -203,13 +211,36 @@ function findForm(msg){
     </dl>
     <p class="ref">${esc(T.ref)} ${esc(r.id)}</p>`;
 
-  if (r.state === 'confirmed') shell('ok',  T.ok,   T.okSub,   rows);
-  else if (r.state === 'slip') shell('wait', T.wait, T.waitSub, rows + `<p class="tip">${esc(T.save)}</p>`);
+  if (r.state === 'confirmed') shell('ok', T.ok, T.okSub, rows);
+  else if (r.state === 'slip')
+    shell('wait', T.wait, T.waitSub, rows + `<p class="tip">${esc(T.save)}</p><p class="live">${esc(T.live)}</p>`);
   else if (r.state === 'hold') shell('wait', T.hold, T.holdSub, rows);
   else shell('no', T.no, T.noSub, rows);
+}
 
-  // ยังรอตรวจอยู่ → เช็คซ้ำเงียบๆ ทุกนาที ถ้าพนักงานกดยืนยันหน้าจะเปลี่ยนเอง
-  if (r.state === 'slip') setTimeout(() => location.reload(), 60000);
+async function check(force){
+  if (!force && document.hidden) return;
+  let r;
+  try {
+    r = await (await fetch(`/api?action=holdstatus&id=${encodeURIComponent(ID)}&tok=${encodeURIComponent(TOK)}&_=${Date.now()}`)).json();
+  } catch(e) { return; }
+  if (!r.ok || r.state === 'expired') { stop(); return shell('no', T.gone, T.goneSub); }
+  if (r.state === shown) return;                 // ไม่มีอะไรเปลี่ยน ไม่ต้องวาดใหม่
+  shown = r.state;
+  paint(r);
+  if (r.state !== 'slip' && r.state !== 'hold') stop();
+}
+
+function stop(){ if (poll) { clearInterval(poll); poll = null; } }
+
+(async () => {
+  if (!ID || !TOK) return findForm();
+  await check(true);
+  if (shown === 'slip' || shown === 'hold') {
+    poll = setInterval(check, 20000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) check(true); });
+    window.addEventListener('pageshow', e => { if (e.persisted) check(true); });
+  }
 })();
 </script>
 </body>
