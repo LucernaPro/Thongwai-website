@@ -100,6 +100,7 @@ async function init(db) {
     if (!cols.includes('tok'))     add.push('ALTER TABLE bookings ADD COLUMN tok TEXT');
     if (!cols.includes('amount'))  add.push('ALTER TABLE bookings ADD COLUMN amount INTEGER');
     if (!cols.includes('slip'))    add.push('ALTER TABLE bookings ADD COLUMN slip TEXT');
+    if (!cols.includes('contact')) add.push('ALTER TABLE bookings ADD COLUMN contact TEXT');
     if (add.length) await db.batch(add.map(q => db.prepare(q)));
   }
 
@@ -218,7 +219,7 @@ async function listBookings(db, p) {
   const from = isDate(p.get('from')) ? p.get('from') : addDays(todayStr(), -60);
   const to = isDate(p.get('to')) ? p.get('to') : addDays(todayStr(), 120);
   const bookings = (await db.prepare(
-    `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip FROM bookings
+    `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip,contact FROM bookings
      WHERE checkin < ? AND checkout > ? ORDER BY checkin`).bind(to, from).all()).results;
   return { ok: true, bookings };
 }
@@ -300,8 +301,12 @@ async function holdRoom(db, p) {
   if (!q.ok) return q;
   const room = q.room, checkin = p.get('checkin'), checkout = p.get('checkout');
   const name = (p.get('name') || '').trim(), phone = (p.get('phone') || '').trim();
+  const ch = (p.get('ch') || '').trim(), chid = (p.get('chid') || '').trim().slice(0, 60);
   if (name.length < 2) return { ok: false, error: 'กรุณากรอกชื่อผู้จอง' };
   if (!/^[0-9+\-\s]{6,20}$/.test(phone)) return { ok: false, error: 'กรุณากรอกเบอร์โทรให้ถูกต้อง' };
+  // ที่พักอยู่ลาว ลูกค้าไทยให้เบอร์ไทย → ต้องมีช่องทางออนไลน์ไว้ติดต่อกลับเสมอ
+  if (ch !== 'phone' && chid.length < 2) return { ok: false, error: 'กรุณากรอกช่องทางติดต่อ' };
+  const contact = ch === 'phone' ? 'โทรตามเบอร์ที่ให้ไว้' : `${ch}: ${chid}`;
 
   // กันคนเดิมกดรัวจนล็อกห้องไว้หลายห้องพร้อมกัน
   const mine = await db.prepare(
@@ -313,13 +318,13 @@ async function holdRoom(db, p) {
   const tok = hex(crypto.getRandomValues(new Uint8Array(16)));
   const expires = Date.now() + HOLD_MS;
   const res = await db.prepare(
-    `INSERT INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff,pay,expires,tok,amount)
-     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?
+    `INSERT INTO bookings (id,room,checkin,checkout,name,phone,note,status,created,staff,pay,expires,tok,amount,contact)
+     SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
      WHERE NOT EXISTS (
        SELECT 1 FROM bookings
        WHERE room = ? AND status = 'จอง' AND checkin < ? AND ? < checkout)`)
     .bind(id, room, checkin, checkout, name, phone, 'จองผ่านเว็บ', 'จอง', nowStamp(), 'เว็บไซต์',
-          'hold', expires, tok, q.deposit,
+          'hold', expires, tok, q.deposit, contact,
           room, checkout, checkin)
     .run();
 
@@ -470,7 +475,7 @@ async function slipImage(db, p, env) {
 async function pendingSlips(db) {
   await sweepHolds(db);
   const rows = (await db.prepare(
-    `SELECT b.id,b.room,r.name AS roomName,b.checkin,b.checkout,b.name,b.phone,
+    `SELECT b.id,b.room,r.name AS roomName,b.checkin,b.checkout,b.name,b.phone,b.contact,
             b.amount,b.pay,b.created,b.expires,b.slip
      FROM bookings b LEFT JOIN rooms r ON r.id = b.room
      WHERE b.status = 'จอง' AND b.pay IN ('slip','hold')
@@ -563,7 +568,7 @@ export default {
           const dt = p.get('date');
           if (!/^\d{4}-\d{2}-\d{2}$/.test(dt || '')) return json({ ok: false, error: 'รูปแบบวันที่ไม่ถูกต้อง' });
           const bookings = (await env.DB.prepare(
-            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip FROM bookings
+            `SELECT id,room,checkin,checkout,name,phone,note,status,created,staff,pay,slip,contact FROM bookings
              WHERE created LIKE ? ORDER BY created, id`).bind(dt + '%').all()).results;
           return json({ ok: true, bookings });
         }

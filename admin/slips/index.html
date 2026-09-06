@@ -46,7 +46,7 @@
 <body>
 
 <header>
-  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.2</small></h1>
+  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.3</small></h1>
   <button id="refresh" title="โหลดใหม่">⟳</button>
   <a href="/admin/">← การจอง</a>
 </header>
@@ -100,6 +100,7 @@ async function load(){
           <span class="tag ${paid?'pay':'hold'}">${paid?'จ่ายแล้ว รอตรวจ':'ยังไม่จ่าย · เหลือ '+mins(b.expires)}</span>
           <h2>${esc(b.roomName||b.room)}</h2>
           <p>${esc(b.name)} · ${esc(b.phone||'-')}</p>
+          ${b.contact ? `<p>💬 ${esc(b.contact)}</p>` : ''}
           <p>${esc(b.checkin)} → ${esc(b.checkout)} (${n} คืน)</p>
           <p style="font-size:.78rem">จองเมื่อ ${esc(b.created)} · ${esc(b.id)}</p>
         </div>

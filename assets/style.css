@@ -459,6 +459,9 @@ a.tl:hover .nm{color:var(--glow)}
 .bk .bk-up{color:var(--pine)}
 .bk .bk-ok{color:#fff}
 /* การ์ดเงื่อนไขยกเลิก — ต้องเห็นชัดก่อนจ่ายเงิน */
+.bk .bk-ch{display:grid;grid-template-columns:auto 1fr;gap:8px}
+.bk .bk-ch select{background:var(--white)}
+.bk .bk-hint{margin:6px 0 0;font-size:.78rem;color:var(--ink-soft);line-height:1.5}
 .bk .bk-nocancel{margin-top:16px;padding:14px;border-radius:10px;background:#fdeeea;
   border:1.5px solid #e0a99c;color:var(--ink)}
 .bk .bk-nocancel b{display:block;font-family:'Mitr',sans-serif;font-size:1.02rem;color:#a8321c;margin-bottom:5px}

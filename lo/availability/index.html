@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=fp1">
+<link rel="stylesheet" href="/assets/style.css?v=ct1">
 </head>
 <body class="avpage">
 
@@ -362,6 +362,17 @@ const AVW_DAYS = 92;
       <input class="bk-i" id="bkName" value="${esc(st.name||'')}" autocomplete="name">
       <label class="bk-l">ເບີໂທ</label>
       <input class="bk-i" id="bkPhone" value="${esc(st.phone||'')}" inputmode="tel" autocomplete="tel">
+      <label class="bk-l">ຊ່ອງທາງຕິດຕໍ່ກັບ</label>
+      <div class="bk-ch">
+        <select class="bk-i" id="bkCh">
+          <option value="LINE">LINE</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Facebook">Facebook</option>
+          <option value="phone">ໂທຕາມເບີຂ້າງເທິງ</option>
+        </select>
+        <input class="bk-i" id="bkChId" value="${esc(st.chid||'')}" placeholder="ໄອດີ ຫຼື ຊື່ບັນຊີ">
+      </div>
+      <p class="bk-hint">ທີ່ພັກຢູ່ລາວ ຫາກໂທຫາເບີຕ່າງປະເທດບໍ່ຕິດ ຈະຕິດຕໍ່ທາງນີ້ແທນ</p>
       <div class="bk-sum" id="bkSum">…</div>
       <div class="bk-nocancel">
         <b>ຈອງແລ້ວຍົກເລີກບໍ່ໄດ້</b>
@@ -371,9 +382,16 @@ const AVW_DAYS = 92;
       ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
       <button class="bk-go" id="bkGo">ຮັບ QR ເພື່ອຊຳລະເງິນ</button>`;
     quote();
+    if (st.ch) $('bkCh').value = st.ch;
+    const syncCh = () => {
+      const phoneOnly = $('bkCh').value === 'phone';
+      $('bkChId').style.display = phoneOnly ? 'none' : '';
+    };
+    $('bkCh').onchange = syncCh; syncCh();
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
       st.name = $('bkName').value; st.phone = $('bkPhone').value;
+      st.ch = $('bkCh').value; st.chid = $('bkChId').value;
       st.agree = $('bkAgree').checked; form();
     });
     $('bkGo').onclick = hold;
@@ -395,9 +413,11 @@ const AVW_DAYS = 92;
     if (name.length < 2 || phone.length < 6) return form('ກະລຸນາຕື່ມຂໍ້ມູນໃຫ້ຄົບ');
     if (!st.agree) return form('ກະລຸນາຍອມຮັບເງື່ອນໄຂກ່ອນດຳເນີນການຕໍ່');
     st.name = name; st.phone = phone;
+    st.ch = $('bkCh').value; st.chid = $('bkChId').value.trim();
+    if (st.ch !== 'phone' && st.chid.length < 2) return form('ກະລຸນາຕື່ມຊ່ອງທາງຕິດຕໍ່');
     $('bkGo').disabled = true; $('bkGo').textContent = 'ກຳລັງດຳເນີນການ…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
-      checkout:addD(st.checkin, st.nights), name, phone });
+      checkout:addD(st.checkin, st.nights), name, phone, ch:st.ch, chid:st.chid });
     const r = await (await fetch('/api?' + q)).json();
     if (!r.ok) return r.taken ? taken(r) : form(r.error);
     Object.assign(st, { id:r.id, tok:r.tok, expires:r.expires, deposit:r.deposit, stage:'pay' });

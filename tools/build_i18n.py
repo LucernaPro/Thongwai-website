@@ -698,6 +698,11 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ช่องทางติดต่อกลับ': ('How we can reach you', 'ຊ່ອງທາງຕິດຕໍ່ກັບ'),
+ 'โทรตามเบอร์ข้างบน': ('Call the number above', 'ໂທຕາມເບີຂ້າງເທິງ'),
+ 'ไอดีหรือชื่อบัญชี': ('ID or account name', 'ໄອດີ ຫຼື ຊື່ບັນຊີ'),
+ 'ที่พักอยู่ลาว หากโทรหาเบอร์ต่างประเทศไม่ติด จะติดต่อทางนี้แทน': ('We are in Laos — if an international call does not connect, we will reach you here instead.', 'ທີ່ພັກຢູ່ລາວ ຫາກໂທຫາເບີຕ່າງປະເທດບໍ່ຕິດ ຈະຕິດຕໍ່ທາງນີ້ແທນ'),
+ 'กรุณากรอกช่องทางติดต่อ': ('Please fill in your contact ID', 'ກະລຸນາຕື່ມຊ່ອງທາງຕິດຕໍ່'),
  'ตรวจสอบรูปสลิปก่อนส่ง': ('Check the slip before sending', 'ກວດຮູບສະລິບກ່ອນສົ່ງ'),
  'ใช่ ส่งสลิปนี้': ('Yes, send this slip', 'ແມ່ນແລ້ວ ສົ່ງສະລິບນີ້'),
  'เลือกรูปใหม่': ('Choose another image', 'ເລືອກຮູບໃໝ່'),
