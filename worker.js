@@ -120,7 +120,7 @@ async function init(db) {
         ['R4', 1800, 2200, 2], ['R5',  800, 1000, 1], ['R6',  800, 1000, 1],
         ['R7', 1600, 2000, 4], ['R8', 3000, 4000, 2], ['R9', 3000, 4000, 2],
       ];
-      for (const t of ['T1','T2','T3','T4','T5','T6','T7','T8']) P.push([t, 600, null, 0]);
+      for (const t of ['T1','T2','T3','T4','T5','T6','T7','T8']) P.push([t, 600, 800, 0]);
       await db.batch(P.map(([id, np, bp, ex]) =>
         db.prepare('UPDATE rooms SET price = ?, price_bf = ?, extra_max = ? WHERE id = ?')
           .bind(np, bp, ex, id)));
