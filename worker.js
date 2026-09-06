@@ -439,10 +439,10 @@ async function uploadSlip(request, db, p, env) {
   if (buf.byteLength > 3_000_000) return { ok: false, error: 'ไฟล์ใหญ่เกินไป' };
   if (buf.byteLength < 4_000) return { ok: false, error: 'ไฟล์เล็กเกินไป ไม่น่าจะเป็นสลิป' };
   // เช็คหัวไฟล์จริง ไม่เชื่อนามสกุลหรือ content-type ที่เบราว์เซอร์บอกมา
-  const b = new Uint8Array(buf.slice(0, 12));
-  const isJpg = b[0] === 0xFF && b[1] === 0xD8;
-  const isPng = b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47;
-  const isWebp = b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50;
+  const head = new Uint8Array(buf.slice(0, 12));
+  const isJpg = head[0] === 0xFF && head[1] === 0xD8;
+  const isPng = head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4E && head[3] === 0x47;
+  const isWebp = head[8] === 0x57 && head[9] === 0x45 && head[10] === 0x42 && head[11] === 0x50;
   if (!isJpg && !isPng && !isWebp)
     return { ok: false, error: 'ไฟล์นี้ไม่ใช่รูปภาพ กรุณาแนบรูปสลิปโอนเงิน' };
   const key = `slips/${id}.jpg`;
