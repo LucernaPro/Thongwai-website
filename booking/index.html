@@ -48,6 +48,10 @@
   .links{display:flex;gap:18px;justify-content:center;margin-top:18px;
     padding-top:16px;border-top:1px solid var(--cream2)}
   .links a{color:var(--soft);font-size:.86rem;text-decoration:none;border-bottom:1px solid var(--cream2)}
+  .chk{cursor:pointer;font-family:inherit;background:var(--pine);color:var(--white);
+    border:1px solid var(--pine);font-size:.95rem}
+  .chk:disabled{opacity:.6;cursor:default}
+  .chkmsg{margin:8px 0 0;text-align:center;font-size:.8rem;color:var(--soft);min-height:1em}
   .live{margin-top:10px;text-align:center;font-size:.8rem;color:var(--green)}
   .live::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
     background:var(--green);margin-right:6px;vertical-align:middle;animation:blip 1.6s infinite}
@@ -80,6 +84,7 @@ const lang = pickLang();
 
 const T = {
   th:{ wait:'ได้รับสลิปแล้ว รอตรวจสอบ', waitSub:'ทางที่พักจะตรวจสอบยอดและยืนยันให้ กรุณาเก็บลิงก์นี้ไว้เพื่อดูสถานะ',
+       chk:'ตรวจสอบสถานะ', chking:'กำลังตรวจสอบ…', still:'ยังไม่ได้รับการยืนยัน · ตรวจล่าสุด',
        live:'หน้านี้อัปเดตสถานะให้เอง ไม่ต้องกดอะไร',
        home:'กลับหน้าแรก', rooms:'ดูห้องพักทั้งหมด', avail:'เช็คห้องว่าง', map:'เส้นทางไปที่พัก',
        find:'ตรวจสอบสถานะการจอง', findSub:'กรอกชื่อผู้จองและเลขท้ายเบอร์โทร 4 ตัว',
@@ -94,6 +99,7 @@ const T = {
        paid:'มัดจำที่ชำระ', ref:'เลขที่การจอง', call:'โทรหาที่พัก', line:'แชทไลน์',
        n:'คืน', save:'บันทึกลิงก์หน้านี้ไว้ หรือแคปหน้าจอเก็บไว้' },
   en:{ wait:'Slip received — being checked', waitSub:'We are verifying your transfer. Keep this link to follow the status.',
+       chk:'Check status', chking:'Checking…', still:'Not confirmed yet · last checked',
        live:'This page updates itself — nothing to press',
        home:'Back to home', rooms:'See all rooms', avail:'Check availability', map:'Get directions',
        find:'Check your booking', findSub:'Enter the guest name and the last 4 digits of the phone number',
@@ -108,6 +114,7 @@ const T = {
        paid:'Deposit paid', ref:'Booking ref', call:'Call us', line:'Chat on LINE',
        n:'nights', n1:'night', save:'Save this link or take a screenshot' },
   lo:{ wait:'ໄດ້ຮັບສະລິບແລ້ວ ລໍຖ້າກວດສອບ', waitSub:'ທາງທີ່ພັກຈະກວດສອບຍອດ ແລະ ຢືນຢັນໃຫ້ ກະລຸນາເກັບລິ້ງນີ້ໄວ້',
+       chk:'ກວດສອບສະຖານະ', chking:'ກຳລັງກວດສອບ…', still:'ຍັງບໍ່ໄດ້ຮັບການຢືນຢັນ · ກວດຫຼ້າສຸດ',
        live:'ໜ້ານີ້ອັບເດດສະຖານະໃຫ້ເອງ ບໍ່ຕ້ອງກົດຫຍັງ',
        home:'ກັບໜ້າຫຼັກ', rooms:'ເບິ່ງຫ້ອງພັກທັງໝົດ', avail:'ກວດຫ້ອງວ່າງ', map:'ເສັ້ນທາງໄປທີ່ພັກ',
        find:'ກວດສອບສະຖານະການຈອງ', findSub:'ຕື່ມຊື່ຜູ້ຈອງ ແລະ ເລກທ້າຍເບີໂທ 4 ໂຕ',
@@ -145,6 +152,8 @@ function exits(kind){
        <a class="btn" href="https://lin.ee/tvjr6Fx">${esc(T.line)}</a>
      </div>
      ${kind === 'ok' ? `<a class="wide" href="https://maps.app.goo.gl/7SpH7qq64s1iKQvr7">${esc(T.map)}</a>` : ''}
+     ${kind === 'wait' && ID && TOK ? `<button class="wide chk" id="btnChk">${esc(T.chk)}</button>
+       <p class="chkmsg" id="chkMsg"></p>` : ''}
      <div class="links">
        <a href="${base}/">${esc(T.home)}</a>
        <a href="${base}/availability/">${esc(T.avail)}</a>
@@ -157,6 +166,7 @@ function shell(kind, title, sub, inner){
     `<div class="state"><span class="dot ${kind}">${icon}</span><h1>${esc(title)}</h1></div>
      <p class="sub">${esc(sub)}</p>${inner||''}
      ${exits(kind)}`;
+  bindCheck();
 }
 
 function findForm(msg){
@@ -225,10 +235,31 @@ async function check(force){
     r = await (await fetch(`/api?action=holdstatus&id=${encodeURIComponent(ID)}&tok=${encodeURIComponent(TOK)}&_=${Date.now()}`)).json();
   } catch(e) { return; }
   if (!r.ok || r.state === 'expired') { stop(); return shell('no', T.gone, T.goneSub); }
-  if (r.state === shown) return;                 // ไม่มีอะไรเปลี่ยน ไม่ต้องวาดใหม่
+  if (r.state === shown) return false;           // ไม่มีอะไรเปลี่ยน ไม่ต้องวาดใหม่
   shown = r.state;
   paint(r);
   if (r.state !== 'slip' && r.state !== 'hold') stop();
+  return true;
+}
+
+// ผูกปุ่ม "ตรวจสอบสถานะ" ใหม่ทุกครั้งที่วาดการ์ด (innerHTML ทับของเดิมไปแล้ว)
+function bindCheck(){
+  const b = document.getElementById('btnChk');
+  if (!b) return;
+  b.onclick = async () => {
+    b.disabled = true;
+    const was = b.textContent;
+    b.textContent = T.chking;
+    const changed = await check(true);
+    if (!changed) {                              // ไม่เปลี่ยน = ต้องบอกให้รู้ ไม่งั้นเหมือนปุ่มเสีย
+      const t = new Date().toLocaleTimeString(lang === 'en' ? 'en-GB' : 'th-TH',
+                  { hour:'2-digit', minute:'2-digit' });
+      const m = document.getElementById('chkMsg');
+      if (m) m.textContent = `${T.still} ${t}`;
+      b.disabled = false;
+      b.textContent = was;
+    }
+  };
 }
 
 function stop(){ if (poll) { clearInterval(poll); poll = null; } }
