@@ -697,6 +697,7 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ทำต่อจากเดิมได้เลย': ('Pick up where you left off', 'ສືບຕໍ່ຈາກເດີມໄດ້ເລີຍ'),
  'บันทึกรูป QR ไว้สแกน': ('Save the QR image to scan it', 'ບັນທຶກຮູບ QR ໄວ້ສະແກນ'),
  'บันทึกรูปแล้วเปิดแอปธนาคาร เลือกสแกนจากรูปภาพ': ('Save the image, open your banking app, then choose scan from photos', 'ບັນທຶກຮູບແລ້ວເປີດແອັບທະນາຄານ ເລືອກສະແກນຈາກຮູບພາບ'),
  'จองเลย': ('Book now', 'ຈອງເລີຍ'),

@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=qr1">
+<link rel="stylesheet" href="/assets/style.css?v=rs1">
 </head>
 <body class="avpage">
 
@@ -291,12 +291,33 @@ const AVW_DAYS = 92;
   const addD = (d,n) => { const x=new Date(d+'T00:00:00Z'); x.setUTCDate(x.getUTCDate()+n); return x.toISOString().slice(0,10); };
   let st = {}, timer = null;
 
+  
+  const KEY = 'tw_hold';
+  const remember = () => { try{ localStorage.setItem(KEY, JSON.stringify(
+      { id:st.id, tok:st.tok, deposit:st.deposit, roomName:st.roomName })); }catch(e){} };
+  const forget = () => { try{ localStorage.removeItem(KEY); }catch(e){} };
+
+  async function resume(){
+    let v; try{ v = JSON.parse(localStorage.getItem(KEY) || 'null'); }catch(e){}
+    if (!v || !v.id || !v.tok) return;
+    let r; try{
+      r = await (await fetch(`/api?action=holdstatus&id=${encodeURIComponent(v.id)}&tok=${encodeURIComponent(v.tok)}`)).json();
+    }catch(e){ return; }
+    if (!r.ok || r.state === 'expired' || r.state === 'cancelled') return forget();
+    Object.assign(st, v, { stage: r.state === 'slip' ? 'done' : 'pay' });
+    if (r.state === 'slip' || r.state === 'confirmed') { open(); waiting(); return; }
+    st.expires = Date.now() + (r.secondsLeft || 0) * 1000;
+    st.resumed = true;
+    open(); pay();
+  }
+
   function open(){ bk.hidden = scrim.hidden = false; document.body.style.overflow='hidden'; }
   function close(){
     bk.hidden = scrim.hidden = true; document.body.style.overflow='';
     clearInterval(timer); timer = null;
     if (st.id && st.tok && st.stage === 'pay')            
       navigator.sendBeacon?.('/api?action=release&id='+encodeURIComponent(st.id)+'&tok='+encodeURIComponent(st.tok));
+    forget();
     st = {}; window.__avwReload?.();
   }
   $('bkClose').onclick = close; scrim.onclick = close;
@@ -353,6 +374,7 @@ const AVW_DAYS = 92;
     const r = await (await fetch('/api?' + q)).json();
     if (!r.ok) return r.taken ? taken(r) : form(r.error);
     Object.assign(st, { id:r.id, tok:r.tok, expires:r.expires, deposit:r.deposit, stage:'pay' });
+    remember();
     pay();
   }
 
@@ -383,6 +405,7 @@ const AVW_DAYS = 92;
   function pay(){
     const lak = Math.ceil(st.deposit * LAK / 1000) * 1000;
     body.innerHTML = `
+      ${st.resumed ? '<p class="bk-resume">Pick up where you left off</p>' : ''}
       <div class="bk-amt">฿${num(st.deposit)}<small>Deposit to transfer</small></div>
       <div class="bk-clock">Time left <b id="bkCd">5:00</b></div>
       <div class="bk-tabs">
@@ -444,8 +467,16 @@ const AVW_DAYS = 92;
     $('bkFile').onchange = e => upload(e.target.files[0]);
   }
 
+  function waiting(){
+    body.innerHTML = `<div class="bk-ok">✓</div>
+      <p class="bk-done">Slip received — awaiting check</p>
+      <p class="bk-note">We'll confirm your booking once the slip is checked</p>
+      <button class="bk-go ghost" id="bkBack">Close</button>`;
+    $('bkBack').onclick = close;
+  }
+
   function expired(){
-    st.stage = 'done';
+    st.stage = 'done'; forget();
     body.innerHTML = `<p class="bk-warn">Time is up — the room has been released</p><button class="bk-go ghost" id="bkBack">Close</button>`;
     $('bkBack').onclick = close;
   }
@@ -460,12 +491,8 @@ const AVW_DAYS = 92;
       const r = await (await fetch(`/api?action=slip&id=${encodeURIComponent(st.id)}&tok=${encodeURIComponent(st.tok)}`,
         { method:'POST', body: blob })).json();
       if (!r.ok) throw new Error(r.error);
-      st.stage = 'done';
-      body.innerHTML = `<div class="bk-ok">✓</div>
-        <p class="bk-done">Slip received — awaiting check</p>
-        <p class="bk-note">We'll confirm your booking once the slip is checked</p>
-        <button class="bk-go ghost" id="bkBack">Close</button>`;
-      $('bkBack').onclick = close;
+      st.stage = 'done'; forget();
+      waiting();
     }catch(err){
       $('bkUpL').textContent = 'Paid? Attach your slip here';
       $('bkUpErr').textContent = err.message || 'Upload failed';
@@ -491,6 +518,8 @@ const AVW_DAYS = 92;
       img.src = src;
     });
   }
+
+  resume();
 
   function shrink(file){
     return new Promise((res, rej) => {
