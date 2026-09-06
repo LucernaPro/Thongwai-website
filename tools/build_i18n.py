@@ -697,6 +697,7 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ตรวจสอบสถานะการจอง': ('Check your booking', 'ກວດສອບສະຖານະການຈອງ'),
  'ดูสถานะการจอง': ('View booking status', 'ເບິ່ງສະຖານະການຈອງ'),
  'เก็บลิงก์นี้ไว้ดูสถานะและใช้ตอนเช็คอิน': ('Save this link to follow the status and show it at check-in', 'ເກັບລິ້ງນີ້ໄວ້ເບິ່ງສະຖານະ ແລະ ໃຊ້ຕອນເຊັກອິນ'),
  'ทำต่อจากเดิมได้เลย': ('Pick up where you left off', 'ສືບຕໍ່ຈາກເດີມໄດ້ເລີຍ'),

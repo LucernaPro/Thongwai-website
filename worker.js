@@ -490,6 +490,33 @@ async function rejectSlip(db, p, me) {
   return res.meta.changes ? { ok: true } : { ok: false, error: 'รายการนี้ถูกจัดการไปแล้ว' };
 }
 
+
+// ค้นหาการจองด้วยชื่อ + เลขท้ายเบอร์ 4 ตัว — สำหรับลูกค้าที่ทำลิงก์หาย
+// จงใจไม่คืน tok กลับไป: ผู้ค้นเห็นได้แค่สรุปการจองตัวเอง เอาไปทำอย่างอื่นไม่ได้
+async function lookupBooking(db, p) {
+  const name = (p.get('name') || '').trim().replace(/\s+/g, ' ');
+  const last4 = (p.get('last4') || '').replace(/\D/g, '');
+  if (name.length < 2 || last4.length !== 4)
+    return { ok: false, error: 'กรุณากรอกชื่อและเลขท้ายเบอร์โทร 4 ตัว' };
+
+  await sweepHolds(db);
+  const rows = (await db.prepare(
+    `SELECT b.id,r.name AS roomName,b.checkin,b.checkout,b.name,b.amount,b.pay,b.status
+     FROM bookings b LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.checkout >= ?
+       AND REPLACE(REPLACE(b.phone,'-',''),' ','') LIKE ?
+       AND LOWER(TRIM(b.name)) = LOWER(?)
+     ORDER BY b.checkin LIMIT 5`)
+    .bind(todayStr(), '%' + last4, name).all()).results;
+
+  if (!rows.length) return { ok: true, rows: [] };
+  return { ok: true, rows: rows.map(b => ({
+    id: b.id, roomName: b.roomName, checkin: b.checkin, checkout: b.checkout,
+    name: b.name, amount: b.amount,
+    state: b.pay === 'slip' ? 'slip' : (b.pay === 'hold' ? 'hold' : 'confirmed')
+  })) };
+}
+
 /* ── router ── */
 export default {
   async fetch(request, env, ctx) {
@@ -505,6 +532,7 @@ export default {
       if (action === 'quote')       return json(await quote(env.DB, p));
       if (action === 'hold')        return json(await holdRoom(env.DB, p));
       if (action === 'holdstatus')  return json(await holdStatus(env.DB, p));
+      if (action === 'lookup')      return json(await lookupBooking(env.DB, p));
       if (action === 'release')     return json(await releaseHold(env.DB, p));
       if (action === 'payqr')       return await payQr(env.DB, p, env);
       if (action === 'slip')        return json(await uploadSlip(request, env.DB, p, env));
