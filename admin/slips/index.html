@@ -43,7 +43,7 @@
 <body>
 
 <header>
-  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.0</small></h1>
+  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.1</small></h1>
   <button id="refresh" title="โหลดใหม่">⟳</button>
   <a href="/admin/">← การจอง</a>
 </header>
@@ -86,7 +86,7 @@ async function load(){
   }
   document.title = r.waiting ? `(${r.waiting}) ตรวจสลิป` : 'ทุ่งหวาย · ตรวจสลิป';
   if (!r.rows.length){
-    $('list').innerHTML = '<div class="msg">ไม่มีรายการรอตรวจ ✓</div>';
+    $('list').innerHTML = '<div class="msg">ไม่มีรายการรอตรวจ ✓<br><span style="font-size:.85rem">สลิปที่ยืนยันหรือปฏิเสธไปแล้วจะไม่ค้างอยู่หน้านี้ — ดูย้อนหลังได้ที่หน้าการจอง</span></div>';
     return;
   }
   $('list').innerHTML = r.rows.map(b => {
