@@ -56,7 +56,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=vl1">
+<link rel="stylesheet" href="/assets/style.css?v=tip1">
 </head>
 <body class="avpage">
 
@@ -453,6 +453,7 @@ const AVW_DAYS = 92;
   
   function clearBad(){
     body.querySelectorAll('.bad').forEach(e => e.classList.remove('bad'));
+    body.querySelectorAll('.bk-tip').forEach(e => e.remove());
     if ($('bkErr')) $('bkErr').textContent = '';
   }
 
@@ -465,17 +466,21 @@ const AVW_DAYS = 92;
 
   
   function warnField(msg, id){
-    body.querySelectorAll('.bad').forEach(e => e.classList.remove('bad'));
-    const err = $('bkErr');
-    if (err) err.textContent = msg;
+    clearBad();
     const el = id && $(id);
-    if (el) {
-      el.classList.add('bad');
-      el.scrollIntoView({ behavior:'smooth', block:'center' });
-      if (el.focus) setTimeout(() => el.focus({ preventScroll:true }), 250);
-    } else if (err) {
-      err.scrollIntoView({ behavior:'smooth', block:'center' });
-    }
+    if (!el) { const e = $('bkErr'); if (e) { e.textContent = msg;
+      e.scrollIntoView({ behavior:'smooth', block:'center' }); } return false; }
+
+    el.classList.add('bad');
+    
+    const tip = document.createElement('p');
+    tip.className = 'bk-tip';
+    tip.textContent = msg;
+    
+    const host = el.closest('.bk-ch, .bk-nocancel') || el;
+    host.insertAdjacentElement('afterend', tip);
+    el.scrollIntoView({ behavior:'smooth', block:'center' });
+    if (el.focus) setTimeout(() => el.focus({ preventScroll:true }), 250);
     return false;
   }
 

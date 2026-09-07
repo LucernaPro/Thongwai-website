@@ -485,6 +485,8 @@ a.tl:hover .nm{color:var(--glow)}
 .bk .bk-alt2 a{color:var(--pine);font-weight:600;text-decoration:underline}
 .bk .bad{border-color:#c1462d!important;box-shadow:0 0 0 3px rgba(193,70,45,.14)}
 .bk .bk-l i{color:#c1462d;font-style:normal}
+.bk .bk-tip{margin:7px 0 0;padding:9px 12px;border-radius:8px;background:#fdeeea;
+  border-left:3px solid #c1462d;color:#a8321c;font-size:.86rem;font-weight:500;line-height:1.5}
 .bk .bk-err:empty{display:none}
 .bk .bk-err{margin:10px 0 0;padding:9px 12px;border-radius:8px;background:#fdeeea;
   border-left:3px solid #c1462d;font-size:.86rem}
