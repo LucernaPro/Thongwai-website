@@ -483,6 +483,11 @@ a.tl:hover .nm{color:var(--glow)}
   text-align:center;font-size:.92rem;color:rgba(245,239,227,.85)}
 .bk .bk-alt2{margin:14px 0 0;text-align:center;font-size:.85rem;color:var(--ink-soft)}
 .bk .bk-alt2 a{color:var(--pine);font-weight:600;text-decoration:underline}
+.bk .bad{border-color:#c1462d!important;box-shadow:0 0 0 3px rgba(193,70,45,.14)}
+.bk .bk-l i{color:#c1462d;font-style:normal}
+.bk .bk-err:empty{display:none}
+.bk .bk-err{margin:10px 0 0;padding:9px 12px;border-radius:8px;background:#fdeeea;
+  border-left:3px solid #c1462d;font-size:.86rem}
 .bk .bk-seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .bk .bk-seg button{padding:11px 8px;border:1px solid var(--cream-2);background:var(--white);
   border-radius:9px;font-family:inherit;font-size:.88rem;cursor:pointer;color:var(--ink-soft)}

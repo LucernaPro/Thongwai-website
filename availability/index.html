@@ -52,7 +52,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Sarabun:wght@400;500;600&family=Noto+Sans+Lao+Looped:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=pn1">
+<link rel="stylesheet" href="/assets/style.css?v=vl1">
 </head>
 <body class="avpage">
 
@@ -367,11 +367,11 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
         <button data-n="1" ${st.nights>=14?'disabled':''}>+</button>
       </div>
       <div id="bkOpts"></div>
-      <label class="bk-l">ชื่อผู้จอง</label>
+      <label class="bk-l">ชื่อผู้จอง <i>*</i></label>
       <input class="bk-i" id="bkName" value="${esc(st.name||'')}" autocomplete="name">
-      <label class="bk-l">เบอร์โทร</label>
+      <label class="bk-l">เบอร์โทร <i>*</i></label>
       <input class="bk-i" id="bkPhone" value="${esc(st.phone||'')}" inputmode="tel" autocomplete="tel">
-      <label class="bk-l">ช่องทางติดต่อกลับ</label>
+      <label class="bk-l">ช่องทางติดต่อกลับ <i>*</i></label>
       <div class="bk-ch">
         <select class="bk-i" id="bkCh">
           <option value="LINE">LINE</option>
@@ -388,7 +388,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
         <p>ยอดที่ชำระแล้วไม่สามารถขอคืนได้ทุกกรณี กรุณาตรวจสอบห้องพักและวันที่ให้แน่ใจก่อนชำระเงิน</p>
         <label><input type="checkbox" id="bkAgree"${st.agree?' checked':''}><span>ข้าพเจ้ารับทราบและยอมรับเงื่อนไขนี้</span></label>
       </div>
-      ${err ? `<p class="bk-err">${esc(err)}</p>` : ''}
+      <p class="bk-err" id="bkErr">${err ? esc(err) : ''}</p>
       <button class="bk-go" id="bkGo">รับ QR เพื่อชำระเงิน</button>
       <p class="bk-alt2">ไม่สะดวกจองเอง?
         <a href="https://lin.ee/tvjr6Fx">ทักไลน์</a> ·
@@ -399,7 +399,10 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
       const phoneOnly = $('bkCh').value === 'phone';
       $('bkChId').style.display = phoneOnly ? 'none' : '';
     };
-    $('bkCh').onchange = syncCh; syncCh();
+    $('bkCh').onchange = () => { syncCh(); clearBad(); };
+    syncCh();
+    ['bkName','bkPhone','bkChId'].forEach(id => { const e = $(id); if (e) e.oninput = clearBad; });
+    const ag = $('bkAgree'); if (ag) ag.onchange = clearBad;
     body.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
       st.nights = Math.min(14, Math.max(1, st.nights + Number(b.dataset.n)));
       st.name = $('bkName').value; st.phone = $('bkPhone').value;
@@ -445,6 +448,11 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   }
 
   // เก็บค่าที่กรอกไว้ก่อนวาดฟอร์มใหม่ จะได้ไม่หาย
+  function clearBad(){
+    body.querySelectorAll('.bad').forEach(e => e.classList.remove('bad'));
+    if ($('bkErr')) $('bkErr').textContent = '';
+  }
+
   function keep(){
     if ($('bkName')) st.name = $('bkName').value;
     if ($('bkPhone')) st.phone = $('bkPhone').value;
@@ -452,15 +460,33 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     if ($('bkAgree')) st.agree = $('bkAgree').checked;
   }
 
+  /* ── เตือนตรงช่องที่ผิด แล้วเลื่อนไปให้เห็น ──
+     เดิมวาดฟอร์มใหม่ทั้งอัน ทำให้แผงเด้งกลับบนสุด ข้อความเตือนอยู่ล่างเลยไม่มีใครเห็น ── */
+  function fail(msg, id){
+    body.querySelectorAll('.bad').forEach(e => e.classList.remove('bad'));
+    const err = $('bkErr');
+    if (err) err.textContent = msg;
+    const el = id && $(id);
+    if (el) {
+      el.classList.add('bad');
+      el.scrollIntoView({ behavior:'smooth', block:'center' });
+      if (el.focus) setTimeout(() => el.focus({ preventScroll:true }), 250);
+    } else if (err) {
+      err.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+    return false;
+  }
+
   /* ── ขั้นที่ 2: ถือห้อง + QR ── */
   async function hold(){
     const name = $('bkName').value.trim(), phone = $('bkPhone').value.trim();
     st.agree = $('bkAgree').checked;
-    if (name.length < 2 || phone.length < 6) return form('กรุณากรอกข้อมูลให้ครบ');
-    if (!st.agree) return form('กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ');
-    st.name = name; st.phone = phone;
     st.ch = $('bkCh').value; st.chid = $('bkChId').value.trim();
-    if (st.ch !== 'phone' && st.chid.length < 2) return form('กรุณากรอกช่องทางติดต่อ');
+    if (name.length < 2) return fail('กรุณากรอกชื่อผู้จอง', 'bkName');
+    if (phone.length < 6) return fail('กรุณากรอกเบอร์โทรให้ถูกต้อง', 'bkPhone');
+    if (st.ch !== 'phone' && st.chid.length < 2) return fail('กรุณากรอกช่องทางติดต่อ', 'bkChId');
+    if (!st.agree) return fail('กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ', 'bkAgree');
+    st.name = name; st.phone = phone;
     $('bkGo').disabled = true; $('bkGo').textContent = 'กำลังดำเนินการ…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
       checkout:addD(st.checkin, st.nights), name, phone, ch:st.ch, chid:st.chid,
