@@ -464,7 +464,7 @@ const AVW_DAYS = 92;
   }
 
   
-  function fail(msg, id){
+  function warnField(msg, id){
     body.querySelectorAll('.bad').forEach(e => e.classList.remove('bad'));
     const err = $('bkErr');
     if (err) err.textContent = msg;
@@ -484,10 +484,10 @@ const AVW_DAYS = 92;
     const name = $('bkName').value.trim(), phone = $('bkPhone').value.trim();
     st.agree = $('bkAgree').checked;
     st.ch = $('bkCh').value; st.chid = $('bkChId').value.trim();
-    if (name.length < 2) return fail('Please enter the guest name', 'bkName');
-    if (phone.length < 6) return fail('Please enter a valid phone number', 'bkPhone');
-    if (st.ch !== 'phone' && st.chid.length < 2) return fail('Please fill in your contact ID', 'bkChId');
-    if (!st.agree) return fail('Please accept the condition before continuing', 'bkAgree');
+    if (name.length < 2) return warnField('Please enter the guest name', 'bkName');
+    if (phone.length < 6) return warnField('Please enter a valid phone number', 'bkPhone');
+    if (st.ch !== 'phone' && st.chid.length < 2) return warnField('Please fill in your contact ID', 'bkChId');
+    if (!st.agree) return warnField('Please accept the condition before continuing', 'bkAgree');
     st.name = name; st.phone = phone;
     $('bkGo').disabled = true; $('bkGo').textContent = 'Working…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,

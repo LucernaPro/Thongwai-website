@@ -462,7 +462,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
 
   /* ── เตือนตรงช่องที่ผิด แล้วเลื่อนไปให้เห็น ──
      เดิมวาดฟอร์มใหม่ทั้งอัน ทำให้แผงเด้งกลับบนสุด ข้อความเตือนอยู่ล่างเลยไม่มีใครเห็น ── */
-  function fail(msg, id){
+  function warnField(msg, id){
     body.querySelectorAll('.bad').forEach(e => e.classList.remove('bad'));
     const err = $('bkErr');
     if (err) err.textContent = msg;
@@ -482,10 +482,10 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
     const name = $('bkName').value.trim(), phone = $('bkPhone').value.trim();
     st.agree = $('bkAgree').checked;
     st.ch = $('bkCh').value; st.chid = $('bkChId').value.trim();
-    if (name.length < 2) return fail('กรุณากรอกชื่อผู้จอง', 'bkName');
-    if (phone.length < 6) return fail('กรุณากรอกเบอร์โทรให้ถูกต้อง', 'bkPhone');
-    if (st.ch !== 'phone' && st.chid.length < 2) return fail('กรุณากรอกช่องทางติดต่อ', 'bkChId');
-    if (!st.agree) return fail('กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ', 'bkAgree');
+    if (name.length < 2) return warnField('กรุณากรอกชื่อผู้จอง', 'bkName');
+    if (phone.length < 6) return warnField('กรุณากรอกเบอร์โทรให้ถูกต้อง', 'bkPhone');
+    if (st.ch !== 'phone' && st.chid.length < 2) return warnField('กรุณากรอกช่องทางติดต่อ', 'bkChId');
+    if (!st.agree) return warnField('กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ', 'bkAgree');
     st.name = name; st.phone = phone;
     $('bkGo').disabled = true; $('bkGo').textContent = 'กำลังดำเนินการ…';
     const q = new URLSearchParams({ action:'hold', room:st.room, checkin:st.checkin,
