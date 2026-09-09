@@ -578,6 +578,109 @@ async function lookupBooking(db, p) {
   })) };
 }
 
+
+/* ══════════════ ตรวจสุขภาพระบบจอง ══════════════
+   เป้าหมายเดียว: จับทุกอย่างที่จะทำให้ "ลูกค้ามาถึงแล้วไม่มีห้อง" ก่อนวันนั้นจะมาถึง */
+async function auditSystem(db, env) {
+  const today = todayStr();
+  const out = [];
+  const add = (level, title, detail, rows) =>
+    out.push({ level, title, detail, rows: rows || [], count: (rows || []).length });
+
+  // 1. จองซ้อนกัน — ร้ายแรงที่สุด ลูกค้าสองรายได้ห้องเดียวกัน
+  const dbl = (await db.prepare(
+    `SELECT a.id AS id1, b.id AS id2, a.room, r.name AS roomName,
+            a.checkin AS in1, a.checkout AS out1, a.name AS name1,
+            b.checkin AS in2, b.checkout AS out2, b.name AS name2
+     FROM bookings a
+     JOIN bookings b ON a.room = b.room AND a.id < b.id
+     LEFT JOIN rooms r ON r.id = a.room
+     WHERE a.status = 'จอง' AND b.status = 'จอง'
+       AND a.checkin < b.checkout AND b.checkin < a.checkout
+       AND a.checkout >= ?`).bind(today).all()).results;
+  add(dbl.length ? 'critical' : 'ok', 'การจองซ้อนกัน',
+      dbl.length ? 'มีห้องที่ถูกจองทับกัน ต้องแก้ทันที' : 'ไม่มีห้องไหนถูกจองทับกัน',
+      dbl.map(d => ({ text: `${d.roomName || d.room} · ${d.name1} (${d.in1}→${d.out1}) ทับกับ ${d.name2} (${d.in2}→${d.out2})`,
+                      ids: [d.id1, d.id2] })));
+
+  // 2. จองห้องที่ไม่มีอยู่จริง — ลูกค้าจะมาถึงแล้วหาห้องไม่เจอ
+  const ghost = (await db.prepare(
+    `SELECT b.id, b.room, b.name, b.checkin FROM bookings b
+     LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.checkout >= ? AND r.id IS NULL`).bind(today).all()).results;
+  add(ghost.length ? 'critical' : 'ok', 'จองห้องที่ไม่มีในระบบ',
+      ghost.length ? 'รหัสห้องไม่ตรงกับห้องที่มีอยู่' : 'ทุกการจองชี้ไปห้องที่มีจริง',
+      ghost.map(g => ({ text: `${g.name} · รหัสห้อง ${g.room} · เข้า ${g.checkin}`, ids: [g.id] })));
+
+  // 3. ใกล้ถึงวันเข้าพักแต่ยังไม่ได้ยืนยัน — ต้นเหตุ "มาถึงแล้วไม่มีห้อง" ตัวจริง
+  const soon = (await db.prepare(
+    `SELECT b.id, b.name, b.phone, b.contact, b.checkin, b.pay, r.name AS roomName
+     FROM bookings b LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.pay IN ('hold','slip')
+       AND b.checkin >= ? AND b.checkin <= ?
+     ORDER BY b.checkin`).bind(today, addDays(today, 7)).all()).results;
+  add(soon.length ? 'warn' : 'ok', 'ใกล้เข้าพักแต่ยังไม่ยืนยัน',
+      soon.length ? 'ภายใน 7 วันนี้ ต้องเคลียร์ให้จบก่อนลูกค้ามาถึง' : 'การจองที่ใกล้ถึงยืนยันครบแล้ว',
+      soon.map(b => ({ text: `${b.checkin} · ${b.roomName || '-'} · ${b.name} · ${b.pay === 'slip' ? 'รอตรวจสลิป' : 'ยังไม่ชำระ'} · ${b.phone || '-'}`, ids: [b.id] })));
+
+  // 4. สลิปค้างไม่มีใครตรวจ — ลูกค้าจ่ายแล้วแต่ระบบยังไม่ยืนยัน
+  const stale = (await db.prepare(
+    `SELECT b.id, b.name, b.checkin, b.created, r.name AS roomName
+     FROM bookings b LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.pay = 'slip' AND b.created < ?
+     ORDER BY b.created`).bind(nowStamp().slice(0, 10) + ' 00:00').all()).results;
+  add(stale.length ? 'warn' : 'ok', 'สลิปค้างข้ามวัน',
+      stale.length ? 'ลูกค้าจ่ายแล้วแต่ยังไม่มีใครกดยืนยัน' : 'ไม่มีสลิปค้าง',
+      stale.map(b => ({ text: `${b.name} · ${b.roomName || '-'} · เข้า ${b.checkin} · ส่งสลิป ${b.created}`, ids: [b.id] })));
+
+  // 5. ห้องถูกถือค้างเกินเวลา — บล็อกห้องไว้เปล่าๆ คนอื่นจองไม่ได้
+  const stuck = (await db.prepare(
+    `SELECT b.id, b.name, b.checkin, r.name AS roomName FROM bookings b
+     LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.pay = 'hold' AND b.expires IS NOT NULL AND b.expires < ?`)
+    .bind(Date.now()).all()).results;
+  add(stuck.length ? 'warn' : 'ok', 'ห้องถูกถือค้างเกินเวลา',
+      stuck.length ? 'ควรกดปฏิเสธเพื่อคืนห้องให้คนอื่นจองได้' : 'ไม่มีห้องถูกถือค้าง',
+      stuck.map(b => ({ text: `${b.name} · ${b.roomName || '-'} · เข้า ${b.checkin}`, ids: [b.id] })));
+
+  // 6. วันที่ผิดรูป — จองที่เช็คเอาท์ก่อนเช็คอิน
+  const baddate = (await db.prepare(
+    `SELECT id, name, checkin, checkout FROM bookings
+     WHERE status = 'จอง' AND checkout <= checkin`).all()).results;
+  add(baddate.length ? 'critical' : 'ok', 'วันที่ไม่ถูกต้อง',
+      baddate.length ? 'วันเช็คเอาท์ไม่ได้อยู่หลังวันเช็คอิน' : 'วันที่ทุกการจองถูกต้อง',
+      baddate.map(b => ({ text: `${b.name} · ${b.checkin} → ${b.checkout}`, ids: [b.id] })));
+
+  // 7. ไม่มีช่องทางติดต่อเลย — ถ้าเกิดปัญหาจะตามตัวไม่ได้
+  const nocontact = (await db.prepare(
+    `SELECT b.id, b.name, b.checkin, r.name AS roomName FROM bookings b
+     LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'จอง' AND b.checkin >= ?
+       AND (b.phone IS NULL OR TRIM(b.phone) = '')
+       AND (b.contact IS NULL OR TRIM(b.contact) = '')`).bind(today).all()).results;
+  add(nocontact.length ? 'warn' : 'ok', 'ไม่มีช่องทางติดต่อ',
+      nocontact.length ? 'ถ้าเกิดปัญหาจะตามตัวลูกค้าไม่ได้' : 'การจองที่จะมาถึงมีช่องทางติดต่อครบ',
+      nocontact.map(b => ({ text: `${b.name} · ${b.roomName || '-'} · เข้า ${b.checkin}`, ids: [b.id] })));
+
+  // 8. ราคาห้องยังไม่ถูกตั้ง — ลูกค้าจะจองแล้วได้ยอดผิด
+  const noprice = (await db.prepare(
+    `SELECT id, name FROM rooms WHERE price IS NULL OR price <= 0`).all()).results;
+  add(noprice.length ? 'critical' : 'ok', 'ห้องที่ยังไม่มีราคา',
+      noprice.length ? 'ห้องเหล่านี้จะคิดเงินผิด' : 'ทุกห้องมีราคาครบ',
+      noprice.map(r => ({ text: `${r.name} (${r.id})`, ids: [] })));
+
+  // 9. ระบบรับเงินพร้อมใช้ไหม
+  const cfg = [];
+  if (!env.PROMPTPAY_ID) cfg.push({ text: 'ยังไม่ได้ตั้งค่า PROMPTPAY_ID — QR สร้างไม่ได้', ids: [] });
+  if (!env.SLIPS) cfg.push({ text: 'ยังไม่ได้ผูกที่เก็บสลิป — ลูกค้าแนบสลิปไม่ได้', ids: [] });
+  add(cfg.length ? 'critical' : 'ok', 'ระบบรับชำระเงิน',
+      cfg.length ? 'ลูกค้าจะจ่ายเงินไม่ได้' : 'QR และที่เก็บสลิปพร้อมใช้งาน', cfg);
+
+  const counts = { critical: 0, warn: 0 };
+  for (const o of out) if (o.count) counts[o.level] = (counts[o.level] || 0) + 1;
+  return { ok: true, today, checks: out, critical: counts.critical || 0, warn: counts.warn || 0 };
+}
+
 /* ── router ── */
 export default {
   async fetch(request, env, ctx) {
@@ -609,6 +712,7 @@ export default {
         }
         case 'slipimg': return await slipImage(env.DB, p, env);
         case 'pending':  return json(await pendingSlips(env.DB));
+        case 'audit':    return json(await auditSystem(env.DB, env));
         case 'slipok':   { const r = await confirmSlip(env.DB, p, me); await auditLog(env, ctx, me.username, 'ยืนยันสลิป', p.get('id'), {}); return json(r); }
         case 'slipno':   { const r = await rejectSlip(env.DB, p, me);  await auditLog(env, ctx, me.username, 'ปฏิเสธสลิป', p.get('id'), { reason: p.get('reason') }); return json(r); }
         case 'bookings': return json(await listBookings(env.DB, p));

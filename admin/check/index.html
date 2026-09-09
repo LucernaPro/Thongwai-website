@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2e4a38">
+<title>ตรวจระบบจอง · ทุ่งหวาย</title>
+<style>
+  :root{--ink:#2b2b2b;--soft:#6b6b6b;--line:#e2ddd3;--cream:#f5efe3;--white:#fff;
+        --pine:#2e4a38;--amber:#e8963e;--red:#c1462d;--green:#2f7d4f}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);
+       font-family:'Mitr',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px}
+  header{background:var(--pine);color:#fff;padding:10px 14px;display:flex;align-items:center;
+         gap:8px;position:sticky;top:0;z-index:5;flex-wrap:wrap}
+  header h1{margin:0;font-size:1.02rem;font-weight:600;flex:1;min-width:0}
+  header a,header button{flex:0 0 auto;background:rgba(255,255,255,.15);color:#fff;border:0;
+         border-radius:8px;padding:6px 12px;font:inherit;font-size:.85rem;cursor:pointer;text-decoration:none}
+  @media(max-width:640px){ header h1{flex:1 1 100%} header a{margin-left:auto} }
+  .wrap{max-width:820px;margin:0 auto;padding:16px}
+  .verdict{padding:18px;border-radius:12px;margin-bottom:16px;text-align:center}
+  .verdict.ok{background:#e6f2ea;border:1px solid #a8d4ba}
+  .verdict.warn{background:#fdf1e3;border:1px solid #edc48d}
+  .verdict.critical{background:#fdeeea;border:1px solid #e0a99c}
+  .verdict b{display:block;font-size:1.2rem;margin-bottom:4px}
+  .verdict.ok b{color:var(--green)} .verdict.warn b{color:#a35d12} .verdict.critical b{color:var(--red)}
+  .verdict span{font-size:.88rem;color:var(--soft)}
+  .row{background:var(--white);border:1px solid var(--line);border-radius:11px;
+       padding:14px;margin-bottom:10px}
+  .row.critical{border-left:4px solid var(--red)}
+  .row.warn{border-left:4px solid var(--amber)}
+  .row.ok{opacity:.72}
+  .rh{display:flex;align-items:center;gap:9px}
+  .rh b{flex:1;font-size:.96rem;font-weight:600}
+  .pill{font-size:.75rem;padding:2px 9px;border-radius:99px;white-space:nowrap}
+  .pill.ok{background:#e6f2ea;color:var(--green)}
+  .pill.warn{background:#fdf1e3;color:#a35d12}
+  .pill.critical{background:#fdeeea;color:var(--red)}
+  .rd{margin:5px 0 0;font-size:.85rem;color:var(--soft);line-height:1.55}
+  ul{margin:10px 0 0;padding-left:18px}
+  li{font-size:.86rem;line-height:1.65;margin-bottom:5px}
+  .msg{padding:16px;text-align:center;color:var(--soft)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ตรวจระบบจอง <small style="opacity:.5;font-size:.62em;font-weight:400">v1.0</small></h1>
+  <button id="again">⟳ ตรวจใหม่</button>
+  <a href="/admin/">← การจอง</a>
+</header>
+
+<div class="wrap"><div id="out"><div class="msg">กำลังตรวจ…</div></div></div>
+
+<script>
+const API = '/api';
+const $ = id => document.getElementById(id);
+const store = {
+  get user(){ return localStorage.getItem('tw_user') || '' },
+  get pass(){ return localStorage.getItem('tw_pass') || '' }
+};
+const esc = s => String(s??'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const LABEL = { ok:'ปกติ', warn:'ควรดู', critical:'ต้องแก้ทันที' };
+
+async function run(){
+  if (!store.user || !store.pass){
+    $('out').innerHTML = '<div class="msg">ยังไม่ได้เข้าสู่ระบบ — <a href="/admin/">เข้าหน้าการจองก่อน</a></div>';
+    return;
+  }
+  $('out').innerHTML = '<div class="msg">กำลังตรวจ…</div>';
+  const u = new URL(API, location.origin);
+  u.searchParams.set('user', store.user);
+  u.searchParams.set('pass', store.pass);
+  u.searchParams.set('action', 'audit');
+  let r;
+  try { r = await (await fetch(u)).json(); }
+  catch(e){ $('out').innerHTML = '<div class="msg">ตรวจไม่สำเร็จ ลองกด ⟳ อีกครั้ง</div>'; return; }
+  if (!r.ok){ $('out').innerHTML = '<div class="msg">' + esc(r.error || 'ตรวจไม่สำเร็จ') + '</div>'; return; }
+
+  const level = r.critical ? 'critical' : (r.warn ? 'warn' : 'ok');
+  const head = r.critical
+    ? { t:'พบปัญหาที่ต้องแก้ทันที', s:`${r.critical} เรื่องที่อาจทำให้ลูกค้าไม่ได้ห้อง` }
+    : r.warn
+      ? { t:'มีเรื่องที่ควรดู', s:`${r.warn} เรื่อง ยังไม่ถึงขั้นเสียหาย แต่ปล่อยไว้ไม่ดี` }
+      : { t:'ระบบปกติดี', s:'ไม่พบสิ่งที่จะทำให้ลูกค้าเสียห้อง' };
+
+  // เรียงเรื่องที่ต้องแก้ขึ้นก่อน เรื่องปกติไปอยู่ล่าง
+  const rank = { critical:0, warn:1, ok:2 };
+  const rows = r.checks.slice().sort((a,b) =>
+    (rank[a.count ? a.level : 'ok']) - (rank[b.count ? b.level : 'ok']));
+
+  $('out').innerHTML =
+    `<div class="verdict ${level}"><b>${esc(head.t)}</b><span>${esc(head.s)} · ตรวจเมื่อ ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span></div>` +
+    rows.map(c => {
+      const lv = c.count ? c.level : 'ok';
+      return `<div class="row ${lv}">
+        <div class="rh"><b>${esc(c.title)}</b><span class="pill ${lv}">${esc(LABEL[lv])}</span></div>
+        <p class="rd">${esc(c.detail)}</p>
+        ${c.rows.length ? '<ul>' + c.rows.map(x => `<li>${esc(x.text)}</li>`).join('') + '</ul>' : ''}
+      </div>`;
+    }).join('');
+}
+
+$('again').onclick = run;
+run();
+</script>
+</body>
+</html>
