@@ -46,7 +46,7 @@
 <body>
 
 <header>
-  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.3</small></h1>
+  <h1>ตรวจสลิป <small style="opacity:.55;font-size:.62em;font-weight:400">v1.4</small></h1>
   <button id="refresh" title="โหลดใหม่">⟳</button>
   <a href="/admin/">← การจอง</a>
 </header>
@@ -133,7 +133,7 @@ document.addEventListener('click', async e => {
 
 $('refresh').onclick = load;
 load();
-setInterval(() => { if (!busy && !document.hidden) load(); }, 30000);
+setInterval(() => { if (!busy && !document.hidden) load(); }, 180000);  // 3 นาที
 </script>
 </body>
 </html>

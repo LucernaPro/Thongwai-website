@@ -112,7 +112,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v6.0</small></h1>
+  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v6.1</small></h1>
   <span class="pill" id="whoami"></span>
   <a id="slipBell" class="hbell" href="/admin/slips/" title="ตรวจสลิป">🧾<span id="slipN"></span></a>
   <a class="hbell" href="/admin/check/" title="ตรวจสุขภาพระบบจอง">🩺</a>
@@ -623,7 +623,7 @@ async function pollSlips(){
     document.title = n ? `(${n}) ทุ่งหวาย · จัดการการจอง` : 'ทุ่งหวาย · จัดการการจอง';
   }catch(e){}
 }
-pollSlips(); setInterval(pollSlips, 45000);
+pollSlips(); setInterval(pollSlips, 300000);   // 5 นาที (เดิม 45 วิ — กินโควตาฐานข้อมูลหนักเกิน)
 
 /* ================= 2 มุมมอง ================= */
 function setView(v){

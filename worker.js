@@ -83,6 +83,8 @@ async function init(db) {
       name TEXT NOT NULL, phone TEXT, note TEXT, status TEXT NOT NULL,
       created TEXT, staff TEXT)`),
     db.prepare(`CREATE INDEX IF NOT EXISTS ix_book ON bookings (room, status, checkin, checkout)`),
+    db.prepare(`CREATE INDEX IF NOT EXISTS ix_pay ON bookings (pay, expires)`),
+    db.prepare(`CREATE INDEX IF NOT EXISTS ix_checkin ON bookings (checkin)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS users (
       username TEXT PRIMARY KEY, pass TEXT NOT NULL, role TEXT NOT NULL, created TEXT)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS audit (
@@ -298,8 +300,11 @@ const DEPOSIT   = 1.0;             // ★ เก็บเต็มจำนว�
 
 // ปล่อยห้องที่ถือไว้แล้วไม่จ่าย — เรียกก่อนทุก query ที่อ่านห้องว่าง
 // ต่อเวลาให้อัตโนมัติถ้ายังไม่มีใครมาสนใจห้องนั้น (มี waiting=0) เพื่อไม่ตัดลูกค้าจริงทิ้งฟรีๆ
+let lastSweep = 0;
 async function sweepHolds(db) {
   const now = Date.now();
+  if (now - lastSweep < 60_000) return;   // กันยิงถี่จนกินโควตาอ่านฐานข้อมูล
+  lastSweep = now;
   await db.prepare(
     `UPDATE bookings SET status = 'ยกเลิก', pay = 'expired'
      WHERE pay = 'hold' AND expires IS NOT NULL AND expires < ?`).bind(now).run();
@@ -593,16 +598,17 @@ async function auditSystem(db, env) {
     out.push({ level, title, detail, rows: rows || [], count: (rows || []).length });
 
   // 1. จองซ้อนกัน — ร้ายแรงที่สุด ลูกค้าสองรายได้ห้องเดียวกัน
+  // จำกัดเป็นเฉพาะการจองที่ยังไม่ผ่านไปก่อน แล้วค่อยจับคู่ — ไม่งั้นอ่านทั้งตารางยกกำลังสอง
   const dbl = (await db.prepare(
-    `SELECT a.id AS id1, b.id AS id2, a.room, r.name AS roomName,
+    `WITH live AS (
+       SELECT id, room, checkin, checkout, name FROM bookings
+       WHERE status = 'จอง' AND checkout >= ?)
+     SELECT a.id AS id1, b.id AS id2, a.room, r.name AS roomName,
             a.checkin AS in1, a.checkout AS out1, a.name AS name1,
             b.checkin AS in2, b.checkout AS out2, b.name AS name2
-     FROM bookings a
-     JOIN bookings b ON a.room = b.room AND a.id < b.id
+     FROM live a JOIN live b ON a.room = b.room AND a.id < b.id
      LEFT JOIN rooms r ON r.id = a.room
-     WHERE a.status = 'จอง' AND b.status = 'จอง'
-       AND a.checkin < b.checkout AND b.checkin < a.checkout
-       AND a.checkout >= ?`).bind(today).all()).results;
+     WHERE a.checkin < b.checkout AND b.checkin < a.checkout`).bind(today).all()).results;
   add(dbl.length ? 'critical' : 'ok', 'การจองซ้อนกัน',
       dbl.length ? 'มีห้องที่ถูกจองทับกัน ต้องแก้ทันที' : 'ไม่มีห้องไหนถูกจองทับกัน',
       dbl.map(d => ({ text: `${d.roomName || d.room} · ${d.name1} (${d.in1}→${d.out1}) ทับกับ ${d.name2} (${d.in2}→${d.out2})`,

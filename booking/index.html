@@ -268,7 +268,9 @@ function stop(){ if (poll) { clearInterval(poll); poll = null; } }
   if (!ID || !TOK) return findForm();
   await check(true);
   if (shown === 'slip' || shown === 'hold') {
-    poll = setInterval(check, 20000);
+    poll = setInterval(check, 60000);            // 1 นาที (เดิม 20 วิ)
+    // หยุดเองหลัง 30 นาที — ลูกค้าที่เปิดค้างข้ามคืนไม่ควรยิงทั้งคืน
+    setTimeout(stop, 30 * 60000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) check(true); });
     window.addEventListener('pageshow', e => { if (e.persisted) check(true); });
   }
