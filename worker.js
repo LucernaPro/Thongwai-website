@@ -92,7 +92,7 @@ async function init(db) {
   // เจตนา: ไม่แตะ status เดิม ('จอง'/'ยกเลิก') เลย — การถือห้องก็ status='จอง' เหมือนกัน
   // ทำให้ทุก query กันจองซ้อนที่มีอยู่แล้วครอบคลุมการถือห้องอัตโนมัติ ไม่ต้องแก้ที่ไหน
   // สถานะการจ่ายเงินแยกไว้คอลัมน์ pay: 'hold' → 'slip' → NULL (พนักงานยืนยันแล้ว)
-  {
+  try {
     const cols = (await db.prepare('PRAGMA table_info(bookings)').all()).results.map(r => r.name);
     const add = [];
     if (!cols.includes('pay'))     add.push('ALTER TABLE bookings ADD COLUMN pay TEXT');
@@ -103,17 +103,19 @@ async function init(db) {
     if (!cols.includes('contact')) add.push('ALTER TABLE bookings ADD COLUMN contact TEXT');
     if (!cols.includes('bf'))      add.push('ALTER TABLE bookings ADD COLUMN bf INTEGER');
     if (!cols.includes('beds'))    add.push('ALTER TABLE bookings ADD COLUMN beds INTEGER');
-    if (add.length) await db.batch(add.map(q => db.prepare(q)));
-  }
+    for (const q of add) { try { await db.prepare(q).run(); } catch (e) { /* มีแล้วก็ข้าม */ } }
+  } catch (e) { /* migration ล้มต้องไม่ทำให้ทั้งระบบล่ม */ }
 
-  // migration 6 ก.ย. 2026: ราคารวม/ไม่รวมอาหารเช้า + เตียงเสริม (รันครั้งเดียว)
-  {
+
+  // migration 6 ก.ย. 2026: ราคารวม/ไม่รวมอาหารเช้า + เตียงเสริม
+  // ทำทีละคำสั่งและกลืน error เอง — migration ล้มต้องไม่ทำให้ปฏิทินห้องว่างของลูกค้าล่มไปด้วย
+  try {
     const rc = (await db.prepare('PRAGMA table_info(rooms)').all()).results.map(r => r.name);
     if (!rc.includes('price_bf')) {
-      await db.batch([
-        db.prepare('ALTER TABLE rooms ADD COLUMN price_bf INTEGER'),
-        db.prepare('ALTER TABLE rooms ADD COLUMN extra_max INTEGER'),
-      ]);
+      for (const q of ['ALTER TABLE rooms ADD COLUMN price_bf INTEGER',
+                       'ALTER TABLE rooms ADD COLUMN extra_max INTEGER']) {
+        try { await db.prepare(q).run(); } catch (e) { /* มีอยู่แล้วก็ข้าม */ }
+      }
       // [id, ไม่รวมอาหารเช้า, รวมอาหารเช้า, เสริมเตียงได้สูงสุด]
       const P = [
         ['R1', 2200, 2800, 5], ['R2', 1600, 2000, 4], ['R3', 1800, 2200, 2],
@@ -121,11 +123,14 @@ async function init(db) {
         ['R7', 1600, 2000, 4], ['R8', 3000, 4000, 2], ['R9', 3000, 4000, 2],
       ];
       for (const t of ['T1','T2','T3','T4','T5','T6','T7','T8']) P.push([t, 600, 800, 0]);
-      await db.batch(P.map(([id, np, bp, ex]) =>
-        db.prepare('UPDATE rooms SET price = ?, price_bf = ?, extra_max = ? WHERE id = ?')
-          .bind(np, bp, ex, id)));
+      for (const [id, np, bp, ex] of P) {
+        try {
+          await db.prepare('UPDATE rooms SET price = ?, price_bf = ?, extra_max = ? WHERE id = ?')
+            .bind(np, bp, ex, id).run();
+        } catch (e) { /* ข้ามห้องที่มีปัญหา ไม่ล้มทั้งชุด */ }
+      }
     }
-  }
+  } catch (e) { /* อ่านโครงตารางไม่ได้ก็ปล่อยผ่าน ให้ระบบเดินต่อ */ }
 
   const { c } = await db.prepare('SELECT COUNT(*) AS c FROM rooms').first();
   if (c === 0) {
@@ -692,7 +697,10 @@ export default {
       const p = url.searchParams;
       const action = p.get('action');
       // ── public: ไม่ต้อง login ──
-      if (action === 'availability') { await sweepHolds(env.DB); return json(await availability(env.DB, p)); }
+      if (action === 'availability') {
+        try { await sweepHolds(env.DB); } catch (e) { /* กวาดไม่ได้ก็ยังต้องโชว์ปฏิทินได้ */ }
+        return json(await availability(env.DB, p));
+      }
       if (action === 'quote')       return json(await quote(env.DB, p));
       if (action === 'hold')        return json(await holdRoom(env.DB, p));
       if (action === 'holdstatus')  return json(await holdStatus(env.DB, p));
