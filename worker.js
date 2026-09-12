@@ -323,6 +323,21 @@ function nightsOf(checkin, checkout) {
 const WEEKEND_UP = 1.20;      // ★ ศุกร์+เสาร์ บวก 20% — คิดในราคาเลย ไม่แยกให้ลูกค้าเห็น
 const BED_NOBF = 200, BED_BF = 300;   // ★ เตียงเสริมต่อคืน
 
+/* ★★ ช่วงเทศกาล — Claude เป็นคนดูแลรายการนี้ ไม่ใช่ Pist (ตกลงกันไว้ 12 ก.ย. 2026)
+   from/to คือ "คืนที่เข้าพัก" แบบรวมปลายทั้งสองข้าง (คืน = วันเช็คอินของคืนนั้น)
+   ไม่ทบกับเรตศุกร์-เสาร์ — ใช้ตัวที่สูงกว่าตัวเดียว กติกาเต็มอยู่ใน SPEC.md */
+const SEASONS = [
+  { from: '2026-10-22', to: '2026-10-24', up: 1.30, name: 'วันปิยมหาราช (ศ 23 ต.ค.)' },
+  { from: '2026-12-04', to: '2026-12-06', up: 1.30, name: 'วันพ่อ (ส 5 ธ.ค.)' },
+  { from: '2026-12-29', to: '2027-01-02', up: 1.40, name: 'ปีใหม่ หยุดยาว 6 วัน' },
+  { from: '2027-04-11', to: '2027-04-16', up: 1.40, name: 'สงกรานต์ + ปีใหม่ลาว' },
+];
+const seasonUp = d => {
+  let best = 1;
+  for (const s of SEASONS) if (d >= s.from && d <= s.to && s.up > best) best = s.up;
+  return best;
+};
+
 // ศุกร์ = 5, เสาร์ = 6 (คิดจากวันที่เข้าพักของแต่ละคืน)
 const isWeekendNight = d => [5, 6].includes(new Date(d + 'T00:00:00Z').getUTCDay());
 
@@ -331,7 +346,9 @@ function priceStay(r, checkin, checkout, bf, beds) {
   const base = bf ? r.price_bf : r.price;
   let total = 0;
   for (let d = checkin; d < checkout; d = addDaysStr(d, 1)) {
-    total += Math.round(base * (isWeekendNight(d) ? WEEKEND_UP : 1));
+    // ไม่ทบกัน — คืนเสาร์ที่อยู่ในช่วงเทศกาลใช้เรตเทศกาลตัวเดียว
+    const up = Math.max(seasonUp(d), isWeekendNight(d) ? WEEKEND_UP : 1);
+    total += Math.round(base * up);
     total += beds * (bf ? BED_BF : BED_NOBF);   // เตียงเสริมไม่ปรับตามวัน
   }
   return total;
@@ -696,6 +713,12 @@ async function auditSystem(db, env) {
   if (!env.SLIPS) cfg.push({ text: 'ยังไม่ได้ผูกที่เก็บสลิป — ลูกค้าแนบสลิปไม่ได้', ids: [] });
   add(cfg.length ? 'critical' : 'ok', 'ระบบรับชำระเงิน',
       cfg.length ? 'ลูกค้าจะจ่ายเงินไม่ได้' : 'QR และที่เก็บสลิปพร้อมใช้งาน', cfg);
+
+  // ไม่ใช่ข้อผิดพลาด แค่ให้เห็นว่าตอนนี้ตั้งเรตเทศกาลอะไรไว้บ้าง
+  const upcoming = SEASONS.filter(x => x.to >= today);
+  add('ok', 'ช่วงเทศกาลที่ตั้งราคาไว้',
+      upcoming.length ? 'ราคาปรับอัตโนมัติในช่วงเหล่านี้' : 'ยังไม่มีช่วงเทศกาลข้างหน้า — ควรแจ้ง Claude ให้เติม',
+      upcoming.map(x => ({ text: `${x.from} → ${x.to} · +${Math.round((x.up-1)*100)}% · ${x.name}`, ids: [] })));
 
   const counts = { critical: 0, warn: 0 };
   for (const o of out) if (o.count) counts[o.level] = (counts[o.level] || 0) + 1;
