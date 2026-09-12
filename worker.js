@@ -120,7 +120,7 @@ async function init(db) {
       }
       // [id, ไม่รวมอาหารเช้า, รวมอาหารเช้า, เสริมเตียงได้สูงสุด]
       const P = [
-        ['R1', 2200, 2800, 5], ['R2', 1600, 2000, 4], ['R3', 1800, 2200, 2],
+        ['R1', 2300, 2800, 5], ['R2', 1600, 2000, 4], ['R3', 1800, 2200, 2],
         ['R4', 1800, 2200, 2], ['R5',  800, 1000, 1], ['R6',  800, 1000, 1],
         ['R7', 1600, 2000, 4], ['R8', 3000, 4000, 2], ['R9', 3000, 4000, 2],
       ];
@@ -155,6 +155,12 @@ async function init(db) {
     await db.prepare("UPDATE bookings SET room = 'T7' WHERE room = 'X:เต้นท์หลังเล็ก7'").run();
     await db.prepare("UPDATE bookings SET room = 'T8' WHERE room = 'X:เต้นท์หลังเล็ก8'").run();
   }
+  // แก้ราคาเฮือนมหาเศรษฐี 12 ก.ย. 2026: ไม่รวมอาหารเช้าคือ 2,300 ไม่ใช่ 2,200
+  // เช็คค่าเดิมก่อนแก้ ปรับราคาเองในอนาคตจะไม่โดนทับ
+  try {
+    await db.prepare("UPDATE rooms SET price = 2300 WHERE id = 'R1' AND price = 2200").run();
+  } catch (e) { /* ล้มก็ไม่ทำให้ระบบล่ม */ }
+
   const { u } = await db.prepare('SELECT COUNT(*) AS u FROM users').first();
   if (u === 0) {
     await db.prepare('INSERT INTO users (username,pass,role,created) VALUES (?,?,?,?)')
