@@ -700,6 +700,7 @@ LO.update({k: v[1] for k, v in HR.items()})
 
 # ═══════════ จองออนไลน์ + ชำระมัดจำ (หน้า availability) ═══════════
 BK = {
+ 'ค่าห้อง': ('Room total', 'ຄ່າຫ້ອງ'),
  'กรุณากรอกชื่อผู้จอง': ('Please enter the guest name', 'ກະລຸນາຕື່ມຊື່ຜູ້ຈອງ'),
  'กรุณากรอกเบอร์โทรให้ถูกต้อง': ('Please enter a valid phone number', 'ກະລຸນາຕື່ມເບີໂທໃຫ້ຖືກຕ້ອງ'),
  'กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ': ('Please accept the condition before continuing', 'ກະລຸນາຍອມຮັບເງື່ອນໄຂກ່ອນດຳເນີນການຕໍ່'),

@@ -343,9 +343,13 @@ async function quote(db, p) {
   const beds = Math.min(Math.max(0, Number(p.get('beds')) || 0), r.extra_max || 0);
   const nights = nightsOf(checkin, checkout);
   const total = priceStay(r, checkin, checkout, bf, beds);
+  // แยกยอดให้หน้าเว็บโชว์แบบบวกกันได้ลงตัว — ห้ามให้ลูกค้าเห็นราคาฐานคู่กับยอดจริง
+  // แล้วคิดเลขไม่ตรง เพราะนั่นคือการเปิดเผยเรตวันศุกร์-เสาร์โดยไม่ตั้งใจ
+  const bedTotal = beds * nights * (bf ? BED_BF : BED_NOBF);
   return { ok: true, room: r.id, roomName: r.name, nights, bf, beds,
            hasBf: r.price_bf != null, extraMax: r.extra_max || 0,
            price: bf ? r.price_bf : r.price,
+           roomTotal: total - bedTotal, bedTotal,
            total, deposit: Math.ceil(total * DEPOSIT) };
 }
 
