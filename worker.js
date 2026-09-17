@@ -725,6 +725,16 @@ async function auditSystem(db, env) {
   return { ok: true, today, checks: out, critical: counts.critical || 0, warn: counts.warn || 0 };
 }
 
+
+// แก้บันทึก/ยอดมัดจำของการจองที่บันทึกไปแล้ว — เดิมแก้ไม่ได้เลย ต้องยกเลิกแล้วคีย์ใหม่
+async function editNote(db, p, me) {
+  const id = p.get('id') || '', note = (p.get('note') || '').slice(0, 300);
+  const res = await db.prepare(
+    `UPDATE bookings SET note = ?, staff = ? WHERE id = ? AND status = 'จอง'`)
+    .bind(note, me.username, id).run();
+  return res.meta.changes ? { ok: true } : { ok: false, error: 'ไม่พบรายการนี้ หรือถูกยกเลิกไปแล้ว' };
+}
+
 /* ── router ── */
 export default {
   async fetch(request, env, ctx) {
@@ -759,6 +769,7 @@ export default {
         }
         case 'slipimg': return await slipImage(env.DB, p, env);
         case 'pending':  return json(await pendingSlips(env.DB));
+        case 'editnote': { const r = await editNote(env.DB, p, me); await auditLog(env, ctx, me.username, 'แก้บันทึก', p.get('id'), { note: p.get('note') }); return json(r); }
         case 'audit':    return json(await auditSystem(env.DB, env));
         case 'slipok':   { const r = await confirmSlip(env.DB, p, me); await auditLog(env, ctx, me.username, 'ยืนยันสลิป', p.get('id'), {}); return json(r); }
         case 'slipno':   { const r = await rejectSlip(env.DB, p, me);  await auditLog(env, ctx, me.username, 'ปฏิเสธสลิป', p.get('id'), { reason: p.get('reason') }); return json(r); }

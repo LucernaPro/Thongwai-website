@@ -112,7 +112,7 @@ table.cal{border-collapse:collapse;min-width:100%}
 <body>
 
 <header>
-  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v6.1</small></h1>
+  <h1><span class="hfull">ทุ่งหวายโฮมสเตย์ · </span>การจอง <small title="ถ้าตัวเลขนี้ไม่ตรงกับที่คาด แปลว่ายังไม่ได้ deploy หรือติด cache — กด Cmd/Ctrl+Shift+R">v6.2</small></h1>
   <span class="pill" id="whoami"></span>
   <a id="slipBell" class="hbell" href="/admin/slips/" title="ตรวจสลิป">🧾<span id="slipN"></span></a>
   <a class="hbell" href="/admin/check/" title="ตรวจสุขภาพระบบจอง">🩺</a>
@@ -280,6 +280,7 @@ table.cal{border-collapse:collapse;min-width:100%}
   <div class="row">
     <button class="btn btn-l" id="dDoc">📄 เอกสารการจอง</button>
     <button class="btn btn-g" id="dMove">✏️ เลื่อน/ย้ายห้อง</button>
+    <button class="btn btn-g" id="dNote">📝 แก้มัดจำ/บันทึก</button>
     <button class="btn btn-r" id="dCancel">ยกเลิกการจองนี้</button>
     <button class="btn btn-g" id="dClose">ปิด</button>
   </div>
@@ -903,6 +904,26 @@ function openForm(room, date){
   $('fMsg').className='msg';
   $('backdrop').classList.add('show'); $('formSheet').classList.add('open');
 }
+// ใส่ลูกน้ำให้เองระหว่างพิมพ์ — พนักงานเห็นทันทีว่าระบบอ่านตัวเลขออก
+['fDepB','fDepK'].forEach(id => {
+  const el = $(id);
+  if (!el) return;
+  el.oninput = () => {
+    const d = el.value.replace(/[^\d]/g, '');
+    el.value = d ? Number(d).toLocaleString() : '';
+  };
+});
+
+$('dNote').onclick = async () => {
+  const b = bookings.find(x => x.id === currentId) || logBookings.find(x => x.id === currentId);
+  if (!b) return;
+  const v = prompt('แก้บันทึก (ใส่มัดจำได้เลย เช่น "มัดจำ 650,000 กีบ · ไม่รวมอาหารเช้า")', b.note || '');
+  if (v === null) return;
+  const r = await api({ action:'editnote', id: currentId, note: v.trim() });
+  if (!r.ok) return alert(r.error || 'แก้ไม่สำเร็จ');
+  closeSheets(); await load(true); if (view==='log') loadLog();
+};
+
 $('fabAdd').onclick = () => openForm();
 $('fClose').onclick = closeSheets;
 $('backdrop').onclick = closeSheets;
@@ -911,7 +932,13 @@ function closeSheets(){ $('backdrop').classList.remove('show'); $('formSheet').c
 $('fSave').onclick = async () => {
   const m=$('fMsg'); m.className='msg';
   const parts = [];
-  const depB = Number($('fDepB').value) || 0, depK = Number($('fDepK').value) || 0;
+  // พนักงานพิมพ์ 650,000 เป็นเรื่องปกติ — Number() อ่านลูกน้ำไม่ได้แล้วกลายเป็น 0
+  // ของเดิมเลยทิ้งยอดมัดจำไปเงียบๆ ไม่เตือนอะไรเลย
+  const onlyDigits = id => Number(($(id).value || '').replace(/[^\d]/g, '')) || 0;
+  const rawB = $('fDepB').value.trim(), rawK = $('fDepK').value.trim();
+  const depB = onlyDigits('fDepB'), depK = onlyDigits('fDepK');
+  if (rawB && !depB) { m.className='msg err'; m.textContent='มัดจำ (บาท) กรอกเป็นตัวเลขเท่านั้น'; $('fDepB').focus(); return; }
+  if (rawK && !depK) { m.className='msg err'; m.textContent='มัดจำ (กีบ) กรอกเป็นตัวเลขเท่านั้น'; $('fDepK').focus(); return; }
   if (depB) parts.push('มัดจำ ' + depB.toLocaleString() + '฿');
   if (depK) parts.push('มัดจำ ' + depK.toLocaleString() + ' กีบ');
   parts.push($('fBf').value ? 'รวมอาหารเช้า' : 'ไม่รวมอาหารเช้า');
