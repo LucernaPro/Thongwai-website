@@ -51,9 +51,9 @@ let h = await J(`action=hold&room=R2&checkin=2026-11-25&checkout=2026-11-26&name
 await J(`action=slip&id=${h.id}&tok=${h.tok}`, post(jpg()));
 let ok1 = await J(`${OWNER}&action=slipok&id=${h.id}`);
 let ok2 = await J(`${OWNER}&action=slipok&id=${h.id}`);
-T('กดยืนยันรัวสองครั้ง → ครั้งที่สองไม่ซ้ำ', ok1.ok===true && ok2.ok===false, ok2.error);
+T('กดยืนยันรัวสองครั้ง → บอกว่ายืนยันไปแล้ว', ok1.ok===true && ok2.ok===false && /ยืนยันไปแล้ว/.test(ok2.error), ok2.error);
 let no = await J(`${OWNER}&action=slipno&id=${h.id}&reason=${E('กดพลาด')}`);
-T('กดปฏิเสธหลังยืนยันไปแล้ว → ไม่ให้', no.ok===false, no.error||'');
+T('กดปฏิเสธหลังยืนยันไปแล้ว → บอกให้ใช้ปุ่มยกเลิกแทน', no.ok===false && /ยกเลิกการจอง/.test(no.error||''), no.error||'');
 let row = raw.prepare('SELECT status,pay FROM bookings WHERE id=?').get(String(h.id));
 T('รายการยังเป็นจองที่ยืนยันแล้ว', row.status==='จอง' && row.pay===null, `${row.status}/${row.pay}`);
 
