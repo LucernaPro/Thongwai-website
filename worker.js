@@ -1333,12 +1333,25 @@ export default {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะ admin เท่านั้น' });
           const rooms = Object.fromEntries(
             (await env.DB.prepare('SELECT id,name FROM rooms').all()).results.map(r => [r.id, r.name]));
+          // ★ ต้องมีเรื่องเงินและการจ่ายด้วย — ไฟล์นี้คือตัวสำรองไว้กู้ระบบ
+          //   การจองผ่านเว็บเก็บยอดไว้ในคอลัมน์ amount ไม่ได้อยู่ในหมายเหตุ
+          //   ถ้าไม่มีคอลัมน์พวกนี้ กู้กลับมาแล้วไม่รู้ว่าใครจ่ายเท่าไหร่
           const rows = (await env.DB.prepare(
-            'SELECT id,room,checkin,checkout,name,phone,note,status,created,staff FROM bookings ORDER BY created,id').all()).results;
+            `SELECT id,room,checkin,checkout,name,phone,contact,note,status,created,staff,
+                    amount,pay,bf,beds,slip FROM bookings ORDER BY created,id`).all()).results;
           const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-          const head = ['รหัส','ห้อง','ชื่อห้อง','เช็คอิน','เช็คเอาท์','ชื่อลูกค้า','เบอร์โทร','หมายเหตุ','สถานะ','วันที่จอง','ผู้รับจอง'];
+          const PAY = { hold: 'ยังไม่ชำระ', slip: 'รอตรวจสลิป', expired: 'หมดเวลา',
+                        'ยกเลิกเอง': 'ลูกค้ายกเลิกเอง', 'ปฏิเสธ': 'ปฏิเสธสลิป',
+                        'ยกเลิกโดยพนักงาน': 'พนักงานยกเลิก' };
+          const head = ['รหัส','ห้อง','ชื่อห้อง','เช็คอิน','เช็คเอาท์','ชื่อลูกค้า','เบอร์โทร',
+                        'ช่องทางติดต่อ','หมายเหตุ','สถานะ','ยอดเงิน','สถานะการจ่าย',
+                        'อาหารเช้า','เตียงเสริม','มีสลิป','วันที่จอง','ผู้รับจอง'];
           const csv = '\uFEFF' + head.join(',') + '\n' + rows.map(b =>
-            [b.id, b.room, rooms[b.room] || b.room, b.checkin, b.checkout, b.name, b.phone, b.note, b.status, b.created, b.staff]
+            [b.id, b.room, rooms[b.room] || b.room, b.checkin, b.checkout, b.name, b.phone,
+             b.contact, b.note, b.status, b.amount ?? '',
+             b.pay ? (PAY[b.pay] || b.pay) : (b.status === 'จอง' ? 'ยืนยันแล้ว' : ''),
+             b.bf === null || b.bf === undefined ? '' : (b.bf ? 'รวม' : 'ไม่รวม'),
+             b.beds ?? '', b.slip ? 'มี' : '', b.created, b.staff]
               .map(esc).join(',')).join('\n');
           return new Response(csv, { headers: {
             'content-type': 'text/csv; charset=utf-8',
