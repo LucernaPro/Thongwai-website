@@ -114,6 +114,14 @@ async function init(db) {
   }
 
 
+  // ★ index ที่อ้างคอลัมน์ใหม่ ต้องสร้างหลัง ALTER เสมอ
+  //   เดิมอยู่ในชุดแรกพร้อม CREATE TABLE → ฐานข้อมูลใหม่จะ init ไม่ผ่านเลย
+  for (const q of ['CREATE INDEX IF NOT EXISTS ix_pay ON bookings (pay, expires)',
+                   'CREATE INDEX IF NOT EXISTS ix_checkin ON bookings (checkin)']) {
+    try { await db.prepare(q).run(); } catch (e) { /* ไม่สำคัญพอจะล้มทั้งระบบ */ }
+  }
+
+
   // migration 6 ก.ย. 2026: ราคารวม/ไม่รวมอาหารเช้า + เตียงเสริม
   // ทำทีละคำสั่งและกลืน error เอง — migration ล้มต้องไม่ทำให้ปฏิทินห้องว่างของลูกค้าล่มไปด้วย
   try {
@@ -171,6 +179,36 @@ async function init(db) {
     await db.prepare('INSERT INTO users (username,pass,role,created) VALUES (?,?,?,?)')
       .bind('admin', await makePw('2569'), 'admin', nowStamp()).run();
   }
+  // ★ ตั้งราคาสองแบบ + เตียงเสริม — ต้องรันหลัง seed ห้องเสมอ
+  //   เดิมอยู่ก่อน seed เลย UPDATE ไม่โดนอะไรสักแถว ห้องที่เพิ่มใหม่จะไม่มีราคารวมอาหารเช้า
+  //   เติมเฉพาะห้องที่ยังว่าง (price_bf IS NULL) ราคาที่ปรับเองภายหลังจะไม่โดนทับ
+  try {
+    const cols = (await db.prepare('PRAGMA table_info(rooms)').all()).results.map(r => r.name);
+    for (const q of ['ALTER TABLE rooms ADD COLUMN price_bf INTEGER',
+                     'ALTER TABLE rooms ADD COLUMN extra_max INTEGER']) {
+      if (!cols.includes(q.includes('price_bf') ? 'price_bf' : 'extra_max')) {
+        try { await db.prepare(q).run(); } catch (e) {}
+      }
+    }
+    const { miss } = await db.prepare('SELECT COUNT(*) AS miss FROM rooms WHERE price_bf IS NULL').first();
+    if (miss > 0) {
+      // [id, ไม่รวมอาหารเช้า, รวมอาหารเช้า, เสริมเตียงได้สูงสุด]
+      const P = [
+        ['R1', 2300, 2800, 5], ['R2', 1600, 2000, 4], ['R3', 1800, 2200, 2],
+        ['R4', 1800, 2200, 2], ['R5',  800, 1000, 1], ['R6',  800, 1000, 1],
+        ['R7', 1600, 2000, 4], ['R8', 3000, 4000, 2], ['R9', 3000, 4000, 2],
+      ];
+      for (const t of ['T1','T2','T3','T4','T5','T6','T7','T8']) P.push([t, 600, 800, 0]);
+      for (const [id, np, bp, ex] of P) {
+        try {
+          await db.prepare(
+            'UPDATE rooms SET price = ?, price_bf = ?, extra_max = ? WHERE id = ? AND price_bf IS NULL')
+            .bind(np, bp, ex, id).run();
+        } catch (e) {}
+      }
+    }
+  } catch (e) { /* ล้มก็ไม่ทำให้ระบบล่ม */ }
+
   ready = true;
 }
 
