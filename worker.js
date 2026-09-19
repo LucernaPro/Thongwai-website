@@ -83,8 +83,6 @@ async function init(db) {
       name TEXT NOT NULL, phone TEXT, note TEXT, status TEXT NOT NULL,
       created TEXT, staff TEXT)`),
     db.prepare(`CREATE INDEX IF NOT EXISTS ix_book ON bookings (room, status, checkin, checkout)`),
-    db.prepare(`CREATE INDEX IF NOT EXISTS ix_pay ON bookings (pay, expires)`),
-    db.prepare(`CREATE INDEX IF NOT EXISTS ix_checkin ON bookings (checkin)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS users (
       username TEXT PRIMARY KEY, pass TEXT NOT NULL, role TEXT NOT NULL, created TEXT)`),
     db.prepare(`CREATE TABLE IF NOT EXISTS audit (
@@ -107,6 +105,13 @@ async function init(db) {
     if (!cols.includes('beds'))    add.push('ALTER TABLE bookings ADD COLUMN beds INTEGER');
     for (const q of add) { try { await db.prepare(q).run(); } catch (e) { /* มีแล้วก็ข้าม */ } }
   } catch (e) { /* migration ล้มต้องไม่ทำให้ทั้งระบบล่ม */ }
+
+  // ★ index ที่อ้างคอลัมน์ใหม่ ต้องสร้างหลัง ALTER เสมอ
+  //   เดิมอยู่ในชุดแรกพร้อม CREATE TABLE → ฐานข้อมูลใหม่จะ init ไม่ผ่านเลย
+  for (const q of ['CREATE INDEX IF NOT EXISTS ix_pay ON bookings (pay, expires)',
+                   'CREATE INDEX IF NOT EXISTS ix_checkin ON bookings (checkin)']) {
+    try { await db.prepare(q).run(); } catch (e) { /* ไม่สำคัญพอจะล้มทั้งระบบ */ }
+  }
 
 
   // migration 6 ก.ย. 2026: ราคารวม/ไม่รวมอาหารเช้า + เตียงเสริม
@@ -535,7 +540,10 @@ async function uploadSlip(request, db, p, env) {
     `SELECT id,room,checkin,checkout,name,phone,amount,pay,status FROM bookings WHERE id = ? AND tok = ?`)
     .bind(id, tok).first();
   if (!b) return { ok: false, error: 'ไม่พบรายการนี้' };
-  if (b.status === 'ยกเลิก') return { ok: false, error: 'รายการนี้หมดเวลาไปแล้ว กรุณาจองใหม่' };
+  // ★ ห้ามตัดจบตรงนี้เมื่อสถานะเป็น 'ยกเลิก' — เดิมทำแบบนั้น ทำให้โค้ดกู้คืนห้องข้างล่างไม่เคยทำงาน
+  //   ปล่อยให้ไหลลงไปถึงขั้นกู้คืน ยกเว้นกรณีที่พนักงานตั้งใจปฏิเสธสลิปไปแล้ว
+  if (b.status === 'ยกเลิก' && b.pay === 'ปฏิเสธ')
+    return { ok: false, error: 'รายการนี้ถูกปฏิเสธไปแล้ว กรุณาติดต่อที่พัก' };
 
   const buf = await request.arrayBuffer();
   if (!buf.byteLength) return { ok: false, error: 'ไม่พบไฟล์สลิป' };
