@@ -310,9 +310,15 @@ async function addBooking(db, p, me) {
 }
 
 async function cancelBooking(db, p) {
-  const res = await db.prepare(`UPDATE bookings SET status = 'ยกเลิก' WHERE id = ?`)
-    .bind(p.get('id') || '').run();
-  return res.meta.changes ? { ok: true } : { ok: false, error: 'ไม่พบการจอง ' + p.get('id') };
+  // ทำเฉพาะรายการที่ยังเป็น 'จอง' — กดซ้ำไม่ควรรายงานว่าสำเร็จและไม่ควรเขียน audit เพิ่ม
+  // pay = 'ยกเลิกโดยพนักงาน' เพื่อให้หน้าตรวจระบบรู้ว่ามีคนตัดสินใจแล้ว
+  // ไม่งั้นรายการที่ลูกค้าจ่ายแล้วและพนักงานตั้งใจยกเลิก จะขึ้นแดงค้างตลอดไป
+  const res = await db.prepare(
+    `UPDATE bookings SET status = 'ยกเลิก', pay = 'ยกเลิกโดยพนักงาน', expires = NULL
+     WHERE id = ? AND status = 'จอง'`).bind(p.get('id') || '').run();
+  if (res.meta.changes) return { ok: true };
+  const row = await db.prepare('SELECT status FROM bookings WHERE id = ?').bind(p.get('id') || '').first();
+  return { ok: false, error: row ? 'รายการนี้ถูกยกเลิกไปแล้ว' : 'ไม่พบการจอง ' + p.get('id') };
 }
 
 
@@ -773,7 +779,7 @@ async function auditSystem(db, env) {
     `SELECT b.id,b.name,b.phone,b.checkin,b.pay,r.name AS roomName
      FROM bookings b LEFT JOIN rooms r ON r.id = b.room
      WHERE b.status = 'ยกเลิก' AND b.slip IS NOT NULL AND b.checkout >= ?
-       AND b.pay <> 'ปฏิเสธ'
+       AND b.pay NOT IN ('ปฏิเสธ', 'ยกเลิกโดยพนักงาน')
      ORDER BY b.checkin`).bind(today).all()).results;
   add(paidCancelled.length ? 'critical' : 'ok', 'จ่ายเงินแล้วแต่ถูกยกเลิก',
       paidCancelled.length ? 'ลูกค้าแนบสลิปไว้แต่รายการถูกยกเลิกโดยไม่มีใครตัดสินใจ ต้องติดต่อกลับด่วน (รายการที่พนักงานกดปฏิเสธเองไม่นับ)' : 'ไม่มีสลิปค้างอยู่กับรายการที่ยกเลิก',
