@@ -752,9 +752,10 @@ async function auditSystem(db, env) {
     `SELECT b.id,b.name,b.phone,b.checkin,b.pay,r.name AS roomName
      FROM bookings b LEFT JOIN rooms r ON r.id = b.room
      WHERE b.status = 'ยกเลิก' AND b.slip IS NOT NULL AND b.checkout >= ?
+       AND b.pay <> 'ปฏิเสธ'
      ORDER BY b.checkin`).bind(today).all()).results;
   add(paidCancelled.length ? 'critical' : 'ok', 'จ่ายเงินแล้วแต่ถูกยกเลิก',
-      paidCancelled.length ? 'ลูกค้าแนบสลิปไว้แต่รายการถูกยกเลิก ต้องติดต่อกลับด่วน' : 'ไม่มีสลิปค้างอยู่กับรายการที่ยกเลิก',
+      paidCancelled.length ? 'ลูกค้าแนบสลิปไว้แต่รายการถูกยกเลิกโดยไม่มีใครตัดสินใจ ต้องติดต่อกลับด่วน (รายการที่พนักงานกดปฏิเสธเองไม่นับ)' : 'ไม่มีสลิปค้างอยู่กับรายการที่ยกเลิก',
       paidCancelled.map(b => ({ text: `${b.name} · ${b.roomName || '-'} · เข้า ${b.checkin} · ${b.phone || '-'}`, ids: [b.id] })));
 
   // ไม่ใช่ข้อผิดพลาด แค่ให้เห็นว่าตอนนี้ตั้งเรตเทศกาลอะไรไว้บ้าง
