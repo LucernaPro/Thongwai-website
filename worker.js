@@ -122,31 +122,6 @@ async function init(db) {
   }
 
 
-  // migration 6 ก.ย. 2026: ราคารวม/ไม่รวมอาหารเช้า + เตียงเสริม
-  // ทำทีละคำสั่งและกลืน error เอง — migration ล้มต้องไม่ทำให้ปฏิทินห้องว่างของลูกค้าล่มไปด้วย
-  try {
-    const rc = (await db.prepare('PRAGMA table_info(rooms)').all()).results.map(r => r.name);
-    if (!rc.includes('price_bf')) {
-      for (const q of ['ALTER TABLE rooms ADD COLUMN price_bf INTEGER',
-                       'ALTER TABLE rooms ADD COLUMN extra_max INTEGER']) {
-        try { await db.prepare(q).run(); } catch (e) { /* มีอยู่แล้วก็ข้าม */ }
-      }
-      // [id, ไม่รวมอาหารเช้า, รวมอาหารเช้า, เสริมเตียงได้สูงสุด]
-      const P = [
-        ['R1', 2300, 2800, 5], ['R2', 1600, 2000, 4], ['R3', 1800, 2200, 2],
-        ['R4', 1800, 2200, 2], ['R5',  800, 1000, 1], ['R6',  800, 1000, 1],
-        ['R7', 1600, 2000, 4], ['R8', 3000, 4000, 2], ['R9', 3000, 4000, 2],
-      ];
-      for (const t of ['T1','T2','T3','T4','T5','T6','T7','T8']) P.push([t, 600, 800, 0]);
-      for (const [id, np, bp, ex] of P) {
-        try {
-          await db.prepare('UPDATE rooms SET price = ?, price_bf = ?, extra_max = ? WHERE id = ?')
-            .bind(np, bp, ex, id).run();
-        } catch (e) { /* ข้ามห้องที่มีปัญหา ไม่ล้มทั้งชุด */ }
-      }
-    }
-  } catch (e) { /* อ่านโครงตารางไม่ได้ก็ปล่อยผ่าน ให้ระบบเดินต่อ */ }
-
   const { c } = await db.prepare('SELECT COUNT(*) AS c FROM rooms').first();
   if (c === 0) {
     await db.batch(SEED_ROOMS.map(r =>
