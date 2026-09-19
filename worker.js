@@ -444,6 +444,18 @@ async function freeRooms(db, checkin, checkout, nearPrice) {
 }
 
 // สถานะการถือห้อง — หน้าเว็บ poll เพื่อนับถอยหลัง
+// ต่อเวลาถือห้องเงียบๆ เมื่อใกล้หมดแต่ยังไม่มีใครมาแย่ง
+// การตัดสิทธิ์มีประโยชน์ก็ต่อเมื่อมีคนรออยู่ — ถ้าห้องว่างอยู่ดี ตัดทิ้งคือเสียลูกค้าฟรีๆ
+async function extendIfNobodyWaiting(db, b) {
+  if (b.pay !== 'hold' || !b.expires) return b.expires;
+  if (b.expires - Date.now() > 60_000) return b.expires;      // ยังเหลือเวลาเยอะ ไม่ต้องยุ่ง
+  const next = Date.now() + GRACE_MS;
+  const r = await db.prepare(
+    `UPDATE bookings SET expires = ? WHERE id = ? AND pay = 'hold' AND status = 'จอง'`)
+    .bind(next, b.id).run();
+  return r.meta.changes ? next : b.expires;
+}
+
 async function holdStatus(db, p) {
   const b = await db.prepare(
     `SELECT b.id,b.room,r.name AS roomName,b.checkin,b.checkout,b.name,b.phone,
@@ -452,6 +464,7 @@ async function holdStatus(db, p) {
      WHERE b.id = ? AND b.tok = ?`)
     .bind(p.get('id') || '', p.get('tok') || '').first();
   if (!b) return { ok: false, error: 'ไม่พบรายการนี้' };
+  if (b.status === 'จอง') b.expires = await extendIfNobodyWaiting(db, b);
   if (b.pay === 'hold' && b.expires < Date.now()) return { ok: true, state: 'expired' };
   return { ok: true,
            state: b.status === 'ยกเลิก' ? 'cancelled' : (b.pay || 'confirmed'),
@@ -539,9 +552,29 @@ async function uploadSlip(request, db, p, env) {
   await env.SLIPS.put(key, buf, { httpMetadata: { contentType: 'image/jpeg' } });
 
   // expires = NULL → sweepHolds ไม่แตะอีก ห้องถูกถือไว้ไม่มีกำหนดจนกว่าพนักงานจะกด
-  await db.prepare(
-    `UPDATE bookings SET pay = 'slip', slip = ?, expires = NULL WHERE id = ?`).bind(key, id).run();
-  return { ok: true, booking: b };
+  // ★ ต้องมีเงื่อนไข status ในคำสั่งเดียวกัน — เดิมเช็คสถานะไว้ข้างบนแล้วค่อยเขียนทีหลัง
+  //   ระหว่างนั้นอัปรูปขึ้น R2 กินเวลา ถ้ามีคนเปิดปฏิทินพอดี sweepHolds จะยกเลิกคั่นกลาง
+  //   แล้วบรรทัดนี้ก็เขียนทับต่อไปเฉยๆ → ได้สลิปที่ติดอยู่กับรายการที่ถูกยกเลิกแล้ว
+  const upd = await db.prepare(
+    `UPDATE bookings SET pay = 'slip', slip = ?, expires = NULL
+     WHERE id = ? AND status = 'จอง'`).bind(key, id).run();
+  if (upd.meta.changes) return { ok: true, booking: b };
+
+  // ★ กู้คืนให้ลูกค้าที่จ่ายเงินมาแล้ว: หมดเวลาระหว่างไปโอน แต่ยังไม่มีใครเอาห้องไป
+  //   คืนห้องให้เขาเลย ดีกว่าให้ไปจองใหม่จนเกิดรายการซ้ำ (และดีกว่าเสียลูกค้าที่จ่ายแล้ว)
+  const revive = await db.prepare(
+    `UPDATE bookings SET status = 'จอง', pay = 'slip', slip = ?, expires = NULL
+     WHERE id = ?
+       AND NOT EXISTS (
+         SELECT 1 FROM bookings o
+         WHERE o.id <> bookings.id AND o.room = bookings.room AND o.status = 'จอง'
+           AND o.checkin < bookings.checkout AND bookings.checkin < o.checkout)`)
+    .bind(key, id).run();
+  if (revive.meta.changes) return { ok: true, revived: true, booking: b };
+
+  // ห้องถูกคนอื่นเอาไปแล้วจริงๆ — ลูกค้าจ่ายเงินมาแล้ว ต้องบอกให้ชัดว่าให้ติดต่อที่พัก
+  return { ok: false,
+    error: 'ห้องนี้ถูกจองโดยท่านอื่นไปแล้วระหว่างที่ท่านชำระเงิน สลิปของท่านถูกบันทึกไว้แล้ว กรุณาติดต่อที่พักทางโทรศัพท์หรือไลน์ทันที' };
 }
 
 // ส่งรูปสลิปให้หน้า admin (ต้อง login แล้วเท่านั้น)
@@ -713,6 +746,16 @@ async function auditSystem(db, env) {
   if (!env.SLIPS) cfg.push({ text: 'ยังไม่ได้ผูกที่เก็บสลิป — ลูกค้าแนบสลิปไม่ได้', ids: [] });
   add(cfg.length ? 'critical' : 'ok', 'ระบบรับชำระเงิน',
       cfg.length ? 'ลูกค้าจะจ่ายเงินไม่ได้' : 'QR และที่เก็บสลิปพร้อมใช้งาน', cfg);
+
+  // สลิปติดอยู่กับรายการที่ถูกยกเลิก = ลูกค้าจ่ายเงินแล้วแต่ไม่ได้ห้อง ต้องตามคืนเงินหรือคืนห้อง
+  const paidCancelled = (await db.prepare(
+    `SELECT b.id,b.name,b.phone,b.checkin,b.pay,r.name AS roomName
+     FROM bookings b LEFT JOIN rooms r ON r.id = b.room
+     WHERE b.status = 'ยกเลิก' AND b.slip IS NOT NULL AND b.checkout >= ?
+     ORDER BY b.checkin`).bind(today).all()).results;
+  add(paidCancelled.length ? 'critical' : 'ok', 'จ่ายเงินแล้วแต่ถูกยกเลิก',
+      paidCancelled.length ? 'ลูกค้าแนบสลิปไว้แต่รายการถูกยกเลิก ต้องติดต่อกลับด่วน' : 'ไม่มีสลิปค้างอยู่กับรายการที่ยกเลิก',
+      paidCancelled.map(b => ({ text: `${b.name} · ${b.roomName || '-'} · เข้า ${b.checkin} · ${b.phone || '-'}`, ids: [b.id] })));
 
   // ไม่ใช่ข้อผิดพลาด แค่ให้เห็นว่าตอนนี้ตั้งเรตเทศกาลอะไรไว้บ้าง
   const upcoming = SEASONS.filter(x => x.to >= today);
