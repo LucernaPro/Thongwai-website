@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Check Availability — Live Calendar | Thongwai Homestay, Paksong</title>
-<meta name="description" content="Check room and tent availability at Thongwai Homestay — live calendar up to 3 months ahead, updated from the resort booking records. Book direct: +856 20 91 555 288">
+<meta name="description" content="Check room and tent availability at Thongwai Homestay — live calendar up to 1 year ahead, updated from the resort booking records. Book direct: +856 20 91 555 288">
 <link rel="icon" type="image/png" href="/images/favicon.png">
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 <link rel="canonical" href="https://thongwaihomestay.com/en/availability/">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thongwaihomestay.com/en/availability/">
 <meta property="og:title" content="Check Availability | Thongwai Homestay, Paksong">
-<meta property="og:description" content="Live availability for every house and tent, up to 3 months ahead. Book direct with the owner.">
+<meta property="og:description" content="Live availability for every house and tent, up to 1 year ahead. Book direct with the owner.">
 <meta property="og:image" content="https://thongwaihomestay.com/images/hero-entrance.webp">
 <meta property="og:locale" content="en_US">
 <script>
@@ -99,7 +99,7 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">Availability</div>
     <h2 style="color:var(--white)">Pick your dates</h2>
-    <p class="lead">Select a date on the calendar to check availability for every house and tent, up to 3 months ahead</p>
+    <p class="lead">Select a date on the calendar to check availability for every house and tent, up to 1 year ahead</p>
 
     <div class="bway">
       <p class="bway-h">The easiest way — message us directly</p>
@@ -158,7 +158,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <script>
 
 const BOOKING_API = '/api';
-const AVW_DAYS = 92;      
+const AVW_DAYS = 366;     
 (async () => {
   const fail = () => {
     document.getElementById('avwLoad').style.display = 'none';
@@ -276,7 +276,7 @@ const AVW_DAYS = 92;
   render();
   window.__avwReload = async () => {           
     try {
-      const r = await (await fetch('/api?action=availability&days=120')).json();
+      const r = await (await fetch('/api?action=availability&days=' + AVW_DAYS)).json();
       if (r.ok) { D.rooms = r.rooms; D.booked = r.booked; render(); }
     } catch (e) {}
   };

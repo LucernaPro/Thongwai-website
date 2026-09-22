@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>เช็คห้องว่าง — ปฏิทินห้องว่างทุกเฮือน | ทุ่งหวายโฮมสเตย์ ปากซอง</title>
-<meta name="description" content="เช็คห้องว่างทุ่งหวายโฮมสเตย์ด้วยตัวเอง — ปฏิทินห้องว่างทุกเฮือนและเต็นท์ ดูล่วงหน้าได้ 3 เดือน อัปเดตจากสมุดจองจริง จองตรงกับเจ้าของ โทร +856 20 91 555 288">
+<meta name="description" content="เช็คห้องว่างทุ่งหวายโฮมสเตย์ด้วยตัวเอง — ปฏิทินห้องว่างทุกเฮือนและเต็นท์ ดูล่วงหน้าได้ 1 ปี อัปเดตจากสมุดจองจริง จองตรงกับเจ้าของ โทร +856 20 91 555 288">
 <link rel="icon" type="image/png" href="/images/favicon.png">
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 <link rel="canonical" href="https://thongwaihomestay.com/availability/">
@@ -15,7 +15,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thongwaihomestay.com/availability/">
 <meta property="og:title" content="เช็คห้องว่าง | ทุ่งหวายโฮมสเตย์ ปากซอง">
-<meta property="og:description" content="ปฏิทินห้องว่างทุกเฮือนและเต็นท์ ดูล่วงหน้าได้ 3 เดือน จองตรงกับเจ้าของ">
+<meta property="og:description" content="ปฏิทินห้องว่างทุกเฮือนและเต็นท์ ดูล่วงหน้าได้ 1 ปี จองตรงกับเจ้าของ">
 <meta property="og:image" content="https://thongwaihomestay.com/images/hero-entrance.webp">
 <meta property="og:locale" content="th_TH">
 <script>
@@ -95,7 +95,7 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">เช็คห้องว่าง</div>
     <h2 style="color:var(--white)">เลือกวันที่เข้าพัก</h2>
-    <p class="lead">เลือกวันที่ในปฏิทินเพื่อตรวจสอบห้องว่างของทุกเฮือนและเต็นท์ ตรวจสอบล่วงหน้าได้สูงสุด 3 เดือน</p>
+    <p class="lead">เลือกวันที่ในปฏิทินเพื่อตรวจสอบห้องว่างของทุกเฮือนและเต็นท์ ตรวจสอบล่วงหน้าได้ 1 ปี</p>
 
     <div class="bway">
       <p class="bway-h">จองง่ายที่สุด — ทักมาคุยกับเจ้าของ</p>
@@ -154,7 +154,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <script>
 // ═══ ปฏิทินห้องว่างรายเดือน (ย้ายจากหน้าแรก 19 ส.ค. 2026) ═══
 const BOOKING_API = '/api';
-const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
+const AVW_DAYS = 366;     // ดูล่วงหน้า 1 ปีเต็ม — มีลูกค้าจองข้ามปีจริง
 (async () => {
   const fail = () => {
     document.getElementById('avwLoad').style.display = 'none';
@@ -271,7 +271,7 @@ const AVW_DAYS = 92;      // ดูล่วงหน้า ~3 เดือน
   render();
   window.__avwReload = async () => {           // โหลดปฏิทินใหม่หลังจองสำเร็จ
     try {
-      const r = await (await fetch('/api?action=availability&days=120')).json();
+      const r = await (await fetch('/api?action=availability&days=' + AVW_DAYS)).json();
       if (r.ok) { D.rooms = r.rooms; D.booked = r.booked; render(); }
     } catch (e) {}
   };

@@ -253,7 +253,7 @@ async function userSetPw(db, p) {
 /* ── actions ── */
 async function availability(db, p) {
   const from = isDate(p.get('from')) ? p.get('from') : todayStr();
-  const days = Math.min(Number(p.get('days')) || 30, 120);
+  const days = Math.min(Number(p.get('days')) || 30, 400);   // ลูกค้าจองข้ามปีจริง (ปีใหม่/สงกรานต์) ต้องเห็นได้
   const to = addDays(from, days);
   const rooms = (await db.prepare('SELECT id,name FROM rooms ORDER BY sort').all()).results;
   const rows = (await db.prepare(

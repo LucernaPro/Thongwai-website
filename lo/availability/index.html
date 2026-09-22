@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ກວດເບິ່ງຫ້ອງວ່າງ — ປະຕິທິນທຸກເຮືອນ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ</title>
-<meta name="description" content="ກວດເບິ່ງຫ້ອງວ່າງທົ່ງຫວາຍໂຮມສະເຕດ້ວຍຕົນເອງ — ປະຕິທິນຫ້ອງວ່າງທຸກເຮືອນ ແລະ ເຕັນ ເບິ່ງລ່ວງໜ້າໄດ້ 3 ເດືອນ ຈອງກົງກັບເຈົ້າຂອງ ໂທ +856 20 91 555 288">
+<meta name="description" content="ກວດເບິ່ງຫ້ອງວ່າງທົ່ງຫວາຍໂຮມສະເຕດ້ວຍຕົນເອງ — ປະຕິທິນຫ້ອງວ່າງທຸກເຮືອນ ແລະ ເຕັນ ເບິ່ງລ່ວງໜ້າໄດ້ 1 ປີ ຈອງກົງກັບເຈົ້າຂອງ ໂທ +856 20 91 555 288">
 <link rel="icon" type="image/png" href="/images/favicon.png">
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 <link rel="canonical" href="https://thongwaihomestay.com/lo/availability/">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thongwaihomestay.com/lo/availability/">
 <meta property="og:title" content="ກວດເບິ່ງຫ້ອງວ່າງ | ທົ່ງຫວາຍໂຮມສະເຕ ປາກຊ່ອງ">
-<meta property="og:description" content="ປະຕິທິນຫ້ອງວ່າງທຸກເຮືອນ ແລະ ເຕັນ ເບິ່ງລ່ວງໜ້າໄດ້ 3 ເດືອນ ຈອງກົງກັບເຈົ້າຂອງ">
+<meta property="og:description" content="ປະຕິທິນຫ້ອງວ່າງທຸກເຮືອນ ແລະ ເຕັນ ເບິ່ງລ່ວງໜ້າໄດ້ 1 ປີ ຈອງກົງກັບເຈົ້າຂອງ">
 <meta property="og:image" content="https://thongwaihomestay.com/images/hero-entrance.webp">
 <meta property="og:locale" content="lo_LA">
 <script>
@@ -99,7 +99,7 @@ if (location.hostname.endsWith('workers.dev')) {
   <div class="wrap">
     <div class="eyebrow">ກວດຫ້ອງວ່າງ</div>
     <h2 style="color:var(--white)">ເລືອກວັນທີເຂົ້າພັກ</h2>
-    <p class="lead">ເລືອກວັນທີໃນປະຕິທິນເພື່ອກວດເບິ່ງຫ້ອງວ່າງຂອງທຸກເຮືອນ ແລະ ເຕັນ ກວດລ່ວງໜ້າໄດ້ສູງສຸດ 3 ເດືອນ</p>
+    <p class="lead">ເລືອກວັນທີໃນປະຕິທິນເພື່ອກວດເບິ່ງຫ້ອງວ່າງຂອງທຸກເຮືອນ ແລະ ເຕັນ ກວດລ່ວງໜ້າໄດ້ 1 ປີ</p>
 
     <div class="bway">
       <p class="bway-h">ຈອງງ່າຍທີ່ສຸດ — ທັກມາລົມກັບເຈົ້າຂອງ</p>
@@ -158,7 +158,7 @@ if (location.hostname.endsWith('workers.dev')) {
 <script>
 
 const BOOKING_API = '/api';
-const AVW_DAYS = 92;      
+const AVW_DAYS = 366;     
 (async () => {
   const fail = () => {
     document.getElementById('avwLoad').style.display = 'none';
@@ -276,7 +276,7 @@ const AVW_DAYS = 92;
   render();
   window.__avwReload = async () => {           
     try {
-      const r = await (await fetch('/api?action=availability&days=120')).json();
+      const r = await (await fetch('/api?action=availability&days=' + AVW_DAYS)).json();
       if (r.ok) { D.rooms = r.rooms; D.booked = r.booked; render(); }
     } catch (e) {}
   };
