@@ -927,7 +927,7 @@ export default {
           if (me.role !== 'admin') return json({ ok: false, error: 'เฉพาะเจ้าของเท่านั้น' });
           const rooms = (await env.DB.prepare('SELECT id,name,sort,price FROM rooms ORDER BY sort').all()).results;
           const all = (await env.DB.prepare(
-            'SELECT room,checkin,checkout,created,phone,name,status FROM bookings').all()).results;
+            'SELECT room,checkin,checkout,created,phone,name,status,amount,pay FROM bookings').all()).results;
           const roomSet = new Set(rooms.map(r => r.id));
           const CAP = rooms.length || 1;
           const today = todayStr();
@@ -1308,7 +1308,65 @@ export default {
 
           advice.sort((a, b) => a.sev - b.sev);
 
-          return json({ ok: true,
+          /* ── รายสัปดาห์: การจองที่ "เข้ามา" ในแต่ละวัน แล้วนับย้อนหลัง 7 วันตลอด ──
+             ต่างจากอัตราเข้าพัก (ซึ่งดูวันที่ "มาพัก") ตัวนี้ดูจังหวะที่ลูกค้าตัดสินใจจอง
+             เหมาะกับการจับว่าสัปดาห์นี้เงียบหรือคึกกว่าปกติ โดยไม่ต้องรอให้วันเข้าพักมาถึง */
+          const byDay = {};
+          for (const b of all) {
+            const d = (b.created || '').slice(0, 10);
+            if (!isDate(d)) continue;
+            if (!byDay[d]) byDay[d] = { n: 0, nights: 0, baht: 0, cx: 0, web: 0 };
+            const x = byDay[d];
+            if (b.status === 'จอง') {
+              x.n++; x.nights += nightsOf(b);
+              if (b.amount) x.baht += Number(b.amount) || 0;
+              if (b.pay !== undefined && (b.pay === null || b.pay === 'slip' || b.pay === 'hold') && b.amount) x.web++;
+            } else if (b.pay !== 'expired' && b.pay !== 'ยกเลิกเอง') {
+              x.cx++;                      // ยกเลิกจริง ไม่นับการถือห้องที่หมดเวลาเอง
+            }
+          }
+          const DAYS_BACK = 84;            // 12 สัปดาห์
+          const dayRows = [];
+          for (let i = DAYS_BACK - 1; i >= 0; i--) {
+            const d = addDaysStr(today, -i);
+            const x = byDay[d] || { n: 0, nights: 0, baht: 0, cx: 0, web: 0 };
+            dayRows.push({ d, w: N(d).getUTCDay(), ...x });
+          }
+          // ยอดย้อนหลัง 7 วัน ณ ทุกวัน (rolling)
+          for (let i = 0; i < dayRows.length; i++) {
+            let n = 0, nights = 0, baht = 0, cx = 0;
+            for (let k = Math.max(0, i - 6); k <= i; k++) {
+              n += dayRows[k].n; nights += dayRows[k].nights; baht += dayRows[k].baht; cx += dayRows[k].cx;
+            }
+            dayRows[i].r7 = { n, nights, baht, cx };
+          }
+          // แบ่งเป็นบล็อก 7 วัน ย้อนจากวันนี้ 12 บล็อก เทียบบล็อกก่อนหน้า
+          const weekRows = [];
+          for (let wk = 0; wk < 12; wk++) {
+            const end = dayRows.length - 1 - wk * 7, start = end - 6;
+            if (start < 0) break;
+            let n = 0, nights = 0, baht = 0, cx = 0, web = 0;
+            for (let k = start; k <= end; k++) {
+              n += dayRows[k].n; nights += dayRows[k].nights; baht += dayRows[k].baht;
+              cx += dayRows[k].cx; web += dayRows[k].web;
+            }
+            weekRows.push({ from: dayRows[start].d, to: dayRows[end].d, n, nights, baht, cx, web });
+          }
+          for (let i = 0; i < weekRows.length; i++) {
+            const prev = weekRows[i + 1];
+            weekRows[i].dN = prev ? weekRows[i].n - prev.n : null;
+            weekRows[i].dNights = prev ? weekRows[i].nights - prev.nights : null;
+          }
+          const last8 = weekRows.slice(1, 9);
+          const avgN = last8.length ? last8.reduce((a, w) => a + w.n, 0) / last8.length : 0;
+          const weekly = {
+            days: dayRows.slice(-28),          // 4 สัปดาห์ล่าสุดสำหรับกราฟรายวัน
+            weeks: weekRows,
+            now: weekRows[0] || null,
+            avg8: Math.round(avgN * 10) / 10,   // ค่าเฉลี่ย 8 สัปดาห์ก่อนหน้า ไว้เทียบว่าคึกหรือเงียบ
+          };
+
+          return json({ ok: true, weekly,
             months: monthRows, dow: dowRows, seasons: seasonRows, rooms: roomRows,
             lead, stay, repeat: repeatRows, forward: daily,
             alerts: alerts.slice(0, 8), weak: weak.slice(0, 4), horizon,

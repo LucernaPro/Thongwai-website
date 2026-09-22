@@ -26,6 +26,15 @@ h2{font-family:'Mitr';color:var(--glow);font-size:1rem;margin:26px 0 4px}
 .bars .b i{display:block;background:var(--lantern);border-radius:4px 4px 0 0;min-height:2px}
 .bars .b.now i{background:var(--ok)}
 .bars .b small{font-size:.62rem;opacity:.7;margin-top:4px;white-space:nowrap}
+.bars .b.we i{background:var(--glow)}
+.bars .b.zero i{background:rgba(255,255,255,.12)}
+.wk{width:100%;border-collapse:collapse;font-size:.86rem}
+.wk th,.wk td{padding:8px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
+.wk th{font-weight:500;opacity:.7;text-align:right}
+.wk th:first-child,.wk td:first-child{text-align:left}
+.wk tr.now td{background:rgba(120,200,160,.10);font-weight:600}
+.wk .up{color:var(--ok)} .wk .dn{color:#ffb0a5} .wk .same{opacity:.5}
+.wk-line{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none}
 .bars .b em{font-style:normal;font-size:.66rem;color:var(--glow)}
 .bars .b.thin{opacity:.38}
 .hrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.85rem}
@@ -108,6 +117,18 @@ a{color:var(--glow)}
 
 <div id="app" class="wrap" style="display:none">
   <div class="cards" id="kpis"></div>
+
+  <h2>📈 รายสัปดาห์ — การจองที่เข้ามา</h2>
+  <div class="sub">นับตาม <b>วันที่ลูกค้าจอง</b> ไม่ใช่วันเข้าพัก แล้วรวมย้อนหลัง 7 วันตลอด —
+  ตัวนี้บอกว่าสัปดาห์นี้ลูกค้าตัดสินใจจองมากหรือน้อยกว่าปกติ โดยไม่ต้องรอให้วันเข้าพักมาถึง</div>
+  <div class="cards" id="wkKpi"></div>
+  <div class="card">
+    <div class="sub" style="margin-top:0">28 วันล่าสุด · แท่ง = จองใหม่ในวันนั้น · เส้นทอง = รวมย้อนหลัง 7 วัน · ศุกร์-เสาร์สีเข้ม</div>
+    <div class="bars" style="height:140px;position:relative" id="wkBars"></div>
+  </div>
+  <div class="card" style="margin-top:10px;padding:0;overflow:auto">
+    <table class="wk" id="wkTable"></table>
+  </div>
 
   <h2>💡 อ่านตัวเลขให้แล้ว — ควรโฟกัสอะไร</h2>
   <div class="sub">แปลจากข้อมูลข้างล่างทั้งหมด เปลี่ยนเองทุกวันตามการจองที่เข้ามา ·
@@ -232,6 +253,45 @@ function render(d){
     ['อัตรายกเลิก', s.cancelPct + '%', '12 เดือนล่าสุด ' + s.cancelRecentPct + '%'],
     ['จองล่วงหน้าค้างอยู่', s.futureBookings + ' รายการ', 'สะสม ' + s.totalNights.toLocaleString() + ' คืน'],
   ].map(([k,v,i]) => `<div class="card kpi"><b>${v}</b><span>${k}</span><i>${i}</i></div>`).join('');
+
+  /* ── รายสัปดาห์ ── */
+  if (d.weekly && d.weekly.now) {
+    const W = d.weekly, now = W.now, prev = W.weeks[1];
+    const delta = (a, b) => b == null ? '' : a - b === 0 ? 'เท่าสัปดาห์ก่อน' : (a - b > 0 ? '+' : '') + (a - b) + ' จากสัปดาห์ก่อน';
+    const vsAvg = W.avg8 ? Math.round((now.n / W.avg8 - 1) * 100) : null;
+    const mood = vsAvg == null ? '' : vsAvg >= 20 ? 'คึกกว่าปกติ' : vsAvg <= -20 ? 'เงียบกว่าปกติ' : 'ใกล้เคียงปกติ';
+    $('wkKpi').innerHTML = [
+      ['จองเข้ามา 7 วันล่าสุด', now.n + ' รายการ', delta(now.n, prev && prev.n)],
+      ['คืนที่ขายได้ 7 วันล่าสุด', now.nights + ' คืน', delta(now.nights, prev && prev.nights)],
+      ['เทียบค่าเฉลี่ย 8 สัปดาห์', vsAvg == null ? '-' : (vsAvg > 0 ? '+' : '') + vsAvg + '%', mood + ' (เฉลี่ย ' + W.avg8 + ' รายการ)'],
+      ['ยกเลิก 7 วันล่าสุด', now.cx + ' รายการ', delta(now.cx, prev && prev.cx)],
+    ].map(([k,v,i]) => `<div class="card kpi"><b>${v}</b><span>${k}</span><i>${i}</i></div>`).join('');
+
+    const days = W.days, maxN = Math.max(1, ...days.map(x => x.n)), maxR = Math.max(1, ...days.map(x => x.r7.n));
+    const DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+    $('wkBars').innerHTML = days.map((x, i) => {
+      const cls = (x.w === 5 || x.w === 6) ? ' we' : x.n === 0 ? ' zero' : '';
+      const h = x.n === 0 ? 2 : Math.max(6, Math.round(x.n / maxN * 100));
+      const lab = (i % 7 === 0 || i === days.length - 1) ? x.d.slice(5) : DOW[x.w];
+      return `<div class="b${cls}" title="${x.d} · จอง ${x.n} · รวม 7 วัน ${x.r7.n}"><i style="height:${h}%"></i><small>${lab}</small></div>`;
+    }).join('') +
+      // เส้นรวมย้อนหลัง 7 วัน
+      `<svg class="wk-line" viewBox="0 0 ${days.length} 100" preserveAspectRatio="none">
+        <polyline fill="none" stroke="var(--glow)" stroke-width="1.5" vector-effect="non-scaling-stroke"
+          points="${days.map((x, i) => (i + 0.5) + ',' + (100 - Math.round(x.r7.n / maxR * 88) - 12)).join(' ')}"/>
+      </svg>`;
+
+    const fmt = v => v == null ? '<span class="same">–</span>' : v > 0 ? `<span class="up">+${v}</span>` : v < 0 ? `<span class="dn">${v}</span>` : '<span class="same">0</span>';
+    const th = s => s.slice(5).replace('-', '/');
+    $('wkTable').innerHTML = `<tr><th>ช่วง 7 วัน</th><th>จอง</th><th>เทียบก่อน</th><th>คืน</th><th>เทียบก่อน</th><th>ผ่านเว็บ</th><th>ยกเลิก</th><th>ยอดเงิน*</th></tr>` +
+      W.weeks.map((w, i) => `<tr class="${i === 0 ? 'now' : ''}">
+        <td>${th(w.from)} – ${th(w.to)}${i === 0 ? ' · ล่าสุด' : ''}</td>
+        <td>${w.n}</td><td>${fmt(w.dN)}</td>
+        <td>${w.nights}</td><td>${fmt(w.dNights)}</td>
+        <td>${w.web}</td><td>${w.cx}</td>
+        <td>${w.baht ? '฿' + w.baht.toLocaleString() : '<span class="same">–</span>'}</td></tr>`).join('') +
+      `<tr><td colspan="8" style="text-align:left;font-size:.75rem;opacity:.6;font-weight:400">*ยอดเงินนับเฉพาะรายการที่จองผ่านเว็บ (ระบบล็อกยอดไว้) รายการคีย์มือยอดอยู่ในหมายเหตุ ไม่รวมในนี้</td></tr>`;
+  }
 
   /* ── 90 วันข้างหน้า ── */
   $('chFwd').innerHTML = d.forward.map(x => {
